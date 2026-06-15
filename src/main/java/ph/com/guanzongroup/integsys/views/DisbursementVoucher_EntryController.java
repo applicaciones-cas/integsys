@@ -1666,8 +1666,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         loadRecordMasterJEP();
                         break;
                 }
-            }
-    );
+            });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /*Lost Focus*/
@@ -1847,7 +1846,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         break;
                     case "tfSupplierBank":
                         if (lsValue.isEmpty()) {
-                            
+
                         }
                         break;
                     case "tfSupplierAccountNoBTransfer":

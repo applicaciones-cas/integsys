@@ -9,7 +9,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import javafx.scene.control.Pagination;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -493,16 +491,23 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
 
     private List<String> checkJEorJEP() {
         List<String> titles = new ArrayList<>();
-        // allows JE and JEP to have value
-        // require to review, either of two, if one have value then require it to check tab
-        // if two have value require to check it both
-        // if neither have value message that any of JE or JEP or both must have value
-        // question is how to define valid entry for both 
-        if (!JFXUtil.isObjectEqualTo(poController.Journal().Detail(0).getAccountCode(), null, "")) {
-            titles.add("Journal Entry");
-        }
-        if (!JFXUtil.isObjectEqualTo(poController.JournalProposal(0).Detail(0).getAccountCode(), null, "")) {
-            titles.add("Journal Proposal");
+        try {
+            // allows JE and JEP to have value
+            // require to review, either of two, if one have value then require it to check tab
+            // if two have value require to check it both
+            // if neither have value message that any of JE or JEP or both must have value
+            // question is how to define valid entry for both
+            if (!poController.existJournal().equals("")) {
+                titles.add("Journal Entry");
+            }
+            if (poController.getJournalProposalList().size() >= 1) {
+                if (!JFXUtil.isObjectEqualTo(poController.JournalProposal(0).Detail(0).getAccountCode(), null, "")) {
+                    titles.add("Journal Proposal");
+                }
+            }
+            return titles;
+        } catch (SQLException ex) {
+            Logger.getLogger(DisbursementVoucher_VerificationController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return titles;
     }
