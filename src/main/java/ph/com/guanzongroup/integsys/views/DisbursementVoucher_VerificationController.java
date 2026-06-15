@@ -1627,6 +1627,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         }
                         loadRecordMasterJE();
                         break;
+                    case "taJournalProposalRemarks":
+                        poJSON = poController.JournalProposal(pnMainJEP).Master().setRemarks(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        loadRecordMasterJEP();
+                        break;
                 }
             });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
