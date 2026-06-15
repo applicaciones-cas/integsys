@@ -38,7 +38,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -1549,12 +1548,12 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     return;
                 }
             }
-
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
             boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
-
-            JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
-            JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            if (lbStat) {
+                JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
+                JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
             //for hiding purposes
@@ -1608,7 +1607,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-
 
     public void loadRecordDetailJEP() {
         try {

@@ -2769,9 +2769,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
             boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
-
-            JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
-            JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            if (lbStat) {
+                JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
+                JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
             //for hiding purposes

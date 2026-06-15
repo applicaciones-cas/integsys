@@ -631,7 +631,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     if (pnEditMode == EditMode.READY && !DisbursementStatic.APPROVED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to approve this transaction?")) { //requires to review journal entry
 //                            if (!poController.existJournal().equals("")) {
-                           if (!checkJEorJEPSaving()) {
+                            if (!checkJEorJEPSaving()) {
                                 break;
                             } else {
                                 poJSON = poController.ApproveTransaction("");
@@ -2804,12 +2804,12 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     return;
                 }
             }
-
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
             boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
-
-            JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
-            JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            if (lbStat) {
+                JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
+                JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
             //for hiding purposes
@@ -3113,7 +3113,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
                 poJSON = new JSONObject();
                 String inputText = datePicker.getEditor().getText();
-                LocalDate  transactionDate = null, referenceDate = null, periodToDate = null, periodFromDate = null;
+                LocalDate transactionDate = null, referenceDate = null, periodToDate = null, periodFromDate = null;
                 String lsTransDate = "", lsRefDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
                 switch (datePicker.getId()) {
                     case "dpCheckDate":

@@ -2742,9 +2742,10 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             }
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
             boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
-
-            JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
-            JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            if (lbStat) {
+                JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
+                JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+            }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
             //for hiding purposes
@@ -3049,7 +3050,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
                 poJSON = new JSONObject();
                 String inputText = datePicker.getEditor().getText();
-                LocalDate  transactionDate = null, referenceDate = null, periodToDate = null, periodFromDate = null;
+                LocalDate transactionDate = null, referenceDate = null, periodToDate = null, periodFromDate = null;
                 String lsTransDate = "", lsRefDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
                 switch (datePicker.getId()) {
                     case "dpCheckDate":
