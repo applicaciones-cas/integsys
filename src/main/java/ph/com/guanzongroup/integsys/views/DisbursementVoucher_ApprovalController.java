@@ -518,22 +518,23 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         if ((titles.contains("Journal Entry")) && (titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalTab && !pbIsCheckedJournalProposalTab) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal before saving.");
-                return true;
+                return false;
             }
         } else if ((titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalProposalTab) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal before saving.");
-                return true;
+                return false;
             }
         } else if (titles.contains("Journal Entry")) {
             if (!pbIsCheckedJournalTab) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                return true;
+                return false;
             }
         } else {
             ShowMessageFX.Warning(null, pxeModuleName, "No journal entry or journal proposal found. Add either one or both and save before verifying.");
+            return false;
         }
-        return false;
+        return true;
     }
 
     private void cmdButton_Click(ActionEvent event) {
@@ -630,8 +631,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     if (pnEditMode == EditMode.READY && !DisbursementStatic.APPROVED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to approve this transaction?")) { //requires to review journal entry
 //                            if (!poController.existJournal().equals("")) {
-                            if (!checkJEorJEPSaving()) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                           if (!checkJEorJEPSaving()) {
                                 break;
                             } else {
                                 poJSON = poController.ApproveTransaction("");
