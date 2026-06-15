@@ -3082,7 +3082,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
                 poJSON = new JSONObject();
                 String inputText = datePicker.getEditor().getText();
-                LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate = null, periodFromDate = null;
+                LocalDate transactionDate = null, referenceDate = null, periodToDate = null, periodFromDate = null;
                 String lsTransDate = "", lsRefDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
                 switch (datePicker.getId()) {
                     case "dpCheckDate":
@@ -3091,7 +3091,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (pbSuccess && (selectedDate.isBefore(transactionDate))) {
+                            if (pbSuccess && (ldSelectedDate.isBefore(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
@@ -3114,12 +3114,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsTransDate = sdfFormat.format(poController.Journal().Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (selectedDate.isAfter(currentDate)) {
+                            if (ldSelectedDate.isAfter(ldCurrentDate)) {
                                 JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
 
-                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
+                            if (pbSuccess && (ldSelectedDate.isAfter(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Report date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
@@ -3141,11 +3141,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsTransDate = sdfFormat.format(poController.JournalProposal(pnMainJEP).Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (selectedDate.isAfter(currentDate)) {
+                            if (ldSelectedDate.isAfter(ldCurrentDate)) {
                                 JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
-                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
+                            if (pbSuccess && (ldSelectedDate.isAfter(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Report date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
@@ -3168,7 +3168,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsPeriodToDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodTo());
                             periodToDate = LocalDate.parse(lsPeriodToDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (pbSuccess && (selectedDate.isAfter(periodToDate))) {
+                            if (pbSuccess && (ldSelectedDate.isAfter(periodToDate))) {
                                 JFXUtil.setJSONError(poJSON, "Period From cannot be later than the \"Period To\" date.");
                                 pbSuccess = false;
                             }
@@ -3190,7 +3190,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsPeriodFromDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
                             periodFromDate = LocalDate.parse(lsPeriodFromDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (pbSuccess && (selectedDate.isBefore(periodFromDate))) {
+                            if (pbSuccess && (ldSelectedDate.isBefore(periodFromDate))) {
                                 JFXUtil.setJSONError(poJSON, "Period To cannot be before than the \"Period From\" date.");
                                 pbSuccess = false;
                             }
