@@ -98,7 +98,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 public class DisbursementVoucher_EntryController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    private JSONObject poJSON, poJSONVAT;
+    private JSONObject poJSON;
     JFXUtil.StageManager stageView = new JFXUtil.StageManager();
     private static final int ROWS_PER_PAGE = 50;
     private int pnMain = 0;

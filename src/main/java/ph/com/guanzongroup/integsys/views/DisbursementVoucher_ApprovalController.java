@@ -97,7 +97,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 public class DisbursementVoucher_ApprovalController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    private JSONObject poJSON, poJSONVAT;
+    private JSONObject poJSON;
     JFXUtil.StageManager stageView = new JFXUtil.StageManager();
     private static final int ROWS_PER_PAGE = 50;
     private int pnMain = 0;
@@ -110,7 +110,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     private boolean pbIsCheckedJournalTab = false;
     private boolean pbIsCheckedJournalProposalTab = false;
     private boolean pbIsCheckedBIRTab = false;
-    private boolean pbIsCheckedAttachmentTab = false;
     private final String pxeModuleName = "Disbursement Voucher Verification";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -399,7 +398,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                            pbIsCheckedAttachmentTab = true;
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
