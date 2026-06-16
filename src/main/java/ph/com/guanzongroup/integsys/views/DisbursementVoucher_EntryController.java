@@ -2140,6 +2140,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         if (tfCreditAmount.isFocused()) {
                             pbEnteredJE = true;
                         }
+                        if (tfJournalProposalCreditAmount.isFocused()) {
+                            pbEnteredJEP = true;
+                        }
                         if (tfBaseAmount.isFocused()) {
                             pbEnteredBIR = true;
                         }
@@ -2777,8 +2780,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 JFXUtil.setDisabled(true, apJournalProposalDetails);
             } else {
                 JFXUtil.setDisabledExcept(!lbShow, apJournalProposalMaster);
-                JFXUtil.setDisabled(true, tfJournalProposalTransactionNo,dpJournalProposalTransactionDate);
-                JFXUtil.setDisabled(!lbShow,  apJournalProposalDetails);
+                JFXUtil.setDisabled(true, tfJournalProposalTransactionNo, dpJournalProposalTransactionDate);
+                JFXUtil.setDisabled(!lbShow, apJournalProposalDetails);
             }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 

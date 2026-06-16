@@ -2104,6 +2104,9 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         if (tfCreditAmount.isFocused()) {
                             pbEnteredJE = true;
                         }
+                        if (tfJournalProposalCreditAmount.isFocused()) {
+                            pbEnteredJEP = true;
+                        }
                         if (tfBaseAmount.isFocused()) {
                             pbEnteredBIR = true;
                         }

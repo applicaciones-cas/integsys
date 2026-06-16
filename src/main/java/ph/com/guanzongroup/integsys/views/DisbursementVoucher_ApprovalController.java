@@ -678,7 +678,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         if (pnEditMode == EditMode.READY) {
                             //validation for checking details in JE & JEP
                             if (!checkJEorJEPSaving()) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before approving.");
                                 return;
                             } else {
                                 poJSON = poController.ApproveTransaction("");
@@ -2166,6 +2165,9 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         }
                         if (tfCreditAmount.isFocused()) {
                             pbEnteredJE = true;
+                        }
+                        if (tfJournalProposalCreditAmount.isFocused()) {
+                            pbEnteredJEP = true;
                         }
                         if (tfBaseAmount.isFocused()) {
                             pbEnteredBIR = true;
