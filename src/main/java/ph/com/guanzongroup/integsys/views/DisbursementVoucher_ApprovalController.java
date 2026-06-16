@@ -676,7 +676,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to approve transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                             //validation for checking details in JE & JEP
+                            //validation for checking details in JE & JEP
                             if (!checkJEorJEPSaving()) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before approving.");
                                 return;
@@ -2804,8 +2804,10 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
             boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
             if (lbStat) {
-                JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
-                JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
+                JFXUtil.setDisabledExcept(true, apJournalProposalMaster, cbJEMasterProposalReverse);
+                JFXUtil.setDisabled(true, apJournalProposalDetails);
+            } else {
+                JFXUtil.setDisabled(false, apJournalProposalMaster,apJournalProposalDetails);
             }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
