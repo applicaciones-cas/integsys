@@ -770,12 +770,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             poJSON = new JSONObject();
             JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
             poController.getEditMode();
-            poJSON = poController.populateJournal();
-            if (JFXUtil.isJSONSuccess(poJSON)) {
-                loadTableDetailJE.reload();
-            } else {
-                journal_data.clear();
-            }
+            poController.loadTBJ();
+            loadTableDetailJE.reload();
+//            poJSON = poController.populateJournal();
+//            if (JFXUtil.isJSONSuccess(poJSON)) {
+//                loadTableDetailJE.reload();
+//            } else {
+//                journal_data.clear();
+//            }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
