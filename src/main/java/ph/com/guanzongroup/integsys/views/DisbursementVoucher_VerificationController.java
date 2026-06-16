@@ -564,7 +564,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     pbIsCheckedJournalProposalTab = false;
                     pnEditMode = poController.getEditMode();
                     CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
-                    loadTableDetail.reload();
                     break;
                 case "btnSearch":
                     JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apJournalProposalMaster, apJournalProposalDetails, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails, apBIRDetail);
@@ -601,7 +600,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     }
                     if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
-//                            if (!poController.existJournal().equals("")) {
+                           //validation for checking details in JE & JEP
                             if (!checkJEorJEPSaving()) {
                                 break;
                             } else {
@@ -614,10 +613,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
                             }
-//                            } else {
-//                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
-//                                break;
-//                            }
                         }
                     }
                     pnEditMode = poController.getEditMode();
@@ -653,7 +648,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to verify transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-//                            if (!poController.existJournal().equals("")) {
+                            //validation for checking details in JE & JEP
                             if (!checkJEorJEPSaving()) {
                                 return;
                             } else {
@@ -667,10 +662,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
                             }
-//                            } else {
-//                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable verification.");
-//                                return;
-//                            }
                         }
                     } else {
                         return;
@@ -765,8 +756,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        loadTableMainJEP.reload();
-        loadTableDetailJEP.reload();
+        Platform.runLater(() -> {
+            loadTableMainJEP.reload();
+            JFXUtil.runWithDelay(0.50, () -> {
+                loadTableDetailJEP.reload();
+            });
+        });
     }
 
     private void populateJE() {
@@ -828,7 +823,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
     private void loadTableDetailFromMainJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
-        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();;
+        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
         loadRecordMasterJEP();
         loadTableDetailJEP.reload();
     }
@@ -3350,7 +3345,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
 
         JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
-                apMasterDVCheck,  apMasterDVBTransfer, apMasterDVOp,  apBIRDetail, apAttachments);
+                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail, apAttachments);
         JFXUtil.setDisabled(!lbShow, apJournalProposalMaster, apJournalProposalDetails, apJournalMaster, apJournalDetails);
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {

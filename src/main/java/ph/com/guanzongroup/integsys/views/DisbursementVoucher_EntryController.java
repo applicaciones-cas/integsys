@@ -531,7 +531,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pnEditMode = poController.getEditMode();
                     psSupplierPayeeId = poController.Master().Payee().getClientID();
                     poController.populateJournal();
-                    loadTableDetail.reload();
                     break;
                 case "btnNew":
                     clearTextFields();
@@ -544,7 +543,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     poController.Master().setDisbursementType(DisbursementStatic.DisbursementType.CHECK);
                     poController.Master().setSupplierClientID(psSupplierPayeeId);
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
-                    loadTableDetail.reload();
                     pnEditMode = poController.getEditMode();
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
@@ -572,7 +570,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pbIsCheckedBIRTab = false;
                     pnEditMode = poController.getEditMode();
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
-                    loadTableDetail.reload();
                     break;
                 case "btnSearch":
                     JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apJournalProposalMaster, apJournalProposalDetails, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails, apBIRDetail);
@@ -611,7 +608,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     if (pnEditMode == EditMode.READY) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
-//                            if (!poController.existJournal().equals("")) {
                             if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                 break;
@@ -761,8 +757,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        loadTableMainJEP.reload();
-        loadTableDetailJEP.reload();
+        Platform.runLater(() -> {
+            loadTableMainJEP.reload();
+            JFXUtil.runWithDelay(0.50, () -> {
+                loadTableDetailJEP.reload();
+            });
+        });
     }
 
     private void populateJE() {
@@ -865,7 +865,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadTableDetailFromMainJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
-        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();;
+        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
         loadRecordMasterJEP();
         loadTableDetailJEP.reload();
     }

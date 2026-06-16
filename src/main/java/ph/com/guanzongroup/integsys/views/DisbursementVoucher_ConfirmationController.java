@@ -763,8 +763,12 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        loadTableMainJEP.reload();
-        loadTableDetailJEP.reload();
+        Platform.runLater(() -> {
+            loadTableMainJEP.reload();
+            JFXUtil.runWithDelay(0.50, () -> {
+                loadTableDetailJEP.reload();
+            });
+        });
     }
 
     private void populateJE() {
@@ -825,7 +829,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
 
     private void loadTableDetailFromMainJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
-        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();;
+        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
         loadRecordMasterJEP();
         loadTableDetailJEP.reload();
     }
