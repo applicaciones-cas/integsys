@@ -725,7 +725,21 @@ public class InventoryStockIssuanceConfirmationControllerAppliance implements In
                         }
                         if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved()) {
                             lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved();
-                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
+//                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
+                            loTextField.setText(String.valueOf(lnIssuedQty));
+
+                            poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
+
+                            reloadTableDetail();
+                            loadSelectedTransactionDetail(pnTransactionDetail);
+                            reloadTableDetailOther();
+
+                            break;
+                        }
+
+                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand()) {
+                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand();
+//                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
                             loTextField.setText(String.valueOf(lnIssuedQty));
                         }
 
@@ -764,6 +778,77 @@ public class InventoryStockIssuanceConfirmationControllerAppliance implements In
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+
+                            case "tfIssuedQty":
+                                if (poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).getStockId() == null
+                                        || poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).getStockId().isEmpty()) {
+                                    if (Double.parseDouble(tfIssuedQty.getText()) > 0.0) {
+                                        tfIssuedQty.setText("0.00");
+                                        loTxtField.requestFocus();
+                                        ShowMessageFX.Information("Unable to set quantity! No Stock Invetory Detected", psFormName, null);
+                                    }
+                                    return;
+                                }
+                                double lnIssuedQty;
+                                try {
+                                    lnIssuedQty = Double.parseDouble(lsValue);
+                                } catch (NumberFormatException e) {
+                                    lnIssuedQty = 0.0; // default if parsing fails
+                                    poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
+                                    reloadTableDetail();
+                                    loadSelectedTransactionDetail(pnTransactionDetailOther);
+                                    loTxtField.requestFocus();
+                                }
+                                if (lnIssuedQty < 0.00) {
+                                    return;
+                                }
+                                // check if serialized
+                                if (poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).Inventory().isSerialized()) {
+                                    // must be whole number AND exactly 1
+                                    if (lnIssuedQty != 1 || lnIssuedQty % 1 != 0) {
+                                        ShowMessageFX.Information("Invalid quantity for serialized item", psFormName, null);
+                                        lnIssuedQty = 1; // force to 1
+                                        loTxtField.setText("1");
+                                    }
+                                    if (poAppController.getDetail(pnTransactionDetail).InventoryTransfer()
+                                            .getDetail(pnTransactionDetailOther).getSerialID() == null
+                                            || poAppController.getDetail(pnTransactionDetail).InventoryTransfer()
+                                                    .getDetail(pnTransactionDetailOther).getSerialID().isEmpty()) {
+                                        //Search record and sepate the row
+                                        if (!isJSONSuccess(poAppController.searchDetailIssuanceSerial(pnTransactionDetail, pnTransactionDetailOther, tfSerial.getText(), true, true),
+                                                "Initialize Search Serial")) {
+                                            lnIssuedQty = 0;
+                                            return;
+                                        }
+
+                                    }
+                                }
+                                if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved()) {
+                                    lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved();
+                                    ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
+                                    loTxtField.setText(String.valueOf(lnIssuedQty));
+
+                                    poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
+
+                                    reloadTableDetail();
+                                    loadSelectedTransactionDetail(pnTransactionDetail);
+                                    reloadTableDetailOther();
+
+                                    break;
+                                }
+
+                                if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand()) {
+                                    lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand();
+                                    ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                                    loTxtField.setText(String.valueOf(lnIssuedQty));
+                                }
+                                poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
+
+                                reloadTableDetail();
+                                loadSelectedTransactionDetail(pnTransactionDetail);
+                                reloadTableDetailOther();
+
+                                break;
                             case "tfClusterName":
                                 if (!tfClusterName.getText().isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Cluster", "Transaction's already Retrieve. Do you want to reset Transaction? ") == false) {

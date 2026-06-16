@@ -611,11 +611,11 @@ public class InventoryStockIssuanceNeoControllerLP_Food implements Initializable
 
                             }
                         }
-//                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
-//                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
-//                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
-//                            loTextField.setText(String.valueOf(lnIssuedQty));
-//                        }
+                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
+                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
+                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                            loTextField.setText(String.valueOf(lnIssuedQty));
+                        }
 
                         poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
 
@@ -678,14 +678,56 @@ public class InventoryStockIssuanceNeoControllerLP_Food implements Initializable
                                 getLoadedTransaction();
                                 break;
                             case "tfIssuedQty":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Invalid quantity", psFormName, null);
-                                    loTxtField.requestFocus();
+                                if (poAppController.getDetail(pnTransactionDetail).getStockId() == null
+                                        || poAppController.getDetail(pnTransactionDetail).getStockId().isEmpty()) {
+                                    if (Double.parseDouble(tfIssuedQty.getText()) > 0.0) {
+                                        tfIssuedQty.setText("0.00");
+                                        loTxtField.requestFocus();
+                                        ShowMessageFX.Information("Unable to set quantity! No Stock Invetory Detected", psFormName, null);
+                                    }
                                     return;
                                 }
-                                poAppController.getDetail(pnTransactionDetail).setQuantity(Double.parseDouble(lsValue));
-                                reloadTableDetail();
+                                double lnIssuedQty;
+                                try {
+                                    lnIssuedQty = Double.parseDouble(lsValue);
+                                } catch (NumberFormatException e) {
+                                    lnIssuedQty = 0.0; // default if parsing fails
+                                    poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
+                                    reloadTableDetail();
+                                    loadSelectedTransactionDetail(pnTransactionDetail);
+                                    loTxtField.requestFocus();
+                                }
+                                if (lnIssuedQty < 0.00) {
+                                    return;
+                                }
+                                // check if serialized
+                                if (poAppController.getDetail(pnTransactionDetail).Inventory().isSerialized()) {
+                                    // must be whole number AND exactly 1
+                                    if (lnIssuedQty != 1 || lnIssuedQty % 1 != 0) {
+                                        ShowMessageFX.Information("Invalid quantity for serialized item", psFormName, null);
+                                        lnIssuedQty = 1; // force to 1
+                                        loTxtField.setText("1");
+                                    }
+                                    if (poAppController.getDetail(pnTransactionDetail).getSerialID() == null
+                                            || poAppController.getDetail(pnTransactionDetail).getSerialID().isEmpty()) {
+                                        //Search record and sepate the row
+                                        if (!isJSONSuccess(poAppController.searchDetailByIssuance(pnTransactionDetail, tfSearchSerial.getText(), true, true),
+                                                "Initialize Search Serial")) {
+                                            lnIssuedQty = 0;
+                                            return;
+                                        }
 
+                                    }
+                                }
+                                if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
+                                    lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
+                                    ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                                    loTxtField.setText(String.valueOf(lnIssuedQty));
+                                }
+
+                                poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
+
+                                reloadTableDetail();
                                 loadSelectedTransactionDetail(pnTransactionDetail);
                                 break;
                         }
