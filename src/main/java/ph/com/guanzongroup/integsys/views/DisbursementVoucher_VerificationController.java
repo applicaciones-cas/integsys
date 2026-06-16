@@ -3347,13 +3347,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setButtonsVisibility(lbShow2, btnVerify);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
-        JFXUtil.setDisabled(!lbShow, apJournalMaster, apJournalDetails);
-
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
 
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
-                apMasterDVCheck, apJournalProposalMaster, apJournalProposalDetails, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
-
+        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
+                apMasterDVCheck,  apMasterDVBTransfer, apMasterDVOp,  apBIRDetail, apAttachments);
+        JFXUtil.setDisabled(!lbShow, apJournalProposalMaster, apJournalProposalDetails, apJournalMaster, apJournalDetails);
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
