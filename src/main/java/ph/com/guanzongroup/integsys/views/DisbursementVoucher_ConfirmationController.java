@@ -2746,13 +2746,14 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     return;
                 }
             }
+            boolean lbShow = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
             boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
             if (lbStat) {
                 JFXUtil.setDisabledExcept(true, apJournalProposalMaster, cbJEMasterProposalReverse);
                 JFXUtil.setDisabled(true, apJournalProposalDetails);
             } else {
-                JFXUtil.setDisabled(false, apJournalProposalMaster,apJournalProposalDetails);
+                JFXUtil.setDisabled(!lbShow, apJournalProposalMaster, apJournalProposalDetails);
             }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 

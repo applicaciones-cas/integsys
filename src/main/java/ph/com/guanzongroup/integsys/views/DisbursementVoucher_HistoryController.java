@@ -1554,13 +1554,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 }
             }
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
-            boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
-            if (lbStat) {
-                JFXUtil.setDisabledExcept(true, apJournalProposalMaster, cbJEMasterProposalReverse);
-                JFXUtil.setDisabled(true, apJournalProposalDetails);
-            } else {
-                JFXUtil.setDisabled(false, apJournalProposalMaster,apJournalProposalDetails);
-            }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
             //for hiding purposes
