@@ -2753,7 +2753,9 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                 JFXUtil.setDisabledExcept(true, apJournalProposalMaster, cbJEMasterProposalReverse);
                 JFXUtil.setDisabled(true, apJournalProposalDetails);
             } else {
-                JFXUtil.setDisabled(!lbShow, apJournalProposalMaster, apJournalProposalDetails);
+                JFXUtil.setDisabledExcept(!lbShow, apJournalProposalMaster);
+                JFXUtil.setDisabled(true, tfJournalProposalTransactionNo,dpJournalProposalTransactionDate);
+                JFXUtil.setDisabled(!lbShow,  apJournalProposalDetails);
             }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
