@@ -46,6 +46,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import javafx.concurrent.Task;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -691,6 +692,20 @@ public class InventoryStockIssuanceControllerMC_SP implements Initializable, Scr
                             lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved();
                             ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
                             loTextField.setText(String.valueOf(lnIssuedQty));
+
+                            poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
+
+                            reloadTableDetail();
+                            loadSelectedTransactionDetail(pnTransactionDetail);
+                            reloadTableDetailOther();
+
+                            break;
+                        }
+
+                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand()) {
+                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand();
+                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                            loTextField.setText(String.valueOf(lnIssuedQty));
                         }
 
                         poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
@@ -728,6 +743,9 @@ public class InventoryStockIssuanceControllerMC_SP implements Initializable, Scr
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+                            default:
+                                CommonUtils.SetNextFocus(loTxtField);
+                                break;
                             case "tfClusterName":
                                 if (!tfClusterName.getText().isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Cluster", "Transaction's already Retrieve. Do you want to reset Transaction? ") == false) {
@@ -1037,7 +1055,7 @@ public class InventoryStockIssuanceControllerMC_SP implements Initializable, Scr
         loadDeliveryTypes();
         initButtonDisplay(poAppController.getEditMode());
         initButtonDisplayDetail(EditMode.UNKNOWN);
-        
+
         lblMainStatus.setText("UNKNOWN");
         lblDeliveryStatus.setText("UNKNOWN");
     }

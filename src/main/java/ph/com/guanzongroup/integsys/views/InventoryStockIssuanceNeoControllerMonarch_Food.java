@@ -541,7 +541,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                                     );
                                     tfDiscountRate.requestFocus();
                                     tfDiscountAmount.setText("0.0");
-                            poAppController.getMaster().setDiscount(0.0);
+                                    poAppController.getMaster().setDiscount(0.0);
                                     return;
                                 }
                                 // Continue with valid discount rate logic here...
@@ -553,7 +553,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                                 );
                                 tfDiscountRate.requestFocus();
                                 tfDiscountAmount.setText("0.0");
-                            poAppController.getMaster().setDiscount(0.0);
+                                poAppController.getMaster().setDiscount(0.0);
                                 return;
                             }
                         } else {
@@ -612,12 +612,11 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
 
                             }
                         }
-//                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
-//                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
-//                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
-//                            loTextField.setText(String.valueOf(lnIssuedQty));
-//                        }
-
+                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryMaster().getQuantityOnHand()) {
+                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryMaster().getQuantityOnHand();
+                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                            loTextField.setText(String.valueOf(lnIssuedQty));
+                        }
                         poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
 
                         reloadTableDetail();
@@ -652,45 +651,10 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
-                            case "tfDiscountRate":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Invalid freight amount", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
 
-                                poAppController.getMaster().setFreight(Double.parseDouble(lsValue));
-                                poAppController.getMaster().setTransactionTotal(poAppController.getMaster().getFreight() - computeDiscount(
-                                        poAppController.getMaster().getFreight(), poAppController.getMaster().getDiscount()));
-
-                                getLoadedTransaction();
+                            default:
+                                CommonUtils.SetNextFocus(loTxtField);
                                 break;
-                            case "tfDiscountAmount":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Invalid discount amount", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
-
-                                poAppController.getMaster().setDiscount(Double.parseDouble(lsValue));
-                                poAppController.getMaster().setTransactionTotal(poAppController.getMaster().getFreight() - computeDiscount(
-                                        poAppController.getMaster().getFreight(), poAppController.getMaster().getDiscount()));
-
-                                getLoadedTransaction();
-                                break;
-                            case "tfIssuedQty":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Invalid quantity", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
-                                poAppController.getDetail(pnTransactionDetail).setQuantity(Double.parseDouble(lsValue));
-                                reloadTableDetail();
-
-                                loadSelectedTransactionDetail(pnTransactionDetail);
-                                break;
-                        }
-                        switch (txtFieldID) {
                             case "tfSearchSourceno":
                                 if (!tfTransNo.getText().isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {

@@ -711,11 +711,11 @@ public class InventoryStockIssuanceNeoController_ApprovalMC_SP implements Initia
 
                             }
                         }
-//                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
-//                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
-//                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
-//                            loTextField.setText(String.valueOf(lnIssuedQty));
-//                        }
+                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryMaster().getQuantityOnHand()) {
+                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryMaster().getQuantityOnHand();
+                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                            loTextField.setText(String.valueOf(lnIssuedQty));
+                        }
 
                         poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
 
@@ -749,75 +749,12 @@ public class InventoryStockIssuanceNeoController_ApprovalMC_SP implements Initia
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        switch (txtFieldID) {
-                            case "tfDiscountRate":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Imvalid freight amount", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
-
-                                poAppController.getMaster().setFreight(Double.parseDouble(lsValue));
-                                poAppController.getMaster().setTransactionTotal(poAppController.getMaster().getFreight() - computeDiscount(
-                                        poAppController.getMaster().getFreight(), poAppController.getMaster().getDiscount()));
-
-                                getLoadedTransaction();
-                                break;
-                            case "tfDiscountAmount":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Imvalid discount amount", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
-                                if (tfDiscountRate.getText() != null && !tfDiscountRate.getText().isEmpty()) {
-                                    try {
-                                        double discountRate = Double.parseDouble(tfDiscountRate.getText());
-                                        if (discountRate < 0) {
-                                            ShowMessageFX.Information(
-                                                    "Invalid discount amount. Please add freight amount first.",
-                                                    psFormName, null
-                                            );
-                                            tfDiscountRate.requestFocus();
-                                            tfDiscountAmount.setText("0.0");
-                                            return;
-                                        }
-                                        // Continue with valid discount rate logic here...
-
-                                    } catch (NumberFormatException e) {
-                                        ShowMessageFX.Information(
-                                                "Invalid input. Please enter a valid numeric discount rate.",
-                                                psFormName, null
-                                        );
-                                        tfDiscountRate.requestFocus();
-                                        tfDiscountAmount.setText("0.0");
-                                        return;
-                                    }
-                                } else {
-                                    ShowMessageFX.Information(
-                                            "Discount rate cannot be empty. Please enter a value.",
-                                            psFormName, null
-                                    );
-                                    tfDiscountRate.requestFocus();
-                                    tfDiscountAmount.setText("0.0");
-                                    return;
-                                }
-                                poAppController.getMaster().setDiscount(Double.parseDouble(lsValue));
-                                loadTransactionMaster();
-                                break;
-                            case "tfIssuedQty":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Imvalid quantity", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
-                                poAppController.getDetail(pnTransactionDetail).setQuantity(Double.parseDouble(lsValue));
-                                reloadTableDetail();
-
-                                loadSelectedTransactionDetail(pnTransactionDetail);
-                                break;
-                        }
                     case F3:
                         switch (txtFieldID) {
+
+                            default:
+                                CommonUtils.SetNextFocus(loTxtField);
+                                break;
                             case "tfSearchSourceno":
                                 if (!tfTransNo.getText().isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
