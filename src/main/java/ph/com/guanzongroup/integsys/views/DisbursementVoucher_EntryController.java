@@ -544,6 +544,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     poController.Master().setSupplierClientID(psSupplierPayeeId);
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     pnEditMode = poController.getEditMode();
+                    System.out.println("UI JOURNAL EDIT MODE :  " + poController.Journal().getEditMode());
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
                 case "btnUpdate":
@@ -1511,8 +1512,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 loSIPostingController.setTransaction(fsSourceNo);
                 showDialog("/ph/com/guanzongroup/integsys/views/SIPosting_View.fxml", loSIPostingController);
                 break;
+            case DisbursementStatic.SourceCode.PO_RETURN:
+                POReturnPosting_ViewController loPOReturnPostingController = new POReturnPosting_ViewController();
+                loPOReturnPostingController.setGRider(oApp);
+                loPOReturnPostingController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/POReturnPosting_View.fxml", loPOReturnPostingController);
+                break;
             default:
-                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + fsSourceCode + ". Please contact the system administrator.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + poController.getSourceCodeDescription(fsSourceCode) + ". Please contact the system administrator.");
                 break;
         }
     }

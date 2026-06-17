@@ -1538,8 +1538,14 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 loSIPostingController.setTransaction(fsSourceNo);
                 showDialog("/ph/com/guanzongroup/integsys/views/SIPosting_View.fxml", loSIPostingController);
                 break;
+            case DisbursementStatic.SourceCode.PO_RETURN:
+                POReturnPosting_ViewController loPOReturnPostingController = new POReturnPosting_ViewController();
+                loPOReturnPostingController.setGRider(oApp);
+                loPOReturnPostingController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/POReturnPosting_View.fxml", loPOReturnPostingController);
+                break;
             default:
-                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + fsSourceCode + ". Please contact the system administrator.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + poController.getSourceCodeDescription(fsSourceCode) + ". Please contact the system administrator.");
                 break;
         }
     }
