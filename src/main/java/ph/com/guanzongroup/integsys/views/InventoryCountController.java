@@ -101,6 +101,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
     private ObservableList<Model_Inventory_Count_Master> laTransactionMaster;
     private ObservableList<Model_Inventory_Count_Detail> laTransactionDetail;
     private int pnSelectMaster, pnEditMode, pnTransactionDetail;
+    private boolean pbIsProgrammaticSelection = false;
 
     @FXML
     private AnchorPane apMainAnchor, apMaster, apDetail, apDetail1, apTransaction,
@@ -404,6 +405,20 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         appUnload.unloadForm(apMainAnchor, poApp, psFormName);
                     }
                     break;
+
+                case "btnPrint":
+                    if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
+                        return;
+                    }
+//                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
+                    if (!isJSONSuccess(poAppController.printRecord(),
+                            "Initialize Print Transaction")) {
+                        return;
+                    }
+                    break;
+//                    }
+                //ref
                 case "btnVoid":
                     if (tfTransNo.getText().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", null, "Issuance Approval");
@@ -764,12 +779,14 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             tfTransNo.setText(poAppController.getMaster().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getMaster().getTransactionDate()));
             tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
+            pbIsProgrammaticSelection = true;
             if (!poAppController.getMaster().getIncluded().isEmpty()) {
                 cmbInclusion.getSelectionModel().select(
                         Inclusion.fromCode(poAppController.getMaster().getIncluded()).getDisplayName());
             } else {
                 cmbInclusion.getSelectionModel().select(-1);
             }
+            pbIsProgrammaticSelection = false;
             tfRequestedBy.setText(String.valueOf(poAppController.getMaster().ClientRequestBy().getCompanyName()));
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
@@ -869,20 +886,99 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 
         cmbInclusion.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> {
-                    if (newVal != null) {
+                    if (newVal != null && !pbIsProgrammaticSelection) {
                         try {
                             Inclusion selected = Inclusion.fromDisplay(newVal);
-//                        System.out.println("Inclusion code: " + selected.name()); // "AI", "BB", "RX", "C"
-                            if (!isJSONSuccess(poAppController.setInclusion(selected.name()),
-                                     "Initialize override detail")) {
-                                cmbInclusion.getSelectionModel().select(-1);
+
+                            StackPane overlay = getOverlayProgress(apMaster);
+                            ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
+                            overlay.setVisible(true);
+                            pi.setVisible(true);
+
+                            Task<ObservableList<Model_Inventory_Count_Detail>> overrideTask
+                            = new Task<ObservableList<Model_Inventory_Count_Detail>>() {
+
+                        @Override
+                        protected ObservableList<Model_Inventory_Count_Detail> call() throws Exception {
+                            JSONObject loJSON = poAppController.setInclusion(selected.name());
+                            if (!isJSONSuccess(loJSON, "Initialize override detail")) {
+                                return null; // signal failure
+                            }
+
+                            List<Model_Inventory_Count_Detail> rawDetail = poAppController.getDetailList();
+                            System.out.println("Override detail size: " + rawDetail.size());
+                            return FXCollections.observableArrayList(new ArrayList<>(rawDetail));
+                        }
+
+                        @Override
+                        protected void succeeded() {
+                            ObservableList<Model_Inventory_Count_Detail> result = getValue();
+
+                            overlay.setVisible(false);
+                            pi.setVisible(false);
+
+                            if (result == null) {
+                                // setInclusion failed — restore previous selection
+                                pbIsProgrammaticSelection = true;
+                                if (oldVal != null) {
+                                    cmbInclusion.getSelectionModel().select(oldVal);
+                                } else {
+                                    cmbInclusion.getSelectionModel().select(-1);
+                                }
+                                pbIsProgrammaticSelection = false;
                                 return;
                             }
-                            reloadTableDetail();
 
-                        } catch (GuanzonException ex) {
+                            // Force full refresh of table with new paDetail contents
+                            laTransactionDetail.clear();
+                            laTransactionDetail.addAll(result);
+                            tblViewDetails.setItems(laTransactionDetail);
+                            tblViewDetails.refresh();
+
+                            // Reset selection to first row
+                            if (!laTransactionDetail.isEmpty()) {
+                                pnTransactionDetail = 1;
+                                tblViewDetails.getSelectionModel().select(0);
+                                tblViewDetails.scrollTo(0);
+                                try {
+                                    loadSelectedTransactionDetail(pnTransactionDetail);
+                                } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                                    Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        }
+
+                        @Override
+                        protected void failed() {
+                            overlay.setVisible(false);
+                            pi.setVisible(false);
+
+                            // Restore previous selection on failure
+                            pbIsProgrammaticSelection = true;
+                            if (oldVal != null) {
+                                cmbInclusion.getSelectionModel().select(oldVal);
+                            } else {
+                                cmbInclusion.getSelectionModel().select(-1);
+                            }
+                            pbIsProgrammaticSelection = false;
+
+                            Throwable ex = getException();
                             Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (SQLException ex) {
+                            poLogWrapper.severe(psFormName + " : " + ex.getMessage());
+                        }
+
+                        @Override
+                        protected void cancelled() {
+                            overlay.setVisible(false);
+                            pi.setVisible(false);
+                        }
+                    };
+
+                            Thread thread = new Thread(overrideTask);
+                            thread.setDaemon(true);
+                            thread.start();
+
+                        } catch (Exception ex) {
                             Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
