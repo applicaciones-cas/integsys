@@ -702,7 +702,7 @@ public class InventoryStockIssuanceController implements Initializable, ScreenIn
                         }
                         if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved()) {
                             lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved();
-//                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
+                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
                             loTextField.setText(String.valueOf(lnIssuedQty));
                             poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
 
@@ -715,7 +715,7 @@ public class InventoryStockIssuanceController implements Initializable, ScreenIn
 
                         if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand()) {
                             lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand();
-//                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
                             loTextField.setText(String.valueOf(lnIssuedQty));
                             tfIssuedQty.requestFocus();
                         }
