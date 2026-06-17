@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
@@ -753,9 +749,12 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
         // Show-only based on mode
         initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
         initButtonControls(!lbShow, "btnBrowse", "btnNew", "btnUpdate");
-
+        
         apMaster.setDisable(!lbShow);//viewing only
         apDetail.setDisable(!lbShow);
+        tfWarehouse.setDisable(fnEditMode != EditMode.UPDATE);
+        tfSection.setDisable(fnEditMode != EditMode.UPDATE);
+        tfLevel.setDisable(fnEditMode != EditMode.UPDATE);
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
@@ -1027,9 +1026,9 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
             poLogWrapper.severe(psFormName + " : " + message);
             if (message != null && !message.trim().isEmpty()) {
                 if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                    ShowMessageFX.Warning(null, psFormName, message);
                 } else {
-                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message));
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, message));
                 }
             }
             return false;
@@ -1038,9 +1037,9 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
         if ("success".equalsIgnoreCase(result)) {
             if (message != null && !message.trim().isEmpty()) {
                 if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                    ShowMessageFX.Information(null, psFormName, message);
                 } else {
-                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
+                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, message));
                 }
             }
             poLogWrapper.info(psFormName + " : Success on " + fsModule);

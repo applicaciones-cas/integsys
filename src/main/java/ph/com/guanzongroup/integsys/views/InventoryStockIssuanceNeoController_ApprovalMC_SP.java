@@ -711,8 +711,8 @@ public class InventoryStockIssuanceNeoController_ApprovalMC_SP implements Initia
 
                             }
                         }
-                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
-                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
+                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryMaster().getQuantityOnHand()) {
+                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryMaster().getQuantityOnHand();
                             ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
                             loTextField.setText(String.valueOf(lnIssuedQty));
                         }
@@ -749,117 +749,12 @@ public class InventoryStockIssuanceNeoController_ApprovalMC_SP implements Initia
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        switch (txtFieldID) {
-                            case "tfDiscountRate":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Imvalid freight amount", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
-
-                                poAppController.getMaster().setFreight(Double.parseDouble(lsValue));
-                                poAppController.getMaster().setTransactionTotal(poAppController.getMaster().getFreight() - computeDiscount(
-                                        poAppController.getMaster().getFreight(), poAppController.getMaster().getDiscount()));
-
-                                getLoadedTransaction();
-                                break;
-                            case "tfDiscountAmount":
-                                if (lsValue.isEmpty()) {
-                                    ShowMessageFX.Information("Imvalid discount amount", psFormName, null);
-                                    loTxtField.requestFocus();
-                                    return;
-                                }
-                                if (tfDiscountRate.getText() != null && !tfDiscountRate.getText().isEmpty()) {
-                                    try {
-                                        double discountRate = Double.parseDouble(tfDiscountRate.getText());
-                                        if (discountRate < 0) {
-                                            ShowMessageFX.Information(
-                                                    "Invalid discount amount. Please add freight amount first.",
-                                                    psFormName, null
-                                            );
-                                            tfDiscountRate.requestFocus();
-                                            tfDiscountAmount.setText("0.0");
-                                            return;
-                                        }
-                                        // Continue with valid discount rate logic here...
-
-                                    } catch (NumberFormatException e) {
-                                        ShowMessageFX.Information(
-                                                "Invalid input. Please enter a valid numeric discount rate.",
-                                                psFormName, null
-                                        );
-                                        tfDiscountRate.requestFocus();
-                                        tfDiscountAmount.setText("0.0");
-                                        return;
-                                    }
-                                } else {
-                                    ShowMessageFX.Information(
-                                            "Discount rate cannot be empty. Please enter a value.",
-                                            psFormName, null
-                                    );
-                                    tfDiscountRate.requestFocus();
-                                    tfDiscountAmount.setText("0.0");
-                                    return;
-                                }
-                                poAppController.getMaster().setDiscount(Double.parseDouble(lsValue));
-                                loadTransactionMaster();
-                                break;
-                            case "tfIssuedQty":
-                                if (poAppController.getDetail(pnTransactionDetail).getStockId() == null
-                                        || poAppController.getDetail(pnTransactionDetail).getStockId().isEmpty()) {
-                                    if (Double.parseDouble(tfIssuedQty.getText()) > 0.0) {
-                                        tfIssuedQty.setText("0.00");
-                                        loTxtField.requestFocus();
-                                        ShowMessageFX.Information("Unable to set quantity! No Stock Invetory Detected", psFormName, null);
-                                    }
-                                    return;
-                                }
-                                double lnIssuedQty;
-                                try {
-                                    lnIssuedQty = Double.parseDouble(lsValue);
-                                } catch (NumberFormatException e) {
-                                    lnIssuedQty = 0.0; // default if parsing fails
-                                    poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
-                                    reloadTableDetail();
-                                    loadSelectedTransactionDetail(pnTransactionDetail);
-                                    loTxtField.requestFocus();
-                                }
-                                if (lnIssuedQty < 0.00) {
-                                    return;
-                                }
-                                // check if serialized
-                                if (poAppController.getDetail(pnTransactionDetail).Inventory().isSerialized()) {
-                                    // must be whole number AND exactly 1
-                                    if (lnIssuedQty != 1 || lnIssuedQty % 1 != 0) {
-                                        ShowMessageFX.Information("Invalid quantity for serialized item", psFormName, null);
-                                        lnIssuedQty = 1; // force to 1
-                                        loTxtField.setText("1");
-                                    }
-                                    if (poAppController.getDetail(pnTransactionDetail).getSerialID() == null
-                                            || poAppController.getDetail(pnTransactionDetail).getSerialID().isEmpty()) {
-                                        //Search record and sepate the row
-                                        if (!isJSONSuccess(poAppController.searchDetailByIssuance(pnTransactionDetail, tfSearchSerial.getText(), true, true),
-                                                "Initialize Search Serial")) {
-                                            lnIssuedQty = 0;
-                                            return;
-                                        }
-
-                                    }
-                                }
-                                if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
-                                    lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
-                                    ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
-                                    loTxtField.setText(String.valueOf(lnIssuedQty));
-                                }
-
-                                poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
-
-                                reloadTableDetail();
-                                loadSelectedTransactionDetail(pnTransactionDetail);
-                                break;
-                        }
                     case F3:
                         switch (txtFieldID) {
+
+                            default:
+                                CommonUtils.SetNextFocus(loTxtField);
+                                break;
                             case "tfSearchSourceno":
                                 if (!tfTransNo.getText().isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
