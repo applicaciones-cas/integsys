@@ -46,6 +46,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import javafx.concurrent.Task;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -703,8 +704,21 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
                             lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryStockRequest().getApproved();
                             ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
                             loTextField.setText(String.valueOf(lnIssuedQty));
+
+                            poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
+
+                            reloadTableDetail();
+                            loadSelectedTransactionDetail(pnTransactionDetail);
+                            reloadTableDetailOther();
+
+                            break;
                         }
 
+                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand()) {
+                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).InventoryMaster().getQuantityOnHand();
+                            ShowMessageFX.Information("Issued Quantity exceed Quantity on Hand Detected", psFormName, null);
+                            loTextField.setText(String.valueOf(lnIssuedQty));
+                        }
                         poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getDetail(pnTransactionDetailOther).setQuantity(lnIssuedQty);
 
                         reloadTableDetail();
@@ -740,6 +754,9 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+                            default:
+                                CommonUtils.SetNextFocus(loTxtField);
+                                break;
                             case "tfClusterName":
                                 if (!tfClusterName.getText().isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Cluster", "Transaction's already Retrieve. Do you want to reset Transaction? ") == false) {
@@ -940,7 +957,7 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
             } else {
                 btnVoid.setText("Void");
             }
-            
+
             if (tfTransNo.getText().trim().isEmpty()) {
                 lblMainStatus.setText("UNKNOWN");
             }
@@ -1050,7 +1067,7 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
         loadDeliveryTypes();
         initButtonDisplay(poAppController.getEditMode());
         initButtonDisplayDetail(EditMode.UNKNOWN);
-        
+
         lblMainStatus.setText("UNKNOWN");
         lblDeliveryStatus.setText("UNKNOWN");
     }

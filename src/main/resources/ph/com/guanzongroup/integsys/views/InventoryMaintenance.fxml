@@ -500,7 +500,7 @@
                                                 </Text>
                                                 <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="ON-HAND" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
                                                     <font>
-                                                        <Font name="System Bold" size="14.0" />
+                                                        <Font name="System Bold" size="18.0" />
                                                     </font>
                                                     <GridPane.margin>
                                                         <Insets right="10.0" />
@@ -510,7 +510,7 @@
                                                 <TextField fx:id="tfQOH" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                                 <TextField fx:id="tfMinLevelMaster" alignment="CENTER_RIGHT" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                                 <TextField fx:id="tfMaxLevelMaster" alignment="CENTER_RIGHT" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                                                <TextField fx:id="tfOnHand" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                                                <TextField fx:id="tfOnHand" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" style="-fx-font-size: 18; -fx-font-weight: BOLD;" GridPane.columnIndex="4" GridPane.rowIndex="7" />
                                                 <TextField fx:id="tfAveMonthlySales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="5" />
                                                 <TextField fx:id="tfCXOrder" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="6" />
                                                 <TextField fx:id="tfClass" disable="true" editable="false" promptText="F" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="4" />
