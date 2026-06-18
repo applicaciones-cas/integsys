@@ -71,6 +71,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -104,7 +105,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
     private boolean pbIsProgrammaticSelection = false;
 
     @FXML
-    private AnchorPane apMainAnchor, apMaster, apDetail, apDetail1, apTransaction,
+    private AnchorPane apMainAnchor, apMaster, apDetail, apDetailOther, apTransaction,
             apAttachmentButtons, apBrowse, apButton, apAttachments;
 
     @FXML
@@ -425,17 +426,12 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         return;
                     }
 
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void/Cancel transaction?") == true) {
-                        if (btnVoid.getText().equals("Void")) {
-                            if (!isJSONSuccess(poAppController.VoidTransaction(), "Initialize Void Transaction")) {
-                                return;
-                            }
-                        } else {
-                            if (!isJSONSuccess(poAppController.CancelTransaction(), "Initialize Cancel Transaction")) {
-                                return;
-                            }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Cancel transaction?") == true) {
 
+                        if (!isJSONSuccess(poAppController.CancelTransaction(), "Initialize Cancel Transaction")) {
+                            return;
                         }
+
                         reloadTableDetail();
                         getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
@@ -657,6 +653,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+                            default:
+                                CommonUtils.SetNextFocus(loTxtField);
+                                break;
                             case "tfSearchInvCountType":
 
                                 if (!isJSONSuccess(poAppController.searchTransaction(lsValue, true, false),
@@ -779,6 +778,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             tfTransNo.setText(poAppController.getMaster().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getMaster().getTransactionDate()));
             tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
+            tfCountNo.setText(String.valueOf(poAppController.getMaster().getCounterNo()));
             pbIsProgrammaticSelection = true;
             if (!poAppController.getMaster().getIncluded().isEmpty()) {
                 cmbInclusion.getSelectionModel().select(
@@ -793,8 +793,6 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 
             if (poAppController.getMaster().getTransactionStatus().equals(InventoryStockIssuanceStatus.CONFIRMED)) {
                 btnVoid.setText("Cancel");
-            } else {
-                btnVoid.setText("Void");
             }
             if (tfTransNo.getText().trim().isEmpty()) {
                 lblStatus.setText("UNKNOWN");
@@ -1085,9 +1083,11 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         initButtonControls(!lbEditing && lbHasTransaction, "btnUpdate", "btnVoid", "btnHistory", "btnPrint");
         initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved, "btnUpdate");
 
+        tfInventoryCountType.setDisable(fnEditMode == EditMode.UPDATE);
         // Disable panes during editing
         apMaster.setDisable(!lbEditing);
         apDetail.setDisable(!lbEditing);
+        apDetailOther.setDisable(!lbEditing);
         //reload attachment
         loadTableAttachment.reload();
 
