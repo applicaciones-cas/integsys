@@ -1062,20 +1062,20 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         tblVwJournalDetails.setItems(journal_data);
     }
 
-    private void initDetailJEPGrid() {
-        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
-        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
-        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
-        tblVwJournalProposalDetails.setItems(journalproposal_data);
-    }
-
     private void initMainJEPGrid() {
         JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
         tblVwJournalProposalList.setItems(journalproposalmain_data);
+    }
+
+    private void initDetailJEPGrid() {
+        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
+        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
+        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
+        tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
     private void initDetailBIRGrid() {

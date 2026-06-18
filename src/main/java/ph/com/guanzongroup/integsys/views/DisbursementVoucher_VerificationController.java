@@ -600,7 +600,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     }
                     if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
-                           //validation for checking details in JE & JEP
+                            //validation for checking details in JE & JEP
                             if (!checkJEorJEPSaving()) {
                                 break;
                             } else {
@@ -770,13 +770,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
             JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
             poController.getEditMode();
             poController.loadTBJ();
-              loadTableDetailJE.reload();
-  //            poJSON = poController.populateJournal();
-  //            if (JFXUtil.isJSONSuccess(poJSON)) {
-  //                loadTableDetailJE.reload();
-  //            } else {
-  //                journal_data.clear();
-  //            }
+            loadTableDetailJE.reload();
+            //            poJSON = poController.populateJournal();
+            //            if (JFXUtil.isJSONSuccess(poJSON)) {
+            //                loadTableDetailJE.reload();
+            //            } else {
+            //                journal_data.clear();
+            //            }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -1324,20 +1324,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
         tblVwJournalDetails.setItems(journal_data);
     }
 
-    private void initDetailJEPGrid() {
-        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
-        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
-        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
-        tblVwJournalProposalDetails.setItems(journalproposal_data);
-    }
-
     private void initMainJEPGrid() {
         JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
         tblVwJournalProposalList.setItems(journalproposalmain_data);
+    }
+
+    private void initDetailJEPGrid() {
+        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
+        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
+        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
+        tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
     private void initDetailBIRGrid() {
@@ -2743,8 +2743,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 JFXUtil.setDisabled(true, apJournalProposalDetails);
             } else {
                 JFXUtil.setDisabledExcept(!lbShow, apJournalProposalMaster);
-                JFXUtil.setDisabled(true, tfJournalProposalTransactionNo,dpJournalProposalTransactionDate);
-                JFXUtil.setDisabled(!lbShow,  apJournalProposalDetails);
+                JFXUtil.setDisabled(true, tfJournalProposalTransactionNo, dpJournalProposalTransactionDate);
+                JFXUtil.setDisabled(!lbShow, apJournalProposalDetails);
             }
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
