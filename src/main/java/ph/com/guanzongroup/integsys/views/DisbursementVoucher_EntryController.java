@@ -819,7 +819,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void loadTableDetailFromMain() {
-        poJSON = new JSONObject();
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
             ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
@@ -862,7 +861,23 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
             }
         } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
+//            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
+            if ("error".equals(poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+            Platform.runLater(() -> {
+                btnNew.fire();
+                if ("error".equals(poJSON.get("result"))) {
+                    return;
+                }
+                tblViewMainList.getSelectionModel().select(pnMain);
+                pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+                if (pnMain >= 0) {
+                    loadTableDetailFromMain();
+                    initButton(pnEditMode);
+                }
+            });
         }
     }
 
