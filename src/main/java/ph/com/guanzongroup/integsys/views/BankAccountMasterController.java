@@ -178,9 +178,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             oCashflow.getModel().setCompanyId(psCompanyID);
             oCashflow.setCompanyId(psCompanyID);
             lblSource.setText(oCashflow.getModel().Company().getCompanyName() + " - " + oCashflow.getModel().Industry().getDescription());
-        } catch (SQLException ex) {
-            Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -249,7 +247,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                             initTabAnchor();
                             loadRecord();
                         } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             initTabAnchor();
                         }
                         break;
@@ -257,7 +255,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         System.out.print("EDIT MODE ON BROWSE : " + pnEditMode);
                         String loValue = "";
                         switch (psActiveField) {
-                            case "01":
+                            case "1":
                                 if (!oCashflow.getModel().getAccountNo().isEmpty() && !txtSeeks01.getText().isEmpty()){
                                     poJSON = oCashflow.searchRecordbyAccount(oCashflow.getModel().getBankAccountId(),true);
                                 }else{
@@ -265,7 +263,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                                     poJSON = oCashflow.searchRecordbyAccount(loValue, true);
                                 }
                                 break;
-                            case "02":
+                            case "2":
                                 if (!oCashflow.getModel().getAccountName().isEmpty() && !txtSeeks02.getText().isEmpty()){
                                     poJSON = oCashflow.searchRecordbyAccount(oCashflow.getModel().getBankAccountId(),true);
                                 }else{
@@ -273,7 +271,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                                     poJSON = oCashflow.searchRecordbyAccount(loValue, false);
                                 }
                                 break;
-                            case "03":
+                            case "3":
                                 loValue = txtSeeks03.getText();
                                 poJSON = oCashflow.searchRecordbyBranchBank(loValue, false);
                                 break;
@@ -295,7 +293,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     case "btnUpdate":
                         poJSON = oCashflow.updateRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             break;
                         }
                         pnEditMode = oCashflow.getEditMode();
@@ -316,14 +314,14 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         oCashflow.getModel().setModifiedDate(oApp.getServerDate());
                         JSONObject saveResult = oCashflow.saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) saveResult.get("message"), pxeModuleName, null);
                             initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
                             initButton(pnEditMode);
                             clearAllFields();
                             btnNew.fire();
                         } else {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) saveResult.get("message"), pxeModuleName, null);
                         }
                         break;
                     case "btnActivate":
@@ -336,34 +334,36 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
                                     poJsON = oCashflow.activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
                                     }
+                                    ShowMessageFX.Information("Record successfully activated.", pxeModuleName, null);
                                     poJsON = oCashflow.openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
                                     }
                                     clearAllFields();
                                     loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                    
                                 }
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
                                     poJsON = oCashflow.deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
                                     }
+                                    ShowMessageFX.Information("Record successfully deactivated.", pxeModuleName, null);
                                     poJsON = oCashflow.openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
                                     }
                                     clearAllFields();
                                     loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                    
                                 }
                                 break;
                             default:
@@ -558,6 +558,10 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         txtField14.focusedProperty().addListener(txtField_Focus);
         txtField15.focusedProperty().addListener(txtField_Focus);
         
+        txtSeeks01.focusedProperty().addListener(txtSeeks_Focus);
+        txtSeeks02.focusedProperty().addListener(txtSeeks_Focus);
+        txtSeeks03.focusedProperty().addListener(txtSeeks_Focus);
+        
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
         txtSeeks02.setOnKeyPressed(this::txtSeeks_KeyPressed);
         txtSeeks03.setOnKeyPressed(this::txtSeeks_KeyPressed);
@@ -580,7 +584,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                             psActiveField = String.valueOf(lnIndex);
                             poJSON = oCashflow.searchRecordbyAccount(lsValue, true);
                             if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                                ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                                 txtSeeks01.clear();
                                 break;
                             }
@@ -597,7 +601,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                             psActiveField = String.valueOf(lnIndex);
                             poJSON = oCashflow.searchRecordbyAccount(lsValue, false);
                             if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                                ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                                 txtSeeks02.clear();
                                 break;
                             }
@@ -614,7 +618,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                             psActiveField = String.valueOf(lnIndex);
                             poJSON = oCashflow.searchRecordbyBranchBank(lsValue, false);
                             if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                                ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                                 txtSeeks03.clear();
                                 break;
                             }
@@ -643,6 +647,50 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    final ChangeListener<? super Boolean> txtSeeks_Focus = (o, ov, nv) -> {
+        if (!pbLoaded) {
+            return;
+        }
+
+        TextField txtField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
+        int lnIndex = Integer.parseInt(txtField.getId().substring(8, 10));
+        String lsValue = txtField.getText();
+
+        if (lsValue == null) {
+            return;
+        }
+
+        if (!nv) {
+            try {
+                switch (lnIndex) {
+                    case 1:
+                        psActiveField = String.valueOf(lnIndex);
+                        break;
+                    case 2:
+                        psActiveField = String.valueOf(lnIndex);
+                        break;
+                    case 3:
+                        psActiveField = String.valueOf(lnIndex);
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+                try {
+                    if (oApp != null) {
+
+                        oApp.rollbackTrans(); // 🔥 force rollback
+                    }
+                } catch (SQLException ex1) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            }
+        } else {
+            txtField.selectAll();
+        }
+    };
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         if (!pbLoaded) {
             return;
@@ -807,6 +855,8 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             txtField.selectAll();
         }
     };
+    
+    
 
     private void txtField_KeyPressed(KeyEvent event) {
         try {
@@ -821,7 +871,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         case 02:
                             poJSON = oCashflow.SearchBanks(lsValue, false);
                             if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
-                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                                ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             }
                             
                             txtField02.setText((String) oCashflow.getModel().Banks().getBankName());
@@ -830,7 +880,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         case 06:
                             poJSON = oCashflow.SearchBanksBranch(lsValue, false);
                             if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
-                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                                ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             }
                             txtField06.setText(oCashflow.getModel().BanksBranh().getBranchBankName());
                             break;
@@ -859,7 +909,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             txtField03.setText(oCashflow.getModel().getAccountNo());
             txtField04.setText(oCashflow.getModel().getAccountCode());
             txtField05.setText(oCashflow.getModel().getAccountName());
-            txtField06.setText(oCashflow.getModel().getBranch());
+            txtField06.setText(oCashflow.getModel().BanksBranh().getBranchBankName());
             txtField07.setText( String.valueOf(oCashflow.getModel().getClearingDays()));
             txtField08.setText( String.valueOf(oCashflow.getModel().getSignatoryCount()));
             txtField09.setText(oCashflow.getModel().getSerialNo());
