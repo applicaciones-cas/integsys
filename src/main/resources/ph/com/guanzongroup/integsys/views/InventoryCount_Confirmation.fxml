@@ -476,11 +476,11 @@
                                                                         <TextField fx:id="tfEntryNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" />
                                                                         <TextField fx:id="tfActualQuantity" alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" promptText="0.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                                         <TextField fx:id="tfDE" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                                                                        <TextField fx:id="tfMS" alignment="CENTER_RIGHT" disable="true" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                                                                        <TextField fx:id="tfTD" alignment="CENTER_RIGHT" disable="true" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                                                                        <TextField fx:id="tfMS" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                                        <TextField fx:id="tfTD" alignment="CENTER_RIGHT" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                                                                         <TextField fx:id="tfEX" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="6" />
-                                                                        <TextField fx:id="tfDG" alignment="CENTER_RIGHT" disable="true" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="7" />
-                                                                        <TextField fx:id="tfSE" alignment="CENTER_RIGHT" disable="true" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="8" />
+                                                                        <TextField fx:id="tfDG" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="7" />
+                                                                        <TextField fx:id="tfSE" alignment="CENTER_RIGHT" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="8" />
                                                                         <Label text="Transfer w/o Doc" GridPane.rowIndex="8">
                                                                            <font>
                                                                               <Font size="12.0" />

@@ -79,7 +79,7 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.inv.warehouse.InventoryCount;
 import org.json.simple.JSONObject;
-import org.guanzon.cas.inv.warehouse.status.InventoryStockIssuanceStatus;
+import org.guanzon.cas.inv.warehouse.status.InventoryCountStatus;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Count_Detail;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Count_Master;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
@@ -772,8 +772,8 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         try {
 //            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
 //                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
-            lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
-                    : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
+            lblStatus.setText(InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
+                    : InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
             tfTransNo.setText(poAppController.getMaster().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getMaster().getTransactionDate()));
@@ -791,7 +791,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
 
-            if (poAppController.getMaster().getTransactionStatus().equals(InventoryStockIssuanceStatus.CONFIRMED)) {
+            if (poAppController.getMaster().getTransactionStatus().equals(InventoryCountStatus.CONFIRMED)) {
                 btnVoid.setText("Cancel");
             }
             if (tfTransNo.getText().trim().isEmpty()) {

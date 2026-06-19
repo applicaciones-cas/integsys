@@ -79,10 +79,11 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.inv.warehouse.InventoryCount;
 import org.json.simple.JSONObject;
-import org.guanzon.cas.inv.warehouse.status.InventoryStockIssuanceStatus;
+import org.guanzon.cas.inv.warehouse.status.InventoryCountStatus;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Count_Detail;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Count_Master;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
+import org.guanzon.cas.inv.warehouse.status.InventoryCountStatus;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
@@ -321,12 +322,31 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                     pnEditMode = poAppController.getEditMode();
                     break;
 
+                case "btnVerify":
+                    if (tfTransNo.getText().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
+                        return;
+                    }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to verify transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.VerifyTransaction(), "Initialize verify Transaction")) {
+                            return;
+                        }
+                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize post Transaction")) {
+                            return;
+                        }
+                    }
+
+                    reloadTableDetail();
+                    getLoadedTransaction();
+                    pnEditMode = poAppController.getEditMode();
+
+                    break;
                 case "btnSave":
                     if (tfTransNo.getText().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
                         return;
                     }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") == true) {
                         return;
                     }
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
@@ -783,8 +803,8 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
         try {
 //            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
 //                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
-            lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
-                    : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
+            lblStatus.setText(InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
+                    : InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
             tfTransNo.setText(poAppController.getMaster().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getMaster().getTransactionDate()));
@@ -802,7 +822,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
 
-            if (poAppController.getMaster().getTransactionStatus().equals(InventoryStockIssuanceStatus.CONFIRMED)) {
+            if (poAppController.getMaster().getTransactionStatus().equals(InventoryCountStatus.CONFIRMED)) {
                 btnVoid.setText("Cancel");
             }
             if (tfTransNo.getText().trim().isEmpty()) {
@@ -1160,6 +1180,10 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                 && "1".equals(poAppController.getMaster().getTransactionStatus())
                 && poAppController.getMaster().getCounterNo() < 3;
 
+        boolean lbIsPosted = lbHasTransaction
+                && "4".equals(poAppController.getMaster().getTransactionStatus())
+                && poAppController.getMaster().getCounterNo() >= 1;
+
         // Always visible
         initButtonControls(true, "btnClose");
 
@@ -1172,7 +1196,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
         initButtonControls(!lbEditing && lbHasTransaction, "btnHistory", "btnPrint");
         initButtonControls(!lbEditing && lbHasTransaction && lbIsApproved, "btnVerify");
         initButtonControls(!lbEditing && lbHasTransaction && lbIsCountable, "btnUpdate");
-        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved, "btnVoid");
+        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved || !lbIsPosted, "btnVoid");
         tfInventoryCountType.setDisable(fnEditMode == EditMode.UPDATE);
         cmbInclusion.setDisable(fnEditMode == EditMode.UPDATE && lbIsApproved);
 
