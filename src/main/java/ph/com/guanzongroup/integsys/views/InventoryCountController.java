@@ -253,7 +253,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     switch (lastFocusedControl.getId()) {
                         case "tfInventoryCountType":
                             if (!isJSONSuccess(poAppController.searchInventoryCountType(tfInventoryCountType.getText(), false),
-                                    "Initialize Search Destination! ")) {
+                                    "Initialize Search Inventory Count! ")) {
                                 return;
                             }
                             tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
@@ -264,7 +264,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             break;
                         case "tfRequestedBy":
                             if (!isJSONSuccess(poAppController.searchRequestBy(tfRequestedBy.getText(), false),
-                                    "Initialize Search Trucking! ")) {
+                                    "Initialize Search Requested By! ")) {
                                 return;
                             }
                             tfRequestedBy.setText(poAppController.getMaster().ClientRequestBy().getCompanyName());
@@ -283,7 +283,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         case "tfSearchInvCountType":
 
                             if (!isJSONSuccess(poAppController.searchTransaction(tfSearchInvCountType.getText(), true, false),
-                                    "Initialize Search Source No! ")) {
+                                    "Initialize Search Inventory Count ! ")) {
                                 return;
                             }
                             getLoadedTransaction();
@@ -320,11 +320,11 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 
                 case "btnUpdate":
                     if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
                         return;
                     }
 
-                    if (!isJSONSuccess(poAppController.UpdateTransaction(), "Initialize UPdate Transaction")) {
+                    if (!isJSONSuccess(poAppController.UpdateTransaction(), "Initialize Update Transaction")) {
                         return;
                     }
                     getLoadedTransaction();
@@ -333,7 +333,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 
                 case "btnSave":
                     if (tfTransNo.getText().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
                         return;
                     }
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
@@ -659,7 +659,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             case "tfSearchInvCountType":
 
                                 if (!isJSONSuccess(poAppController.searchTransaction(lsValue, true, false),
-                                        "Initialize Search Source No! ")) {
+                                        "Initialize Search Inventory Count ! ")) {
                                     return;
                                 }
 
@@ -688,7 +688,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 break;
                             case "tfInventoryCountType":
                                 if (!isJSONSuccess(poAppController.searchInventoryCountType(tfInventoryCountType.getText(), false),
-                                        "Initialize Search Destination! ")) {
+                                        "Initialize Search Inventory Count! ")) {
                                     return;
                                 }
                                 tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
@@ -699,7 +699,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 break;
                             case "tfRequestedBy":
                                 if (!isJSONSuccess(poAppController.searchRequestBy(tfRequestedBy.getText(), false),
-                                        "Initialize Search Trucking! ")) {
+                                        "Initialize Search Requested by! ")) {
                                     return;
                                 }
                                 tfRequestedBy.setText(poAppController.getMaster().ClientRequestBy().getCompanyName());
