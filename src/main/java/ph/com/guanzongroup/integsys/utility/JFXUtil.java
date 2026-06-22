@@ -1365,6 +1365,105 @@ public class JFXUtil {
         return new LoadScreenComponents(progressIndicator, loadingPane, placeholderLabel);
     }
 
+    // Shared loading helper for controllers that need a modal progress screen.
+    public static void runWithLoading(
+            Stage foOwner,
+            Pane foButtonContainer,
+            Runnable foBackgroundAction,
+            Runnable foOnSuccess) {
+        runWithLoading(foOwner, "Processing...", foButtonContainer, foBackgroundAction, foOnSuccess);
+    }
+
+    public static void runWithLoading(
+            Stage foOwner,
+            String fsMessage,
+            Pane foButtonContainer,
+            Runnable foBackgroundAction,
+            Runnable foOnSuccess) {
+
+        String lsMessage = (fsMessage == null || fsMessage.trim().isEmpty()) ? "Processing..." : fsMessage;
+        Stage loLoadingStage = createLoadingStage(foOwner, lsMessage);
+        setBrowseLoadingState(true, foButtonContainer);
+
+        Task<Void> loTask = new Task<Void>() {
+            @Override
+            protected Void call() {
+                if (foBackgroundAction != null) {
+                    foBackgroundAction.run();
+                }
+                return null;
+            }
+        };
+
+        loTask.setOnSucceeded(e -> {
+            loLoadingStage.close();
+            setBrowseLoadingState(false, foButtonContainer);
+            if (foOnSuccess != null) {
+                foOnSuccess.run();
+            }
+        });
+
+        loTask.setOnFailed(e -> {
+            loLoadingStage.close();
+            setBrowseLoadingState(false, foButtonContainer);
+        });
+
+        loLoadingStage.show();
+
+        Thread loThread = new Thread(loTask, "JFXUtil-runWithLoading");
+        loThread.setDaemon(true);
+        loThread.start();
+    }
+
+    public static void setBrowseLoadingState(boolean fbIsLoading, Pane foButtonContainer) {
+        if (foButtonContainer != null) {
+            foButtonContainer.lookupAll(".button").forEach(loNode -> loNode.setDisable(fbIsLoading));
+        }
+    }
+
+    public static Stage createLoadingStage(Stage foOwner, String fsMessage) {
+        ProgressIndicator loProgressIndicator = new ProgressIndicator();
+        loProgressIndicator.setMaxSize(56, 56);
+        loProgressIndicator.setStyle("-fx-progress-color: #FF8201;");
+
+        Label loLabel = new Label(fsMessage);
+
+        VBox loContainer = new VBox(12, loProgressIndicator, loLabel);
+        loContainer.setAlignment(Pos.CENTER);
+        loContainer.setPadding(new Insets(20));
+
+        loContainer.setPrefSize(260, 130);
+        loContainer.setMinSize(260, 130);
+        loContainer.setMaxSize(260, 130);
+        loContainer.setStyle(
+                "-fx-background-color: white;"
+                + "-fx-background-radius: 5;"
+                + "-fx-border-radius: 5;"
+                + "-fx-border-color: #D8D8D8;"
+                + "-fx-border-width: 1;"
+        );
+
+        StackPane loRoot = new StackPane(loContainer);
+        loRoot.setStyle("-fx-background-color: transparent;");
+
+        Scene loScene = new Scene(loRoot);
+        loScene.setFill(Color.TRANSPARENT);
+
+        Stage loStage = new Stage();
+        loStage.initStyle(StageStyle.TRANSPARENT);
+
+        if (foOwner != null) {
+            loStage.initOwner(foOwner);
+        }
+
+        loStage.setAlwaysOnTop(true);
+        loStage.setResizable(false);
+        loStage.setOnCloseRequest(event -> event.consume());
+        loStage.setScene(loScene);
+
+        return loStage;
+    }
+
     /*Sets in pxeModuleName ideally for convenient and dynamic getter of form title*/
  /*Requires controller class*/
     public static String getFormattedClassTitle(Class<?> javaclass) {
@@ -3486,7 +3585,7 @@ public class JFXUtil {
     }
 
     private static Timeline radialTimeline;
-
+/*Anim used in login*/
     public static void applyClockwiseFillAnimation(AnchorPane targetPane, double speed) {
         Platform.runLater(() -> {
             double width = targetPane.getPrefWidth();
@@ -3539,6 +3638,7 @@ public class JFXUtil {
             radialTimeline.playFromStart();
         });
     }
+    /*Reserved values for cmdButton purposes*/
     public static String[] buttonPackArray1 = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid", "btnConfirm", "btnPost"};
     public static String[] buttonPackArray2 = {"btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnPrint", "btnRemoveAttachment", "btnAddAttachment"};
 
@@ -3604,7 +3704,7 @@ public class JFXUtil {
         return calendar.getTime();
     }
 
-    //For combobox two value
+    //For combobox two basis value
     public static class Status {
 
         private final String code;
