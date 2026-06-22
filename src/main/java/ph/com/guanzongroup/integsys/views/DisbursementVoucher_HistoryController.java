@@ -1062,20 +1062,20 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         tblVwJournalDetails.setItems(journal_data);
     }
 
-    private void initDetailJEPGrid() {
-        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
-        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
-        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
-        tblVwJournalProposalDetails.setItems(journalproposal_data);
-    }
-
     private void initMainJEPGrid() {
         JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
         tblVwJournalProposalList.setItems(journalproposalmain_data);
+    }
+
+    private void initDetailJEPGrid() {
+        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
+        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
+        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
+        tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
     private void initDetailBIRGrid() {
@@ -1196,8 +1196,14 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loSIPostingController.setTransaction(fsSourceNo);
                 showDialog("/ph/com/guanzongroup/integsys/views/SIPosting_View.fxml", loSIPostingController);
                 break;
+            case DisbursementStatic.SourceCode.PO_RETURN:
+                POReturnPosting_ViewController loPOReturnPostingController = new POReturnPosting_ViewController();
+                loPOReturnPostingController.setGRider(oApp);
+                loPOReturnPostingController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/POReturnPosting_View.fxml", loPOReturnPostingController);
+                break;
             default:
-                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + fsSourceCode + ". Please contact the system administrator.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + poController.getSourceCodeDescription(fsSourceCode) + ". Please contact the system administrator.");
                 break;
         }
     }

@@ -544,6 +544,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     poController.Master().setSupplierClientID(psSupplierPayeeId);
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     pnEditMode = poController.getEditMode();
+                    System.out.println("UI JOURNAL EDIT MODE :  " + poController.Journal().getEditMode());
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
                 case "btnUpdate":
@@ -818,7 +819,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void loadTableDetailFromMain() {
-        poJSON = new JSONObject();
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
             ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
@@ -861,7 +861,23 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
             }
         } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
+//            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
+            if ("error".equals(poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+            Platform.runLater(() -> {
+                btnNew.fire();
+                if ("error".equals(poJSON.get("result"))) {
+                    return;
+                }
+                tblViewMainList.getSelectionModel().select(pnMain);
+                pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+                if (pnMain >= 0) {
+                    loadTableDetailFromMain();
+                    initButton(pnEditMode);
+                }
+            });
         }
     }
 
@@ -1364,20 +1380,20 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         tblVwJournalDetails.setItems(journal_data);
     }
 
-    private void initDetailJEPGrid() {
-        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
-        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
-        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
-        tblVwJournalProposalDetails.setItems(journalproposal_data);
-    }
-
     private void initMainJEPGrid() {
         JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
         tblVwJournalProposalList.setItems(journalproposalmain_data);
+    }
+
+    private void initDetailJEPGrid() {
+        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
+        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
+        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
+        tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
     private void initDetailBIRGrid() {
@@ -1511,8 +1527,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 loSIPostingController.setTransaction(fsSourceNo);
                 showDialog("/ph/com/guanzongroup/integsys/views/SIPosting_View.fxml", loSIPostingController);
                 break;
+            case DisbursementStatic.SourceCode.PO_RETURN:
+                POReturnPosting_ViewController loPOReturnPostingController = new POReturnPosting_ViewController();
+                loPOReturnPostingController.setGRider(oApp);
+                loPOReturnPostingController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/POReturnPosting_View.fxml", loPOReturnPostingController);
+                break;
             default:
-                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + fsSourceCode + ". Please contact the system administrator.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + poController.getSourceCodeDescription(fsSourceCode) + ". Please contact the system administrator.");
                 break;
         }
     }

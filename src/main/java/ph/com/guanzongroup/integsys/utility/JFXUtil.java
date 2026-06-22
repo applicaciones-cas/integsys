@@ -3146,6 +3146,8 @@ public class JFXUtil {
         }
     }
 
+    /*Displays customized tooltip for Node hover with delay*/
+     /*Requires double type number, message & any count of nodes*/
     public static void applyHoverTooltipDelay(double delay, String message, Node... nodes) {
         if (message == null || nodes == null) {
             return;
@@ -3178,7 +3180,7 @@ public class JFXUtil {
         }
     }
 
-    /*Alternative to switch case, lines saver*/
+    /*Alternative to switch case, code lines saver*/
     public static void altSwitch(String key, Object[][] cases) {
         for (Object[] c : cases) {
             String[] keys = (String[]) c[0];
@@ -3193,6 +3195,7 @@ public class JFXUtil {
         }
     }
 
+    /*Detects particular disabled tabs*/
     public static void checkDisabledTabs(TabPane tabPane, Consumer<Tab> action) {
         tabPane.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             for (Node node : tabPane.lookupAll(".tab")) {
@@ -3228,6 +3231,7 @@ public class JFXUtil {
                 });
     }
 
+    /*Validator for confirmation*/
     public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
 
         if (pnEditMode == EditMode.UPDATE) {
@@ -3246,6 +3250,7 @@ public class JFXUtil {
         return true;
     }
 
+    /*Validator for entry*/
     public static boolean loadValidation2(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo, double lnTotal) {
         if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
             String lsTrans = pnEditMode == EditMode.UPDATE ? "update mode." : "edit mode.";
@@ -3428,7 +3433,7 @@ public class JFXUtil {
         );
     }
 
-    //alternative datepicker action event listener to lessen code line in controllers
+    //alternative datepicker action event listener to lessen code line in ui controllers
     public static EventHandler<ActionEvent> DatePickerAction(DatePickerCommand command) {
         return event -> {
 
@@ -3537,6 +3542,8 @@ public class JFXUtil {
     public static String[] buttonPackArray1 = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid", "btnConfirm", "btnPost"};
     public static String[] buttonPackArray2 = {"btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnPrint", "btnRemoveAttachment", "btnAddAttachment"};
 
+    /*Detects if a string is pure number*/
+ /*Returns boolean*/
     public static boolean isNumeric(String str) {
         if (str == null || str.trim().isEmpty()) {
             return false;
@@ -3549,6 +3556,7 @@ public class JFXUtil {
         }
     }
 
+    /*Text reveal anim*/
     public static void runTextReveal(double duration, TextField textField) {
         String fullText = textField.getText();
 
@@ -3577,6 +3585,7 @@ public class JFXUtil {
         timeline.play();
     }
 
+    /*Gets the first day of Month, returns a Date type*/
     public static Date getFirstDayOfMonth(Date date) {
         if (date == null) {
             return null;
@@ -3595,6 +3604,7 @@ public class JFXUtil {
         return calendar.getTime();
     }
 
+    //For combobox two value
     public static class Status {
 
         private final String code;
