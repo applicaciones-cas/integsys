@@ -204,7 +204,16 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                 System.err.println("Initialize value : Industry >" + psIndustryID
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
-
+                try {
+                    if (!isJSONSuccess(poAppController.isOfficerEmployee(), " Initialize Officer level")) {
+                        unloadForm appUnload = new unloadForm();
+                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                    unloadForm appUnload = new unloadForm();
+                    appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                }
             });
             initializeTableDetail();
             initControlEvents();
@@ -1196,7 +1205,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
         initButtonControls(!lbEditing && lbHasTransaction, "btnHistory", "btnPrint");
         initButtonControls(!lbEditing && lbHasTransaction && lbIsApproved, "btnVerify");
         initButtonControls(!lbEditing && lbHasTransaction && lbIsCountable, "btnUpdate");
-        initButtonControls(!lbEditing && lbHasTransaction &&  !lbIsApproved && !lbIsPosted, "btnVoid");
+        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved && !lbIsPosted, "btnVoid");
         tfInventoryCountType.setDisable(fnEditMode == EditMode.UPDATE);
         cmbInclusion.setDisable(fnEditMode == EditMode.UPDATE && lbIsApproved);
 

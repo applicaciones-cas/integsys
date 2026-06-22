@@ -91,7 +91,22 @@ public class InventoryCountTypeController implements Initializable, ScreenInterf
             initButton(oParameters.getEditMode());
             InitTextFields();
             ClickButton();
+            Platform.runLater(() -> {
+                try {
+                    JSONObject poJSON = oParameters.isOfficerEmployee();
 
+                    if ("error".equals((String) poJSON.get("result"))) {
+
+                        ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                        unloadForm appUnload = new unloadForm();
+                        appUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                    unloadForm appUnload = new unloadForm();
+                    appUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
+                }
+            });
             if (oParameters.getEditMode() == EditMode.ADDNEW) {
                 loadRecord();
                 initButton(oParameters.getEditMode());

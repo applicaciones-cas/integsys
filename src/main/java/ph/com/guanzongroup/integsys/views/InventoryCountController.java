@@ -193,6 +193,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 
             //background thread
             Platform.runLater(() -> {
+
                 poAppController.setTransactionStatus("10");
                 //initialize logged in category
                 poAppController.setIndustryID(psIndustryID);
@@ -201,8 +202,18 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 System.err.println("Initialize value : Industry >" + psIndustryID
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
-
+                try {
+                    if (!isJSONSuccess(poAppController.isOfficerEmployee(), " Initialize Officer level")) {
+                        unloadForm appUnload = new unloadForm();
+                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                    unloadForm appUnload = new unloadForm();
+                    appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                }
                 btnNew.fire();
+
             });
             initializeTableDetail();
             initControlEvents();
@@ -282,7 +293,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchInvCountType":
 
-                            if (!isJSONSuccess(poAppController.searchTransaction(tfSearchInvCountType.getText(), true, false),
+                            if (!isJSONSuccess(poAppController.searchTransactionOpen(tfSearchInvCountType.getText(), true, false),
                                     "Initialize Search Inventory Count ! ")) {
                                 return;
                             }
@@ -293,7 +304,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             break;
                         case "tfSearchTransNo":
 
-                            if (!isJSONSuccess(poAppController.searchTransaction(tfSearchTransNo.getText(), true, true),
+                            if (!isJSONSuccess(poAppController.searchTransactionOpen(tfSearchTransNo.getText(), true, true),
                                     "Initialize Search Transaction! ")) {
                                 return;
                             }
@@ -658,7 +669,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 break;
                             case "tfSearchInvCountType":
 
-                                if (!isJSONSuccess(poAppController.searchTransaction(lsValue, true, false),
+                                if (!isJSONSuccess(poAppController.searchTransactionOpen(lsValue, true, false),
                                         "Initialize Search Inventory Count ! ")) {
                                     return;
                                 }
@@ -675,7 +686,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                         return;
                                     }
                                 }
-                                if (!isJSONSuccess(poAppController.searchTransaction(lsValue, true, true),
+                                if (!isJSONSuccess(poAppController.searchTransactionOpen(lsValue, true, true),
                                         "Initialize Search Transaction! ")) {
                                     return;
                                 }

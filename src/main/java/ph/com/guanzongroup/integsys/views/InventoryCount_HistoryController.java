@@ -203,7 +203,16 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 System.err.println("Initialize value : Industry >" + psIndustryID
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
-
+                try {
+                    if (!isJSONSuccess(poAppController.isOfficerEmployee(), " Initialize Officer level")) {
+                        unloadForm appUnload = new unloadForm();
+                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                    unloadForm appUnload = new unloadForm();
+                    appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                }
             });
             initializeTableDetail();
             initControlEvents();
@@ -499,7 +508,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
 
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                                 break;
-                            
+
                         }
                         break;
                 }
