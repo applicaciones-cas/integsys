@@ -205,7 +205,7 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
             poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
             poPurchaseReceivingController.PurchaseOrderReceiving().setWithUI(true);
             loadRecordSearch();
-            
+
             poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.OPEN + PurchaseOrderReceivingStatus.CONFIRMED + PurchaseOrderReceivingStatus.RETURNED);
             TriggerWindowEvent();
         });
@@ -466,12 +466,23 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
                         }
                         break;
                     case "btnUpdate":
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
+                        String lsUserId = oApp.getUserID();
+                        String lsPosition = poPurchaseReceivingController.PurchaseOrderReceiving().checkPosition(PurchaseOrderReceivingStatus.CONFIRMED_I, lsUserId);
+                        if (lsPosition == null || "".equals(lsPosition)) {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", "User is not an authorized officer.");
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        //Recheck transaction status
+                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
+
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -531,8 +542,9 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
                         retrievePOR();
                         break;
                     case "btnSave":
-                        //Validator
                         poJSON = new JSONObject();
+                        //Recheck transaction status
+                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
