@@ -2129,6 +2129,7 @@ public class SIPosting_EntryController implements Initializable, ScreenInterface
 
                 break;
             case PurchaseOrderReceivingStatus.CONFIRMED_I:
+            case PurchaseOrderReceivingStatus.RETURNED_I:
             case PurchaseOrderReceivingStatus.VERIFIED:
             case PurchaseOrderReceivingStatus.POSTED:
             case PurchaseOrderReceivingStatus.PAID:

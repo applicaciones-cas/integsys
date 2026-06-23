@@ -126,7 +126,7 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
     @FXML
     private Label lblSource, lblStatus, lblJEStatus;
     @FXML
-    private Button btnUpdate, btnSearch, btnSerials, btnSave, btnCancel, btnPost, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSerials, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
     private TextField tfSearchSupplier, tfSearchReceiveBranch, tfSearchReferenceNo, tfTransactionNo, tfSupplier, tfBranch, tfTrucking, tfReferenceNo,
             tfSINo, tfTerm, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfFreightAmt, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales,
@@ -181,9 +181,10 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
             poPurchaseReceivingController.PurchaseOrderReceiving().setIndustryId(psIndustryId);
             poPurchaseReceivingController.PurchaseOrderReceiving().setCompanyId(psCompanyId);
             poPurchaseReceivingController.PurchaseOrderReceiving().setCategoryId(psCategoryId);
-            poPurchaseReceivingController.PurchaseOrderReceiving().isFinance(true);
-            poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
             poPurchaseReceivingController.PurchaseOrderReceiving().setWithUI(true);
+            poPurchaseReceivingController.PurchaseOrderReceiving().isFinance(true);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED);
+            poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
             loadRecordSearch();
 
             TriggerWindowEvent();
@@ -357,6 +358,9 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
             }
             stageSerial.setOnHidden(event -> {
                 moveNext();
+                Platform.runLater(() -> {
+                    loadTableDetail();
+                });
             });
 
             stageSerial.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialCar.fxml"), controller, "Inventory Serial", true, false, false);
@@ -444,6 +448,20 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
                         }
                         break;
                     case "btnUpdate":
+                        String lsUserId = oApp.getUserID();
+                        String lsPosition = poPurchaseReceivingController.PurchaseOrderReceiving().checkPosition(PurchaseOrderReceivingStatus.CONFIRMED, lsUserId);
+                        if (lsPosition == null || "".equals(lsPosition)) {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", "User is not an authorized officer.");
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        //Recheck transaction status
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(true);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
@@ -504,6 +522,12 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
                         retrievePOR();
                         break;
                     case "btnSave":
+                        //Recheck transaction status
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(true);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
                         //Validator
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
@@ -518,9 +542,9 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
                                 // Confirmation Prompt
                                 JSONObject loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
+                                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.CONFIRMED)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
-                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmTransaction("Confirmed");
+                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
@@ -538,27 +562,6 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
                         }
 
                         break;
-                    case "btnPost":
-                        poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post transaction?") == true) {
-                            if (!lbSelectTabJE) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please review and verify all Journal Entry details before posting the transaction.");
-                                return;
-                            }
-
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().PostTransaction("");
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                return;
-                            } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                            }
-                        } else {
-                            return;
-                        }
-                        break;
                     case "btnArrowRight":
                         slideImage(1);
                         break;
@@ -571,7 +574,7 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnPost")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel")) {
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetMaster();
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetOthers();
                     poPurchaseReceivingController.PurchaseOrderReceiving().Detail().clear();
@@ -595,7 +598,7 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
                 }
                 initButton(pnEditMode);
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -1536,17 +1539,7 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
             }
             Platform.runLater(() -> {
                 String lsActive = pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus();
-                Map<String, String> statusMap = new HashMap<>();
-                statusMap.put(PurchaseOrderReceivingStatus.POSTED, "POSTED");
-                statusMap.put(PurchaseOrderReceivingStatus.PAID, "PAID");
-                statusMap.put(PurchaseOrderReceivingStatus.CONFIRMED, "CONFIRMED");
-                statusMap.put(PurchaseOrderReceivingStatus.OPEN, "OPEN");
-                statusMap.put(PurchaseOrderReceivingStatus.RETURNED, "RETURNED");
-                statusMap.put(PurchaseOrderReceivingStatus.VOID, "VOIDED");
-                statusMap.put(PurchaseOrderReceivingStatus.CANCELLED, "CANCELLED");
-
-                String lsStat = statusMap.getOrDefault(lsActive, "UNKNOWN");
-                lblStatus.setText(lsStat);
+                lblStatus.setText(poPurchaseReceivingController.PurchaseOrderReceiving().getStatus(lsActive).toUpperCase());
             });
 
             if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscountRate().doubleValue() > 0.00) {
@@ -2106,16 +2099,17 @@ public class SIPosting_EntryCarController implements Initializable, ScreenInterf
         JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel, btnSerials);
         //Ready
         JFXUtil.setButtonsVisibility(lbShow3, btnUpdate, btnHistory);
-        JFXUtil.setButtonsVisibility(false, btnPost);
         //Unkown || Ready
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
 
         switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
             case PurchaseOrderReceivingStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(lbShow3, btnPost);
 
                 break;
+            case PurchaseOrderReceivingStatus.CONFIRMED_I:
+            case PurchaseOrderReceivingStatus.RETURNED_I:
+            case PurchaseOrderReceivingStatus.VERIFIED:
             case PurchaseOrderReceivingStatus.POSTED:
             case PurchaseOrderReceivingStatus.PAID:
             case PurchaseOrderReceivingStatus.VOID:
