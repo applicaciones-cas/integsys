@@ -205,7 +205,8 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
             poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
             poPurchaseReceivingController.PurchaseOrderReceiving().setWithUI(true);
             loadRecordSearch();
-
+            
+            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.OPEN + PurchaseOrderReceivingStatus.CONFIRMED + PurchaseOrderReceivingStatus.RETURNED);
             TriggerWindowEvent();
         });
 
