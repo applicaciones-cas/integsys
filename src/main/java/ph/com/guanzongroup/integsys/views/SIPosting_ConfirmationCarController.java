@@ -2181,6 +2181,9 @@ public class SIPosting_ConfirmationCarController implements Initializable, Scree
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
+            case PurchaseOrderReceivingStatus.VERIFIED:
+                JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments, apJEMaster, apJEDetail);
+                break;
         }
         boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
                 && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
