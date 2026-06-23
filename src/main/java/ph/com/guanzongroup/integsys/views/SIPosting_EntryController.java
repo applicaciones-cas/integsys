@@ -540,9 +540,9 @@ public class SIPosting_EntryController implements Initializable, ScreenInterface
                                 // Confirmation Prompt
                                 JSONObject loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
+                                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.CONFIRMED)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
-                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmTransaction("Confirmed");
+                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
@@ -1555,17 +1555,6 @@ public class SIPosting_EntryController implements Initializable, ScreenInterface
             Platform.runLater(() -> {
                 String lsActive = pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus();
                 lblStatus.setText(poPurchaseReceivingController.PurchaseOrderReceiving().getStatus(lsActive).toUpperCase());
-//                Map<String, String> statusMap = new HashMap<>();
-//                statusMap.put(PurchaseOrderReceivingStatus.POSTED, "POSTED");
-//                statusMap.put(PurchaseOrderReceivingStatus.PAID, "PAID");
-//                statusMap.put(PurchaseOrderReceivingStatus.CONFIRMED, "CONFIRMED");
-//                statusMap.put(PurchaseOrderReceivingStatus.OPEN, "OPEN");
-//                statusMap.put(PurchaseOrderReceivingStatus.RETURNED, "RETURNED");
-//                statusMap.put(PurchaseOrderReceivingStatus.VOID, "VOIDED");
-//                statusMap.put(PurchaseOrderReceivingStatus.CANCELLED, "CANCELLED");
-//
-//                String lsStat = statusMap.getOrDefault(lsActive, "UNKNOWN");
-//                lblStatus.setText(lsStat);
             });
 
             if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscountRate().doubleValue() > 0.00) {
