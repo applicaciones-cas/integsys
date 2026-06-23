@@ -206,7 +206,8 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
             poPurchaseReceivingController.PurchaseOrderReceiving().setWithUI(true);
             loadRecordSearch();
 
-            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.OPEN + PurchaseOrderReceivingStatus.CONFIRMED + PurchaseOrderReceivingStatus.RETURNED);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED);
             TriggerWindowEvent();
         });
 
@@ -1615,17 +1616,7 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
 
             Platform.runLater(() -> {
                 String lsActive = pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus();
-                Map<String, String> statusMap = new HashMap<>();
-                statusMap.put(PurchaseOrderReceivingStatus.POSTED, "POSTED");
-                statusMap.put(PurchaseOrderReceivingStatus.PAID, "PAID");
-                statusMap.put(PurchaseOrderReceivingStatus.CONFIRMED, "CONFIRMED");
-                statusMap.put(PurchaseOrderReceivingStatus.OPEN, "OPEN");
-                statusMap.put(PurchaseOrderReceivingStatus.RETURNED, "RETURNED");
-                statusMap.put(PurchaseOrderReceivingStatus.VOID, "VOIDED");
-                statusMap.put(PurchaseOrderReceivingStatus.CANCELLED, "CANCELLED");
-
-                String lsStat = statusMap.getOrDefault(lsActive, "UNKNOWN");
-                lblStatus.setText(lsStat);
+                lblStatus.setText(poPurchaseReceivingController.PurchaseOrderReceiving().getStatus(lsActive).toUpperCase());
             });
 
             if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscountRate().doubleValue() > 0.00) {
