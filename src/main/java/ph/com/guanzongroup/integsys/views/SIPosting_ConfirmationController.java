@@ -1585,7 +1585,7 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
                 JFXUtil.updateCaretPositions(apJEMaster);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(SIPosting_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
