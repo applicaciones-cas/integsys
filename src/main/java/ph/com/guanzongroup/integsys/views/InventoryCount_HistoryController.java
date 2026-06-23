@@ -112,7 +112,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             apAttachmentButtons, apBrowse, apButton, apAttachments;
 
     @FXML
-    private DatePicker dpTransactionDate, dpRequestedDate;
+    private DatePicker dpTransactionDate, dpRequestedDate, dpCutOffDate;
 
     @FXML
     private TextArea taRemarks, taRemarksDetail;
@@ -543,6 +543,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             pbIsProgrammaticSelection = false;
             tfRequestedBy.setText(String.valueOf(poAppController.getMaster().ClientRequestBy().getCompanyName()));
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
+            dpCutOffDate.setValue(ParseDate(poAppController.getMaster().getCutOff()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
 
             if (tfTransNo.getText().trim().isEmpty()) {
@@ -580,10 +581,10 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
                 break;
             case 2:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter02();
                 break;
             case 3:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter03();
                 break;
             default:
                 lnActualCount = 0.0;
@@ -1192,6 +1193,9 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             switch (lsDatePickerID) {
                 case "dpRequestedDate":
                     poAppController.getMaster().setRequestedDate((ldDateTimeValue));
+                    return;
+                case "dpCutOffDate":
+                    poAppController.getMaster().setCutOff((ldDateTimeValue));
                     return;
 
             }

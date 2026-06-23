@@ -59,6 +59,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableRow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -109,7 +110,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             apAttachmentButtons, apBrowse, apButton, apAttachments;
 
     @FXML
-    private DatePicker dpTransactionDate, dpRequestedDate;
+    private DatePicker dpTransactionDate, dpRequestedDate, dpCutOffDate;
 
     @FXML
     private TextArea taRemarks, taRemarksDetail;
@@ -800,6 +801,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             pbIsProgrammaticSelection = false;
             tfRequestedBy.setText(String.valueOf(poAppController.getMaster().ClientRequestBy().getCompanyName()));
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
+            dpCutOffDate.setValue(ParseDate(poAppController.getMaster().getCutOff()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
 
             if (poAppController.getMaster().getTransactionStatus().equals(InventoryCountStatus.CONFIRMED)) {
@@ -840,10 +842,10 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
                 break;
             case 2:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter02();
                 break;
             case 3:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter03();
                 break;
             default:
                 lnActualCount = 0.0;
@@ -1143,11 +1145,57 @@ public class InventoryCountController implements Initializable, ScreenInterface 
     }
 
     private void initializeTableDetail() {
+
         if (laTransactionDetail == null) {
             laTransactionDetail = FXCollections.observableArrayList();
 
             tblViewDetails.setItems(laTransactionDetail);
+            tblViewDetails.setRowFactory(tv -> new TableRow<Model_Inventory_Count_Detail>() {
+                @Override
+                protected void updateItem(Model_Inventory_Count_Detail item, boolean empty) {
+                    super.updateItem(item, empty);
 
+                    if (empty || item == null) {
+                        setStyle("");
+                        return;
+                    }
+
+                    // Only apply on 2nd or 3rd cycle
+                    if (poAppController.getMaster().getCounterNo() <= 1) {
+                        setStyle("");
+                        return;
+                    }
+
+                    try {
+                        // Get prior cycle actual count
+                        double lnPriorCount = 0.0;
+                        switch (poAppController.getMaster().getCounterNo()) {
+                            case 2:
+                                lnPriorCount = item.getActualCounter01() != null
+                                        ? item.getActualCounter01() : 0.0;
+                                break;
+                            case 3:
+                                lnPriorCount = item.getActualCounter02() != null
+                                        ? item.getActualCounter02() : 0.0;
+                                break;
+                        }
+
+                        double lnQtyOnHand = item.getQuantityOnHand() != null
+                                ? item.getQuantityOnHand() : 0.0;
+                        double lnVariance = lnPriorCount - lnQtyOnHand;
+
+                        if (Math.abs(lnVariance) < 0.0000001) {
+                            // Zero variance - visually suppressed (grey out)
+                            setStyle("-fx-background-color: #d3d3d3; -fx-text-fill: #888888;");
+                        } else {
+                            // Has discrepancy - highlight
+                            setStyle("-fx-background-color: #fff3cd;");
+                        }
+                    } catch (Exception e) {
+                        setStyle("");
+                    }
+                }
+            });
             tblColCount1.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount2.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount3.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
@@ -1397,6 +1445,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             switch (lsDatePickerID) {
                 case "dpRequestedDate":
                     poAppController.getMaster().setRequestedDate((ldDateTimeValue));
+                    return;
+                case "dpCutOffDate":
+                    poAppController.getMaster().setCutOff((ldDateTimeValue));
                     return;
 
             }

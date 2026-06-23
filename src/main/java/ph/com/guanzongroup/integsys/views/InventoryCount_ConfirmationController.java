@@ -112,7 +112,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
             apAttachmentButtons, apBrowse, apButton, apAttachments;
 
     @FXML
-    private DatePicker dpTransactionDate, dpRequestedDate;
+    private DatePicker dpTransactionDate, dpRequestedDate, dpCutOffDate;
 
     @FXML
     private TextArea taRemarks, taRemarksDetail;
@@ -829,6 +829,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
             pbIsProgrammaticSelection = false;
             tfRequestedBy.setText(String.valueOf(poAppController.getMaster().ClientRequestBy().getCompanyName()));
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
+            dpCutOffDate.setValue(ParseDate(poAppController.getMaster().getCutOff()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
 
             if (poAppController.getMaster().getTransactionStatus().equals(InventoryCountStatus.CONFIRMED)) {
@@ -1511,6 +1512,9 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
             switch (lsDatePickerID) {
                 case "dpRequestedDate":
                     poAppController.getMaster().setRequestedDate((ldDateTimeValue));
+                    return;
+                case "dpCutOffDate":
+                    poAppController.getMaster().setCutOff((ldDateTimeValue));
                     return;
 
             }
