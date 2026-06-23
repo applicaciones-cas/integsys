@@ -565,7 +565,7 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
-                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmTransaction("Confirmed");
+                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
