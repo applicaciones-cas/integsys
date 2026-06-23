@@ -466,6 +466,22 @@ public class SIPosting_ConfirmationAppliancesController implements Initializable
                         }
                         break;
                     case "btnUpdate":
+                        String lsUserId = oApp.getUserID();
+                        String lsPosition = poPurchaseReceivingController.PurchaseOrderReceiving().checkPosition(PurchaseOrderReceivingStatus.CONFIRMED_I, lsUserId);
+                        if (lsPosition == null || "".equals(lsPosition)) {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", "User is not an authorized officer.");
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        //Recheck transaction status
+                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
@@ -548,7 +564,7 @@ public class SIPosting_ConfirmationAppliancesController implements Initializable
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
-                                            loJSON = loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
+                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
