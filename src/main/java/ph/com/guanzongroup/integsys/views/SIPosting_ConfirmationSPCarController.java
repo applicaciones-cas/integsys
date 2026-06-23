@@ -568,8 +568,6 @@ public class SIPosting_ConfirmationSPCarController implements Initializable, Scr
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         } catch (ScriptException ex) {
             Logger.getLogger(SIPosting_ConfirmationSPCarController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ScriptException ex) {
-            Logger.getLogger(SIPosting_ConfirmationSPCarController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
