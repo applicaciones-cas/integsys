@@ -1558,9 +1558,9 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
             //DISABLE Journal entry fields if has value
             String lsJournal = poPurchaseReceivingController.PurchaseOrderReceiving().existJournal();
             if (lsJournal != null && !"".equals(lsJournal)) {
-                JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
-            } else {
                 JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
+            } else {
+                JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
             }
             
             JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
