@@ -5,12 +5,6 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
-import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -18,12 +12,15 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
@@ -36,10 +33,17 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -58,34 +62,30 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
+import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
+import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicReference;
-import javafx.animation.PauseTransition;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.stage.Stage;
-import org.guanzon.appdriver.constant.DocumentType;
-import javafx.util.Pair;
-import javax.script.ScriptException;
-import org.guanzon.appdriver.constant.RecordStatus;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
+import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
@@ -567,6 +567,8 @@ public class SIPosting_ConfirmationMonarchHospitalityController implements Initi
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        } catch (ScriptException ex) {
+            Logger.getLogger(SIPosting_ConfirmationMonarchHospitalityController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
