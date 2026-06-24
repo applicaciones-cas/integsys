@@ -504,7 +504,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) {
-                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
+                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().VerifySIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
@@ -530,7 +530,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
                                 return;
                             }
 
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().VerifySIPosting("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -2127,9 +2127,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
-            case PurchaseOrderReceivingStatus.VERIFIED:
-                JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments, apJEMaster, apJEDetail);
-                break;
+
         }
         boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
                 && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
