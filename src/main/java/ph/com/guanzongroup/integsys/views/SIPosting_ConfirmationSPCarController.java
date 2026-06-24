@@ -207,7 +207,7 @@ public class SIPosting_ConfirmationSPCarController implements Initializable, Scr
             poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
             poPurchaseReceivingController.PurchaseOrderReceiving().setWithUI(true);
             loadRecordSearch();
-            poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
             poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED);
             TriggerWindowEvent();
         });
