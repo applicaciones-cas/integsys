@@ -220,7 +220,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
             initAttachmentsGrid();
             initAttachmentPreviewPane();
             lblSource.setText(poAppController.getMaster().Company().getCompanyName());
-
+            lblSource.setText("");
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
