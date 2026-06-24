@@ -146,7 +146,7 @@ public class SIPosting_VerificationCarController implements Initializable, Scree
     @FXML
     private Label lblSource, lblStatus, lblJEStatus;
     @FXML
-    private Button btnUpdate, btnSearch, btnSerials, btnSave, btnCancel, btnConfirm, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSerials, btnSave, btnCancel, btnVerify, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
     private TextField tfSearchSupplier, tfSearchReceiveBranch, tfSearchReferenceNo, tfTransactionNo, tfSupplier, tfBranch, tfTrucking, tfReferenceNo,
             tfSINo, tfTerm, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfFreightAmt, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales,
@@ -563,7 +563,7 @@ public class SIPosting_VerificationCarController implements Initializable, Scree
                                 JSONObject loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
-                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) {
                                             loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
@@ -582,11 +582,11 @@ public class SIPosting_VerificationCarController implements Initializable, Scree
                         }
 
                         break;
-                    case "btnConfirm":
+                    case "btnVerify":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to verify transaction?") == true) {
                             if (!lbSelectTabJE) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please review and verify all Journal Entry details before confirming the transaction.");
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please review and verify all Journal Entry details before verifying the transaction.");
                                 return;
                             }
 
@@ -615,7 +615,7 @@ public class SIPosting_VerificationCarController implements Initializable, Scree
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnConfirm")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVerify")) {
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetMaster();
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetOthers();
                     poPurchaseReceivingController.PurchaseOrderReceiving().Detail().clear();
@@ -2164,14 +2164,14 @@ public class SIPosting_VerificationCarController implements Initializable, Scree
         JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel, btnSerials);
         //Ready
         JFXUtil.setButtonsVisibility(lbShow3, btnUpdate, btnHistory);
-        JFXUtil.setButtonsVisibility(false, btnConfirm);
+        JFXUtil.setButtonsVisibility(false, btnVerify);
         //Unkown || Ready
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
 
         switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
             case PurchaseOrderReceivingStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(lbShow3, btnConfirm);
+                JFXUtil.setButtonsVisibility(lbShow3, btnVerify);
 
                 break;
             case PurchaseOrderReceivingStatus.POSTED:
