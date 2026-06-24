@@ -348,7 +348,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
                         return;
                     }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") == false) {
                         return;
                     }
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {

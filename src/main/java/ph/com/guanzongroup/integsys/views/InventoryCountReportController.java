@@ -48,6 +48,9 @@ import org.json.simple.JSONObject;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
+import org.guanzon.appdriver.base.CommonUtils;
+import org.guanzon.cas.parameter.Branch;
+import org.guanzon.cas.parameter.Category;
 import org.guanzon.cas.parameter.InventoryCountType;
 import org.guanzon.cas.parameter.services.ParamControllers;
 
@@ -59,6 +62,8 @@ public class InventoryCountReportController implements Initializable, ScreenInte
     private String psIndustryID, psCompanyID, psCategoryID;
     private JasperPrint poJasperPrint;
     private JRViewer poJRViewer;
+    private ResultSet poRSRecord;
+    private String psFinalSQL = "";
 
     // Stored IDs from search
     private String psBranchID = "";
@@ -135,6 +140,10 @@ public class InventoryCountReportController implements Initializable, ScreenInte
 
     // ─── Lost Focus Events — clear ID when field is manually cleared ──────────
     private void initLostFocusEvents() {
+
+        tfSearchBranch.setText("");
+        tfSearchCategory.setText("");
+        tfSearchInvCountType.setText("");
         tfSearchBranch.focusedProperty().addListener(txtField_Focus);
         tfSearchCategory.focusedProperty().addListener(txtField_Focus);
         tfSearchInvCountType.focusedProperty().addListener(txtField_Focus);
@@ -145,29 +154,31 @@ public class InventoryCountReportController implements Initializable, ScreenInte
         String lsID = loTextField.getId();
         String lsValue = loTextField.getText();
 
+        if (lsValue == null) {
+            return;
+        }
         if (!nv) {
             // Lost focus
-            if (lsValue == null || lsValue.trim().isEmpty()) {
-                switch (lsID) {
-                    case "tfSearchBranch":
-                        if (tfSearchBranch.getText().isEmpty()) {
-                            psBranchID = "";
-                            tfSearchBranch.clear();
-                        }
-                        break;
-                    case "tfSearchCategory":
-                        if (tfSearchCategory.getText().isEmpty()) {
-                            psCategorySearchID = "";
-                            tfSearchCategory.clear();
-                        }
-                        break;
-                    case "tfSearchInvCountType":
-                        if (tfSearchInvCountType.getText().isEmpty()) {
-                            psInvCountTypeID = "";
-                            tfSearchInvCountType.clear();
-                        }
-                        break;
-                }
+            switch (lsID) {
+                case "tfSearchBranch":
+                    if (tfSearchBranch == null || tfSearchBranch.getText().isEmpty()) {
+                        psBranchID = "";
+                        tfSearchBranch.setText("");
+                    }
+                    break;
+                case "tfSearchCategory":
+                    if (tfSearchCategory == null || tfSearchCategory.getText().isEmpty()) {
+                        psCategorySearchID = "";
+                        tfSearchCategory.setText("");
+                    }
+                    break;
+                case "tfSearchInvCountType":
+                    if (tfSearchInvCountType == null || tfSearchInvCountType.getText().isEmpty()) {
+                        psInvCountTypeID = "";
+                        tfSearchInvCountType.setText("");
+                    }
+                    break;
+
             }
         } else {
             // Gained focus
@@ -175,7 +186,7 @@ public class InventoryCountReportController implements Initializable, ScreenInte
         }
     };
 
-    // ─── Key Events ───────────────────────────────────────────────────────────
+// ─── Key Events ───────────────────────────────────────────────────────────
     private void initKeyEvents() {
         tfSearchBranch.setOnKeyPressed(this::handleSearchKeyPress);
         tfSearchCategory.setOnKeyPressed(this::handleSearchKeyPress);
@@ -189,6 +200,7 @@ public class InventoryCountReportController implements Initializable, ScreenInte
                 switch (source.getId()) {
                     case "tfSearchBranch":
                         searchBranch();
+
                         break;
                     case "tfSearchCategory":
                         searchCategory();
@@ -205,39 +217,65 @@ public class InventoryCountReportController implements Initializable, ScreenInte
     }
 
     private void searchBranch() throws GuanzonException, SQLException {
-        InventoryCountType loObject = new ParamControllers(poApp, poLogWrapper).InventoryCountType();
+        Branch loObject = new ParamControllers(poApp, poLogWrapper).Branch();
+        loObject.setRecordStatus("1");
         JSONObject loJSON = loObject.searchRecord(tfSearchBranch.getText(), false);
+        if (loJSON != null) {
+            if ("success".equals((String) loJSON.get("result"))) {
+                loJSON = new JSONObject();
+                loJSON.put("result", "success");
+            }
+        }
         if (isJSONSuccess(loJSON, psFormName)) {
+
             tfSearchBranch.setText(loObject.getModel().getDescription());
-            psBranchID = loObject.getModel().getInventoryCountID();
+            psBranchID = loObject.getModel().getBranchName();
+            tfSearchBranch.requestFocus();
         } else {
-            tfSearchBranch.clear();
+            tfSearchBranch.setText("");
             psBranchID = "";
         }
     }
 
     private void searchCategory() throws GuanzonException, SQLException {
-        InventoryCountType loObject = new ParamControllers(poApp, poLogWrapper).InventoryCountType();
+        Category loObject = new ParamControllers(poApp, poLogWrapper).Category();
+        loObject.setRecordStatus("1");
         JSONObject loJSON = loObject.searchRecord(tfSearchCategory.getText(), false);
+        if (loJSON != null) {
+            if ("success".equals((String) loJSON.get("result"))) {
+                loJSON = new JSONObject();
+                loJSON.put("result", "success");
+            }
+        }
         if (isJSONSuccess(loJSON, psFormName)) {
             tfSearchCategory.setText(loObject.getModel().getDescription());
-            psCategorySearchID = loObject.getModel().getInventoryCountID();
+            psCategorySearchID = loObject.getModel().getCategoryId();
+            tfSearchCategory.requestFocus();
         } else {
-            tfSearchCategory.clear();
+            tfSearchCategory.setText("");
             psCategorySearchID = "";
         }
     }
 
     private void searchInventoryCountType() throws GuanzonException, SQLException {
         InventoryCountType loObject = new ParamControllers(poApp, poLogWrapper).InventoryCountType();
+        loObject.setRecordStatus("1");
         JSONObject loJSON = loObject.searchRecord(tfSearchInvCountType.getText(), false);
+        if (loJSON != null) {
+            if ("success".equals((String) loJSON.get("result"))) {
+                loJSON = new JSONObject();
+                loJSON.put("result", "success");
+            }
+        }
         if (isJSONSuccess(loJSON, psFormName)) {
             tfSearchInvCountType.setText(loObject.getModel().getDescription());
             psInvCountTypeID = loObject.getModel().getInventoryCountID();
+            tfSearchInvCountType.requestFocus();
         } else {
-            tfSearchInvCountType.clear();
+            tfSearchInvCountType.setText("");
             psInvCountTypeID = "";
         }
+
     }
 
     // ─── Button Handler ───────────────────────────────────────────────────────
@@ -319,7 +357,8 @@ public class InventoryCountReportController implements Initializable, ScreenInte
                     + SQLUtil.toSQL(ldDateFrom)
                     + " AND "
                     + SQLUtil.toSQL(ldDateTo));
-
+            lsSQL = MiscUtil.addCondition(lsSQL,
+                    "InventoryCountMaster.cTranStat = " + SQLUtil.toSQL("4"));
             if (!psBranchID.isEmpty()) {
                 lsSQL = MiscUtil.addCondition(lsSQL,
                         "InventoryCountMaster.sBranchCd = " + SQLUtil.toSQL(psBranchID));
@@ -348,6 +387,8 @@ public class InventoryCountReportController implements Initializable, ScreenInte
             loParams.put("sBranchNm", poApp.getBranchName());
             loParams.put("sAddressx", poApp.getAddress());
             loParams.put("sCompnyNm", poApp.getClientName());
+            loParams.put("sReportDt", SQLUtil.dateFormat(ldDateFrom, SQLUtil.FORMAT_LONG_DATE)
+                    + " TO " + SQLUtil.dateFormat(ldDateTo, SQLUtil.FORMAT_LONG_DATE));
             loParams.put("DatePrinted", SQLUtil.dateFormat(
                     poApp.getServerDate(), SQLUtil.FORMAT_TIMESTAMP));
             loParams.put("watermarkImagePath",
@@ -356,7 +397,7 @@ public class InventoryCountReportController implements Initializable, ScreenInte
                     poApp.getClientName() == null ? "" : poApp.getClientName());
 
             String lsJasperPath = poApp.getReportPath()
-                    + InventoryCountPrint.getJasperReport(psIndustryID) +"Report"+ ".jasper";
+                    + InventoryCountPrint.getJasperReport(psIndustryID) + "Report" + ".jasper";
 
             Task<JasperPrint> task = new Task<JasperPrint>() {
                 @Override
@@ -365,9 +406,15 @@ public class InventoryCountReportController implements Initializable, ScreenInte
                     System.out.println("Report SQL: " + lsFinalSQL);
 
                     if (MiscUtil.RecordCount(loRS) <= 0) {
-                        throw new Exception("No records found for the selected criteria.");
+                        Platform.runLater(() -> {
+                            ShowMessageFX.Information("No records found for the selected criteria.", "", "");
+                        });
+                        return null;
                     }
                     loRS.beforeFirst();
+
+                    poRSRecord = loRS;   // ← ADD THIS LINE — store it for export
+
                     JRResultSetDataSource loDataSource = new JRResultSetDataSource(loRS);
                     return JasperFillManager.fillReport(lsJasperPath, loParams, loDataSource);
                 }
@@ -377,6 +424,15 @@ public class InventoryCountReportController implements Initializable, ScreenInte
                     overlay.setVisible(false);
                     pi.setVisible(false);
                     poJasperPrint = getValue();
+
+                    if (poJasperPrint == null) {
+                        // No records — message already shown in call(), just reset buttons
+                        overlay.setVisible(false);
+                        pi.setVisible(false);
+                        initButtonDisplay(false);
+                        return;
+                    }
+
                     embedReportInPane(poJasperPrint);
                     initButtonDisplay(true);
                 }
@@ -400,6 +456,7 @@ public class InventoryCountReportController implements Initializable, ScreenInte
             };
 
             Thread thread = new Thread(task);
+
             thread.setDaemon(true);
             thread.start();
 
@@ -409,8 +466,8 @@ public class InventoryCountReportController implements Initializable, ScreenInte
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
         }
     }
-
     // ─── Embed JRViewer ───────────────────────────────────────────────────────
+
     private void embedReportInPane(JasperPrint jasperPrint) {
         Platform.runLater(() -> {
             try {
@@ -480,7 +537,78 @@ public class InventoryCountReportController implements Initializable, ScreenInte
                     "No report loaded. Please retrieve first.");
             return;
         }
-        try {
+        if (poRSRecord == null) {
+            ShowMessageFX.Warning(null, psFormName,
+                    "No data available for export. Please retrieve first.");
+            return;
+        }
+
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook
+                = new org.apache.poi.xssf.usermodel.XSSFWorkbook()) {
+
+            org.apache.poi.ss.usermodel.Sheet sheet
+                    = workbook.createSheet("Inventory Count Report");
+
+            java.sql.ResultSetMetaData metaData = poRSRecord.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            // ── Header row ──────────────────────────────────────────────
+            org.apache.poi.ss.usermodel.CellStyle headerStyle
+                    = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(
+                    org.apache.poi.ss.usermodel.IndexedColors.OLIVE_GREEN.getIndex());
+            headerStyle.setFillPattern(
+                    org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setAlignment(
+                    org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+            headerStyle.setVerticalAlignment(
+                    org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
+            headerStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+            org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setColor(
+                    org.apache.poi.ss.usermodel.IndexedColors.WHITE.getIndex());
+            headerFont.setFontHeightInPoints((short) 12);
+            headerStyle.setFont(headerFont);
+
+            org.apache.poi.ss.usermodel.Row headerRow = sheet.createRow(0);
+            headerRow.setHeightInPoints(20);
+            for (int i = 0; i < columnCount; i++) {
+                org.apache.poi.ss.usermodel.Cell cell = headerRow.createCell(i);
+                cell.setCellValue(metaData.getColumnLabel(i + 1));
+                cell.setCellStyle(headerStyle);
+            }
+
+            // ── Number style ─────────────────────────────────────────────
+            org.apache.poi.ss.usermodel.CellStyle numStyle
+                    = workbook.createCellStyle();
+            org.apache.poi.ss.usermodel.DataFormat fmt = workbook.createDataFormat();
+            numStyle.setDataFormat(fmt.getFormat("#,##0.00"));
+
+            // ── Data rows ────────────────────────────────────────────────
+            int rowIndex = 1;
+            poRSRecord.beforeFirst();
+            while (poRSRecord.next()) {
+                org.apache.poi.ss.usermodel.Row row = sheet.createRow(rowIndex++);
+                for (int col = 0; col < columnCount; col++) {
+                    Object value = poRSRecord.getObject(col + 1);
+                    org.apache.poi.ss.usermodel.Cell cell = row.createCell(col);
+                    if (value instanceof Number) {
+                        cell.setCellValue(((Number) value).doubleValue());
+                        cell.setCellStyle(numStyle);
+                    } else if (value != null) {
+                        cell.setCellValue(value.toString());
+                    }
+                }
+            }
+
+            // ── Auto-size columns ────────────────────────────────────────
+            for (int i = 0; i < columnCount; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
+            }
+
+            // ── File chooser ─────────────────────────────────────────────
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save Report as Excel");
             fileChooser.getExtensionFilters().add(
@@ -489,19 +617,24 @@ public class InventoryCountReportController implements Initializable, ScreenInte
 
             File file = fileChooser.showSaveDialog(
                     (Stage) btnClose.getScene().getWindow());
-            if (file != null) {
-                net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter exporter
-                        = new net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter();
-                exporter.setExporterInput(
-                        new net.sf.jasperreports.export.SimpleExporterInput(poJasperPrint));
-                exporter.setExporterOutput(
-                        new net.sf.jasperreports.export.SimpleOutputStreamExporterOutput(file));
-                exporter.exportReport();
-                ShowMessageFX.Information(null, psFormName, "Excel exported successfully.");
+            if (file == null) {
+                return;   // user cancelled — silent
             }
-        } catch (Exception ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+            String path = file.getAbsolutePath();
+            if (!path.toLowerCase().endsWith(".xlsx")) {
+                path += ".xlsx";
+            }
+
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(path)) {
+                workbook.write(fos);
+            }
+
+            ShowMessageFX.Information(null, psFormName,
+                    "Excel exported successfully.");
+
+        } catch (java.sql.SQLException | java.io.IOException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+            ShowMessageFX.Error(e.getMessage(), psFormName, null);
         }
     }
 

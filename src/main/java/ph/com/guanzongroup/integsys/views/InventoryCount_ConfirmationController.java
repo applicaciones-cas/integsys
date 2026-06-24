@@ -355,13 +355,13 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
                         return;
                     }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") == true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") == false) {
                         return;
                     }
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to verify transaction?") != true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to verify transaction?") == true) {
                         if (!isJSONSuccess(poAppController.VerifyTransaction(), "Initialize verify Transaction")) {
                             return;
                         }
