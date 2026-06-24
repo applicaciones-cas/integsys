@@ -375,10 +375,7 @@ public class InventoryCountReportController implements Initializable, ScreenInte
                 lsSQL = MiscUtil.addCondition(lsSQL,
                         "InventoryCountMaster.sInvCtrID = " + SQLUtil.toSQL(psInvCountTypeID));
             }
-            if (!psCategoryID.isEmpty()) {
-                lsSQL = MiscUtil.addCondition(lsSQL,
-                        "InventoryCountMaster.sCategrCd = " + SQLUtil.toSQL(psCategoryID));
-            }
+            
 
             final String lsFinalSQL = lsSQL;
 
