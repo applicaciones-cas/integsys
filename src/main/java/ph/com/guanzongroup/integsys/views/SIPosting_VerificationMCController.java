@@ -645,7 +645,7 @@ public class SIPosting_VerificationMCController implements Initializable, Screen
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         } catch (ScriptException ex) {
-            Logger.getLogger(SIPosting_VerificationMCController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
