@@ -1,7 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Files;
@@ -9,6 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,16 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -47,9 +46,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import static javafx.scene.input.KeyCode.ENTER;
-import static javafx.scene.input.KeyCode.F3;
-import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -59,33 +55,38 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.Scene;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyCode;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.F3;
+import static javafx.scene.input.KeyCode.TAB;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.guanzon.appdriver.agent.systables.Model_Transaction_Attachment;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.inv.warehouse.InventoryCount;
 import org.json.simple.JSONObject;
-import org.guanzon.cas.inv.warehouse.status.InventoryStockIssuanceStatus;
+import org.guanzon.cas.inv.warehouse.status.InventoryCountStatus;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Count_Detail;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Count_Master;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
+import org.guanzon.cas.inv.warehouse.status.InventoryCountStatus;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
@@ -104,12 +105,14 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
     private ObservableList<Model_Inventory_Count_Master> laTransactionMaster;
     private ObservableList<Model_Inventory_Count_Detail> laTransactionDetail;
     private int pnSelectMaster, pnEditMode, pnTransactionDetail;
+    private boolean pbIsProgrammaticSelection = false;
 
     @FXML
-    private AnchorPane apMainAnchor, apMaster, apDetail, apDetail1, apTransaction, apAttachmentButtons, apBrowse, apButton, apAttachments;
+    private AnchorPane apMainAnchor, apMaster, apDetail, apDetailOther, apTransaction,
+            apAttachmentButtons, apBrowse, apButton, apAttachments;
 
     @FXML
-    private DatePicker dpTransactionDate, dpRequestedDate;
+    private DatePicker dpTransactionDate, dpRequestedDate, dpCutOffDate;
 
     @FXML
     private TextArea taRemarks, taRemarksDetail;
@@ -121,10 +124,8 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             tfEntryNo, tfActualQuantity, tfMS, tfEX, tfSE, tfDE, tfDG, tfTD, tfAttachmentNo;
 
     @FXML
-    private Button btnNew, btnUpdate, btnSearch, btnBrowse, btnSave, btnPrint, btnCancel,
-            btnHistory, btnClose, btnVoid,
+    private Button btnBrowse, btnPrint, btnHistory, btnClose,
             btnArrowLeft, btnArrowRight, btnAddAttachment, btnRemoveAttachment;
-
     @FXML
     private TableView<Model_Inventory_Count_Detail> tblViewDetails;
 
@@ -147,7 +148,13 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
     private TableView tblAttachments;
 
     @FXML
-    private TableColumn<?, ?> tblRowNoAttachment, tblFileNameAttachment;
+    private TableColumn tblRowNoAttachment, tblFileNameAttachment;
+
+    @FXML
+    private TabPane tabPaneMain;
+
+    @FXML
+    private ComboBox<String> cmbInclusion;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -178,7 +185,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new InvWarehouseControllers(poApp, poLogWrapper).InventoryCount();
-            poAppController.setTransactionStatus("10");
+            poAppController.setTransactionStatus("12340");
 
             //initlalize and validate transaction objects from class controller
             if (!isJSONSuccess(poAppController.initTransaction(), psFormName)) {
@@ -188,7 +195,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
 
             //background thread
             Platform.runLater(() -> {
-                poAppController.setTransactionStatus("10");
+                poAppController.setTransactionStatus("12340");
                 //initialize logged in category
                 poAppController.setIndustryID(psIndustryID);
                 poAppController.setCompanyID(psCompanyID);
@@ -196,14 +203,23 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 System.err.println("Initialize value : Industry >" + psIndustryID
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
-
-                btnNew.fire();
+                try {
+                    if (!isJSONSuccess(poAppController.isOfficerEmployee(), " Initialize Officer level")) {
+                        unloadForm appUnload = new unloadForm();
+                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                    unloadForm appUnload = new unloadForm();
+                    appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                }
             });
             initializeTableDetail();
             initControlEvents();
+            initAttachmentsGrid();
             initAttachmentPreviewPane();
-//            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
-
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName());
+            lblSource.setText("");
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -237,17 +253,6 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             //get button id
             String btnID = ((Button) event.getSource()).getId();
             switch (btnID) {
-                case "btnSearch":
-                    if (lastFocusedControl == null) {
-                        ShowMessageFX.Information(null, psFormName,
-                                "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
-                        return;
-                    }
-
-                    switch (lastFocusedControl.getId()) {
-                    }
-                    break;
-
                 case "btnBrowse":
                     if (lastFocusedControl == null) {
                         ShowMessageFX.Information(null, psFormName,
@@ -256,25 +261,19 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                     }
 
                     switch (lastFocusedControl.getId()) {
-                        case "tfSearchSourceno":
-                            if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
-                            if (!isJSONSuccess(poAppController.searchTransaction(tfSearchTransNo.getText(), true, true),
-                                    "Initialize Search Source No! ")) {
+                        case "tfSearchInvCountType":
+
+                            if (!isJSONSuccess(poAppController.searchTransaction(tfSearchInvCountType.getText(), true, false),
+                                    "Initialize Search Inventory Count ! ")) {
                                 return;
                             }
                             getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
+
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                             break;
                         case "tfSearchTransNo":
-                            if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
+
                             if (!isJSONSuccess(poAppController.searchTransaction(tfSearchTransNo.getText(), true, true),
                                     "Initialize Search Transaction! ")) {
                                 return;
@@ -283,82 +282,9 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
 //                                tfSearchTransNo.setText(poAppController.getMaster().getTransactionNo());
                             getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
+
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                             break;
-                    }
-                    break;
-
-                case "btnNew":
-                    if (!isJSONSuccess(poAppController.NewTransaction(), "Initialize New Transaction")) {
-                        return;
-                    }
-//                    clearAllInputs();
-                    getLoadedTransaction();
-                    pnEditMode = poAppController.getEditMode();
-                    break;
-
-                case "btnUpdate":
-                    if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
-                        return;
-                    }
-
-                    if (!isJSONSuccess(poAppController.UpdateTransaction(), "Initialize UPdate Transaction")) {
-                        return;
-                    }
-                    getLoadedTransaction();
-                    pnEditMode = poAppController.getEditMode();
-                    break;
-
-                case "btnSave":
-                    if (tfTransNo.getText().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
-                        return;
-                    }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
-                        return;
-                    }
-                    if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
-                        return;
-                    }
-
-                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm transaction?") == true) {
-                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
-                            return;
-                        }
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print transaction?") == true) {
-                            if (!isJSONSuccess(poAppController.printRecord(), "Initialize print Transaction")) {
-                                return;
-                            }
-                        }
-                    }
-
-                    reloadTableDetail();
-                    getLoadedTransaction();
-                    pnEditMode = poAppController.getEditMode();
-
-                    break;
-
-                case "btnCancel":
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
-                        poAppController = new InvWarehouseControllers(poApp, poLogWrapper).InventoryCount();
-                        poAppController.setTransactionStatus("10");
-
-                        if (!isJSONSuccess(poAppController.initTransaction(), "Initialize Transaction")) {
-                            unloadForm appUnload = new unloadForm();
-                            appUnload.unloadForm(apMainAnchor, poApp, psFormName);
-                        }
-
-                        Platform.runLater(() -> {
-                            poAppController.setTransactionStatus("10");
-//                            poAppController.getMaster().setIndustryId(psIndustryID);
-                            poAppController.setIndustryID(psIndustryID);
-                            poAppController.setCompanyID(psCompanyID);
-                            poAppController.setCategoryID(psCategoryID);
-
-                            clearAllInputs();
-                        });
-                        pnEditMode = poAppController.getEditMode();
-                        break;
                     }
                     break;
 
@@ -382,33 +308,23 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 case "btnClose":
                     unloadForm appUnload = new unloadForm();
                     if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        stageAttachment.closeDialog();
                         appUnload.unloadForm(apMainAnchor, poApp, psFormName);
                     }
                     break;
-                case "btnVoid":
-                    if (tfTransNo.getText().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", null, "Issuance Approval");
+
+                case "btnPrint":
+                    if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
                         return;
                     }
-
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void/Cancel transaction?") == true) {
-                        if (btnVoid.getText().equals("Void")) {
-                            if (!isJSONSuccess(poAppController.VoidTransaction(), "Initialize Void Transaction")) {
-                                return;
-                            }
-                        } else {
-                            if (!isJSONSuccess(poAppController.CancelTransaction(), "Initialize Cancel Transaction")) {
-                                return;
-                            }
-
-                        }
-                        reloadTableDetail();
-                        getLoadedTransaction();
-                        pnEditMode = poAppController.getEditMode();
-                        break;
+//                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
+                    if (!isJSONSuccess(poAppController.printRecord(),
+                            "Initialize Print Transaction")) {
+                        return;
                     }
-
                     break;
+
                 case "btnAddAttachment":
                     fileChooser = new FileChooser();
                     fileChooser.setTitle("Choose Image");
@@ -423,10 +339,11 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                         Image loimage = new Image(Files.newInputStream(imgPath));
                         imageView.setImage(loimage);
 
+                        //Validate attachment
                         String imgPath2 = selectedFile.getName().toString();
                         for (int lnCtr = 0; lnCtr <= poAppController.getTransactionAttachmentCount() - 1; lnCtr++) {
-                            if (imgPath2.equals(poAppController.getAttachmentList(lnCtr).getFileName())
-                                    && RecordStatus.ACTIVE.equals(poAppController.getAttachmentList(lnCtr).getRecordStatus())) {
+                            if (imgPath2.equals(poAppController.TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    && RecordStatus.ACTIVE.equals(poAppController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                                 ShowMessageFX.Warning(null, psFormName, "File name already exists.");
                                 pnAttachment = lnCtr;
                                 loadRecordAttachment(true);
@@ -450,15 +367,15 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                                     ShowMessageFX.Warning(null, psFormName, "PDF exceeds maximum allowed pages.");
                                     return;
                                 }
+                            } catch (IOException ex) {
+                                Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
 
-//                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, poAppController.addAttachment(imgPath2), 3);
-//                            pnAttachment = lnTempRow;
                         pnAttachment = poAppController.addAttachment(imgPath2);
                         //Copy file to Attachment path
                         poAppController.copyFile(selectedFile.toString());
-                        loadTableAttachment();
+                        loadTableAttachment.reload();
                         tblAttachments.getFocusModel().focus(pnAttachment);
                         tblAttachments.getSelectionModel().select(pnAttachment);
                     }
@@ -468,24 +385,23 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                         return;
                     } else {
                         for (int lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
-                            if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList(lnCtr).getRecordStatus())) {
+                            if (RecordStatus.INACTIVE.equals(poAppController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                                 if (pnAttachment == lnCtr) {
                                     return;
                                 }
                             }
                         }
                     }
-                    if (isJSONSuccess(poAppController.removeAttachment(pnAttachment), "Initialize remove Attachment")) {
+                    if (!isJSONSuccess(poAppController.removeAttachment(pnAttachment), "Initialize remove Attachment")) {
                         return;
                     }
-
                     attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
                     if (pnAttachment != 0) {
                         pnAttachment -= 1;
                     }
                     imageinfo_temp.clear();
                     loadRecordAttachment(false);
-                    loadTableAttachment();
+                    loadTableAttachment.reload();
                     if (attachment_data.size() <= 0) {
                         JFXUtil.clearTextFields(apAttachments);
                     }
@@ -515,96 +431,32 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         if (lsValue == null) {
             return;
         }
-        try {
-            if (!nv) {
-                /*Lost Focus*/
-                switch (lsTextFieldID) {
-                    case "taRemarks":
-                        poAppController.getMaster().setRemarks(lsValue);
-                        loadTransactionMaster();
-                        break;
+        if (!nv) {
+            /*Lost Focus*/
+            switch (lsTextFieldID) {
 
-                    case "taRemarksDetail":
-                        poAppController.getDetail(pnTransactionDetail).setRemarks(lsValue);
-                        reloadTableDetail();
-                        loadSelectedTransactionDetail(pnTransactionDetail);
-                        break;
-
-                }
-            } else {
-                loTextField.selectAll();
             }
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        } else {
+            loTextField.selectAll();
         }
+
     };
 
     private final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsTextFieldID = loTextField.getId();
         String lsValue = loTextField.getText();
-        try {
-            if (lsValue == null) {
-                return;
-            }
 
-            if (!nv) {
-                /*Lost Focus*/
-                switch (lsTextFieldID) {
-                    case "tfActualQuantity":
-                        if (poAppController.getDetail(pnTransactionDetail).getStockId() == null
-                                || poAppController.getDetail(pnTransactionDetail).getStockId().isEmpty()) {
-                            if (Double.parseDouble(tfActualQuantity.getText()) > 0.0) {
-                                tfActualQuantity.setText("0.00");
-                                loTextField.requestFocus();
-                                ShowMessageFX.Information("Unable to set quantity! No Stock Invetory Detected", psFormName, null);
-                            }
-                            return;
-                        }
-                        double lnActualQty;
-                        try {
-                            lnActualQty = Double.parseDouble(lsValue);
-                        } catch (NumberFormatException e) {
-                            lnActualQty = 0.0; // default if parsing fails
-                            reloadTableDetail();
-                            loadSelectedTransactionDetail(pnTransactionDetail);
-                            loTextField.requestFocus();
-
-                        }
-                        if (lnActualQty <= 0.00) {
-                            return;
-                        }
-                        switch (poAppController.getMaster().getCounterNo()) {
-                            case 1:
-                                poAppController.getDetail(pnTransactionDetail).setActualCounter01(lnActualQty);
-                                break;
-                            case 2:
-                                poAppController.getDetail(pnTransactionDetail).setActualCounter02(lnActualQty);
-                                break;
-                            case 3:
-                                poAppController.getDetail(pnTransactionDetail).setActualCounter03(lnActualQty);
-                                break;
-                            default:
-                                ShowMessageFX.Information("Unable to set quantity! Count is only on generation", psFormName, null);
-                        }
-                        reloadTableDetail();
-                        loadSelectedTransactionDetail(pnTransactionDetail);
-                        break;
-                }
-            } else {
-                loTextField.selectAll();
-            }
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        if (lsValue == null) {
+            return;
         }
+
+        if (!nv) {
+
+        } else {
+            loTextField.selectAll();
+        }
+
     };
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -623,20 +475,21 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+                            default:
+                                CommonUtils.SetNextFocus(loTxtField);
+                                break;
                             case "tfSearchInvCountType":
-                                if (!tfTransNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
-                                        return;
-                                    }
-                                }
-                                if (!isJSONSuccess(poAppController.searchTransaction(lsValue, true, true),
-                                        "Initialize Search Source No! ")) {
+
+                                if (!isJSONSuccess(poAppController.searchTransaction(lsValue, true, false),
+                                        "Initialize Search Inventory Count ! ")) {
                                     return;
                                 }
 
 //                                tfSearchSourceno.setText(poAppController.getMaster().Branch().getBranchName());
                                 getLoadedTransaction();
                                 initButtonDisplay(poAppController.getEditMode());
+
+                                JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                                 break;
                             case "tfSearchTransNo":
                                 if (!tfTransNo.getText().isEmpty()) {
@@ -652,22 +505,8 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
 //                                tfSearchTransNo.setText(poAppController.getMaster().getTransactionNo());
                                 getLoadedTransaction();
                                 initButtonDisplay(poAppController.getEditMode());
-                                break;
-                            case "tfInventoryCountType":
-                                if (!isJSONSuccess(poAppController.searchInventoryCountType(tfInventoryCountType.getText(), false),
-                                        "Initialize Search Destination! ")) {
-                                    return;
-                                }
-                                tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
-                                loadTransactionDetailList();
 
-                                break;
-                            case "tfRequestedBy":
-                                if (!isJSONSuccess(poAppController.searchRequestBy(tfRequestedBy.getText(), false),
-                                        "Initialize Search Trucking! ")) {
-                                    return;
-                                }
-                                tfRequestedBy.setText(poAppController.getMaster().ClientRequestBy().getCompanyName());
+                                JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                                 break;
 
                         }
@@ -683,76 +522,30 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         }
     }
 
-    private void loadTransactionDetailList() {
-        StackPane overlay = getOverlayProgress(apMaster);
-        ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
-        overlay.setVisible(true);
-        pi.setVisible(true);
-
-        Task<ObservableList<Model_Inventory_Count_Detail>> loadTransaction = new Task<ObservableList<Model_Inventory_Count_Detail>>() {
-            @Override
-            protected ObservableList<Model_Inventory_Count_Detail> call() throws Exception {
-                if (!isJSONSuccess(poAppController.generateDetail(),
-                        "Initialize : Load of generate List")) {
-                    return null;
-                }
-
-                List<Model_Inventory_Count_Detail> rawList = poAppController.getDetailList();
-                System.out.print("The size of list is " + rawList.size());
-                return FXCollections.observableArrayList(new ArrayList<>(rawList));
-            }
-
-            @Override
-            protected void succeeded() {
-                ObservableList<Model_Inventory_Count_Detail> laDetailList = getValue();
-                tblViewDetails.setItems(laDetailList);
-
-                overlay.setVisible(false);
-                pi.setVisible(false);
-            }
-
-            @Override
-            protected void failed() {
-                overlay.setVisible(false);
-                pi.setVisible(false);
-                Throwable ex = getException();
-                Logger
-                        .getLogger(DeliverySchedule_EntryController.class
-                                .getName()).log(Level.SEVERE, null, ex);
-                poLogWrapper.severe(psFormName + " : " + ex.getMessage());
-            }
-
-            @Override
-            protected void cancelled() {
-                overlay.setVisible(false);
-                pi.setVisible(false);
-            }
-        };
-        Thread thread = new Thread(loadTransaction);
-        thread.setDaemon(true);
-        thread.start();
-    }
-
     private void loadTransactionMaster() {
         try {
 //            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
 //                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
-            lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
-                    : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
+            lblStatus.setText(InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
+                    : InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
             tfTransNo.setText(poAppController.getMaster().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getMaster().getTransactionDate()));
             tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
-            tfInclusion.setText(poAppController.getMaster().getIncluded());
+            tfCountNo.setText(String.valueOf(poAppController.getMaster().getCounterNo()));
+            pbIsProgrammaticSelection = true;
+            if (!poAppController.getMaster().getIncluded().isEmpty()) {
+                cmbInclusion.getSelectionModel().select(
+                        Inclusion.fromCode(poAppController.getMaster().getIncluded()).getDisplayName());
+            } else {
+                cmbInclusion.getSelectionModel().select(-1);
+            }
+            pbIsProgrammaticSelection = false;
             tfRequestedBy.setText(String.valueOf(poAppController.getMaster().ClientRequestBy().getCompanyName()));
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
+            dpCutOffDate.setValue(ParseDate(poAppController.getMaster().getCutOff()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
 
-            if (poAppController.getMaster().getTransactionStatus().equals(InventoryStockIssuanceStatus.CONFIRMED)) {
-                btnVoid.setText("Cancel");
-            } else {
-                btnVoid.setText("Void");
-            }
             if (tfTransNo.getText().trim().isEmpty()) {
                 lblStatus.setText("UNKNOWN");
             }
@@ -775,7 +568,8 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         tfMeasure.setText(tblColMeasure.getCellData(tblIndex));
 
         //---------------------------Stock Detail------------------------------------
-        tfSupersede.setText(poAppController.getDetail(fnRow).Inventory().Superseded().getBarCode());
+        tfSupersede.setText(poAppController.getDetail(fnRow).Inventory().Superseded().getBarCode() == null
+                ? "" : poAppController.getDetail(fnRow).Inventory().Superseded().getBarCode());
         tfModel.setText(poAppController.getDetail(fnRow).Inventory().Model().getDescription());
         tfVariant.setText(poAppController.getDetail(fnRow).Inventory().Variant().getDescription());
         tfColor.setText(poAppController.getDetail(fnRow).Inventory().Color().getDescription());
@@ -787,19 +581,24 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
                 break;
             case 2:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter02();
                 break;
             case 3:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter03();
                 break;
             default:
                 lnActualCount = 0.0;
         }
+
         tfEntryNo.setText(String.valueOf(poAppController.getDetail(fnRow).getEntryNo()));
         tfActualQuantity.setText(String.valueOf(lnActualCount));
         taRemarksDetail.setText(poAppController.getDetail(fnRow).getRemarks());
 
-        //---------------------------Dif Cause to Concatication------------------------------------
+        getDifCause(fnRow);
+
+    }
+
+    private void getDifCause(int fnRow) {
         tfDE.setText("0.0");
         tfMS.setText("0.0");
         tfTD.setText("0.0");
@@ -807,6 +606,45 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         tfDG.setText("0.0");
         tfSE.setText("0.0");
 
+        String rawJson = poAppController.getDetail(fnRow).getDifCause();
+        if (rawJson == null || rawJson.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            JSONParser parser = new JSONParser();
+            JSONArray loJSONArray = (JSONArray) parser.parse(rawJson);
+
+            if (loJSONArray == null) {
+                return;
+            }
+
+            for (int i = 0; i < loJSONArray.size(); i++) {
+                JSONObject loObj = (JSONObject) loJSONArray.get(i);
+
+                if (loObj.containsKey("DE")) {
+                    tfDE.setText(String.valueOf(loObj.get("DE")));
+                }
+                if (loObj.containsKey("MS")) {
+                    tfMS.setText(String.valueOf(loObj.get("MS")));
+                }
+                if (loObj.containsKey("TD")) {
+                    tfTD.setText(String.valueOf(loObj.get("TD")));
+                }
+                if (loObj.containsKey("EX")) {
+                    tfEX.setText(String.valueOf(loObj.get("EX")));
+                }
+                if (loObj.containsKey("DG")) {
+                    tfDG.setText(String.valueOf(loObj.get("DG")));
+                }
+                if (loObj.containsKey("SE")) {
+                    tfSE.setText(String.valueOf(loObj.get("SE")));
+                }
+            }
+        } catch (org.json.simple.parser.ParseException e) {
+            System.err.println("Failed to parse JSON string from DB: " + rawJson);
+            e.printStackTrace();
+        }
     }
 
     private void initControlEvents() {
@@ -829,12 +667,155 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             } else if (loControl instanceof ComboBox) {
                 ComboBox loControlField = (ComboBox) loControl;
                 controllerFocusTracker(loControlField);
+            } else if (loControl instanceof DatePicker) {
+                DatePicker loControlField = (DatePicker) loControl;
+                controllerFocusTracker(loControlField);
+                loControlField.focusedProperty().addListener(dPicker_Focus);
+                loControlField.getEditor().setOnKeyPressed(this::dPicker_KeyPressed);
             }
         }
 
         imageView.setImage(null);
-        stackPaneClip();
         clearAllInputs();
+
+        cmbInclusion.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldVal, newVal) -> {
+                    if (newVal != null && !pbIsProgrammaticSelection) {
+                        try {
+                            Inclusion selected = Inclusion.fromDisplay(newVal);
+
+                            StackPane overlay = getOverlayProgress(apMaster);
+                            ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
+                            overlay.setVisible(true);
+                            pi.setVisible(true);
+
+                            Task<ObservableList<Model_Inventory_Count_Detail>> overrideTask
+                            = new Task<ObservableList<Model_Inventory_Count_Detail>>() {
+
+                        @Override
+                        protected ObservableList<Model_Inventory_Count_Detail> call() throws Exception {
+                            JSONObject loJSON = poAppController.setInclusion(selected.name());
+                            if (!isJSONSuccess(loJSON, "Initialize override detail")) {
+                                return null; // signal failure
+                            }
+
+                            List<Model_Inventory_Count_Detail> rawDetail = poAppController.getDetailList();
+                            System.out.println("Override detail size: " + rawDetail.size());
+                            return FXCollections.observableArrayList(new ArrayList<>(rawDetail));
+                        }
+
+                        @Override
+                        protected void succeeded() {
+                            ObservableList<Model_Inventory_Count_Detail> result = getValue();
+
+                            overlay.setVisible(false);
+                            pi.setVisible(false);
+
+                            if (result == null) {
+                                // setInclusion failed — restore previous selection
+                                pbIsProgrammaticSelection = true;
+                                if (oldVal != null) {
+                                    cmbInclusion.getSelectionModel().select(oldVal);
+                                } else {
+                                    cmbInclusion.getSelectionModel().select(-1);
+                                }
+                                pbIsProgrammaticSelection = false;
+                                return;
+                            }
+
+                            // Force full refresh of table with new paDetail contents
+                            laTransactionDetail.clear();
+                            laTransactionDetail.addAll(result);
+                            tblViewDetails.setItems(laTransactionDetail);
+                            tblViewDetails.refresh();
+
+                            // Reset selection to first row
+                            if (!laTransactionDetail.isEmpty()) {
+                                pnTransactionDetail = 1;
+                                tblViewDetails.getSelectionModel().select(0);
+                                tblViewDetails.scrollTo(0);
+                                try {
+                                    loadSelectedTransactionDetail(pnTransactionDetail);
+                                } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                                    Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        }
+
+                        @Override
+                        protected void failed() {
+                            overlay.setVisible(false);
+                            pi.setVisible(false);
+
+                            // Restore previous selection on failure
+                            pbIsProgrammaticSelection = true;
+                            if (oldVal != null) {
+                                cmbInclusion.getSelectionModel().select(oldVal);
+                            } else {
+                                cmbInclusion.getSelectionModel().select(-1);
+                            }
+                            pbIsProgrammaticSelection = false;
+
+                            Throwable ex = getException();
+                            Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                            poLogWrapper.severe(psFormName + " : " + ex.getMessage());
+                        }
+
+                        @Override
+                        protected void cancelled() {
+                            overlay.setVisible(false);
+                            pi.setVisible(false);
+                        }
+                    };
+
+                            Thread thread = new Thread(overrideTask);
+                            thread.setDaemon(true);
+                            thread.start();
+
+                        } catch (Exception ex) {
+                            Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+        );
+    }
+
+    public enum Inclusion {
+        AI("All Items"),
+        BB("Bins"),
+        RX("Random"),
+        C("By Classification");
+
+        private final String displayName;
+
+        Inclusion(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public static Inclusion fromDisplay(String displayName) {
+            for (Inclusion i : values()) {
+                if (i.displayName.equalsIgnoreCase(displayName)) {
+                    return i;
+                }
+            }
+            return AI; // default
+        }
+
+        public static Inclusion fromCode(String code) {
+            if (code == null || code.isEmpty()) {
+                return AI;
+            }
+            try {
+                return valueOf(code.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return AI;
+            }
+        }
+
     }
 
     private void controllerFocusTracker(Control control) {
@@ -864,6 +845,11 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 }
             }
         }
+        cmbInclusion.setItems(FXCollections.observableArrayList(
+                Arrays.stream(Inclusion.values())
+                        .map(Inclusion::getDisplayName)
+                        .collect(Collectors.toList())
+        ));
         pnEditMode = poAppController.getEditMode();
         initButtonDisplay(poAppController.getEditMode());
         if (tfTransNo.getText().trim().isEmpty()) {
@@ -879,22 +865,38 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         String lsTransNo = tfTransNo.getText();
         boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
         boolean lbIsApproved = lbHasTransaction
-                && "1".equals(poAppController.getMaster().getTransactionStatus());
+                && "1".equals(poAppController.getMaster().getTransactionStatus())
+                && poAppController.getMaster().getCounterNo() >= 1;
+        boolean lbIsCountable = lbHasTransaction
+                && "1".equals(poAppController.getMaster().getTransactionStatus())
+                && poAppController.getMaster().getCounterNo() < 3;
+
+        boolean lbIsPosted = lbHasTransaction
+                && "4".equals(poAppController.getMaster().getTransactionStatus())
+                && poAppController.getMaster().getCounterNo() >= 1;
 
         // Always visible
-        initButtonControls(true, "btnRetrieve", "btnClose");
+        initButtonControls(true, "btnClose");
 
         // Editing mode buttons
-        initButtonControls(lbEditing, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbEditing, "btnBrowse", "btnNew");
+        initButtonControls(lbEditing, "btnSearch", "btnSave", "btnCancel",
+                "btnAddAttachment", "btnRemoveAttachment");
+        initButtonControls(!lbEditing, "btnBrowse");
 
         // Transaction-dependent buttons (only when not editing)
-        initButtonControls(!lbEditing && lbHasTransaction, "btnUpdate", "btnVoid", "btnHistory", "btnPrint");
-        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved, "btnUpdate");
+        initButtonControls(!lbEditing && lbHasTransaction, "btnHistory", "btnPrint");
+        initButtonControls(!lbEditing && lbHasTransaction && lbIsApproved, "btnVerify");
+        initButtonControls(!lbEditing && lbHasTransaction && lbIsCountable, "btnUpdate");
+        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved && !lbIsPosted, "btnVoid");
+        tfInventoryCountType.setDisable(fnEditMode == EditMode.UPDATE);
+        cmbInclusion.setDisable(fnEditMode == EditMode.UPDATE && lbIsApproved);
 
         // Disable panes during editing
         apMaster.setDisable(!lbEditing);
         apDetail.setDisable(!lbEditing);
+        apDetailOther.setDisable(!lbEditing);
+        //reload attachment
+        loadTableAttachment.reload();
 
     }
 
@@ -924,6 +926,16 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 ;
             }
         }
+        tblAttachments.setOnMouseClicked(event -> {
+            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
+            if (pnAttachment >= 0) {
+                imageviewerutil.scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
+                loadRecordAttachment(true);
+                JFXUtil.resetImageBounds(imageView, stackPane1);
+            }
+        });
     }
 
     private void initializeTableDetail() {
@@ -991,7 +1003,53 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter03()));
 
             });
-
+            loadTableAttachment = new JFXUtil.ReloadableTableTask(
+                    tblAttachments,
+                    attachment_data,
+                    () -> {
+                        imageviewerutil.scaleFactor = 1.0;
+                        JFXUtil.resetImageBounds(imageView, stackPane1);
+                        Platform.runLater(() -> {
+                            try {
+                                attachment_data.clear();
+                                int lnCtr;
+                                int lnCount = 0;
+                                for (lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
+                                    if (RecordStatus.INACTIVE.equals(poAppController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                        continue;
+                                    }
+                                    lnCount += 1;
+                                    attachment_data.add(
+                                            new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                    String.valueOf(poAppController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                                    String.valueOf(lnCtr)
+                                            ));
+                                }
+                                int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                                if (lnTempRow < 0 || lnTempRow
+                                        >= attachment_data.size()) {
+                                    if (!attachment_data.isEmpty()) {
+                                        /* FOCUS ON FIRST ROW */
+                                        JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                        int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                        pnAttachment = lnRow;
+                                        loadRecordAttachment(true);
+                                    }
+                                } else {
+                                    /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                    JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                    int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                    pnAttachment = lnRow;
+                                    loadRecordAttachment(true);
+                                }
+                                if (attachment_data.size() <= 0) {
+                                    loadRecordAttachment(false);
+                                }
+                            } catch (Exception e) {
+                            }
+                        });
+                    }
+            );
         }
     }
 
@@ -1119,19 +1177,153 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         return controls;
     }
 
-    //-----------------------------Attachment Code--------------------------------------------------------------------------------------
-    private final ObservableList<Model_Transaction_Attachment> attachment_data = FXCollections.observableArrayList();
-    public static ObservableList<String> documentType = FXCollections.observableArrayList("Other");
+    final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
+        DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
+        String lsDatePickerID = loDatePicker.getId();
+        LocalDate loValue = loDatePicker.getValue();
 
+        if (loValue == null) {
+            return;
+        }
+
+        LocalDateTime ldDateTimeValue = loValue.atTime(LocalTime.now());
+        Date ldDateValue = Date.from(loValue.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        if (!nv) {
+            /*Lost Focus*/
+            switch (lsDatePickerID) {
+                case "dpRequestedDate":
+                    poAppController.getMaster().setRequestedDate((ldDateTimeValue));
+                    return;
+                case "dpCutOffDate":
+                    poAppController.getMaster().setCutOff((ldDateTimeValue));
+                    return;
+
+            }
+        }
+    };
+
+    private void dPicker_KeyPressed(KeyEvent event) {
+
+        TextField loTxtField = (TextField) event.getSource();
+        String loDatePickerID = ((DatePicker) loTxtField.getParent()).getId(); // cautious cast
+        String loValue = loTxtField.getText();
+        String lsValue = "";
+        if (loValue != null && !loValue.isEmpty()) {
+            Date toDateValue = SQLUtil.toDate(loValue, "dd/MM/yyyy");
+            lsValue = SQLUtil.dateFormat(toDateValue, SQLUtil.FORMAT_SHORT_DATE);
+
+        }
+
+        if (event.getCode() != null) {
+            switch (event.getCode()) {
+                case TAB:
+                case ENTER:
+                case F3:
+                    event.consume();
+                    switch (loDatePickerID) {
+
+                    }
+            }
+        }
+        event.consume();
+
+    }
+
+    //-----------------------------Attachment Code--------------------------------------------------------------------------------------
+    private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
+    public static ObservableList<String> documentType = FXCollections.observableArrayList("Other");
+    String lsValidDisbMessage = "Please provide generate inventory count detail to proceed.";
+
+    AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
+    AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
+    JFXUtil.ReloadableTableTask loadTableAttachment;
+    private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     Map<String, String> imageinfo_temp = new HashMap<>();
     private FileChooser fileChooser;
-    private int pnAttachment;
+    private int pnAttachment = 0;
     private int currentIndex = 0;
-    double ldstackPaneWidth = 0;
-    double ldstackPaneHeight = 0;
-    private double mouseAnchorX;
-    private double mouseAnchorY;
-    private double scaleFactor = 1.0;
+
+    private boolean pbIsCheckedAttachmentTab = false;
+
+    AnchorPane root = null;
+    Scene scene = null;
+    JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
+    ChangeListener<Scene> WindowKeyEvent = (obs, oldScene, newScene) -> {
+        if (newScene != null) {
+            setKeyEvent(newScene);
+        }
+    };
+
+    public void initTabPane() {
+        JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
+            switch (tabTitle) {
+                case "Details": {
+                    try {
+                        getLoadedTransaction();
+                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                        Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+
+                case "Attachments":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apAttachments);
+                        if (DoesContainValidDisbDetail()) {
+                            pbIsCheckedAttachmentTab = true;
+                            try {
+                                poAppController.loadAttachments();
+                            } catch (GuanzonException | SQLException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
+                            }
+
+                            loadTableAttachment.reload();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
+                            ShowMessageFX.Warning(null, psFormName, lsValidDisbMessage);
+                        }
+                    }
+                    break;
+            }
+        });
+
+    }
+
+    private void setKeyEvent(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F5) {
+                if (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
+                    if (DoesContainValidDisbDetail()) {
+                    } else {
+                        ShowMessageFX.Warning(null, psFormName, lsValidDisbMessage);
+                        return;
+                    }
+                    showAttachmentDialog();
+                }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
+            }
+        });
+        scene.focusOwnerProperty().addListener((obs, oldNode, newNode) -> {
+            if (newNode != null) {
+                if (newNode instanceof Button) {
+                } else {
+                    lastFocusedTextField.set(newNode);
+                    previousSearchedTextField.set(null);
+                }
+            }
+        });
+    }
+
+    private boolean DoesContainValidDisbDetail() {
+
+        if (poAppController.getDetailCount() <= 0) {
+            return false;
+        }
+        return true;
+    }
 
     public void resetImageBounds() {
         imageView.setScaleX(1.0);
@@ -1141,61 +1333,13 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         stackPane1.setAlignment(imageView, javafx.geometry.Pos.CENTER);
     }
 
-    private void initStackPaneListener() {
-        stackPane1.widthProperty().addListener((observable, oldValue, newWidth) -> {
-            double computedWidth = newWidth.doubleValue();
-            ldstackPaneWidth = computedWidth;
-
-        });
-        stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
-            double computedHeight = newHeight.doubleValue();
-            ldstackPaneHeight = computedHeight;
-            loadTableAttachment();
-            loadRecordAttachment(true);
-            initAttachmentsGrid();
-        });
-    }
-
     private void initAttachmentPreviewPane() {
-        stackPane1.layoutBoundsProperty().addListener((observable, oldBounds, newBounds) -> {
-            stackPane1.setClip(new javafx.scene.shape.Rectangle(
-                    newBounds.getMinX(),
-                    newBounds.getMinY(),
-                    newBounds.getWidth(),
-                    newBounds.getHeight()
-            ));
-        });
-        imageView.setOnScroll((ScrollEvent event) -> {
-            double delta = event.getDeltaY();
-            scaleFactor = Math.max(0.5, Math.min(scaleFactor * (delta > 0 ? 1.1 : 0.9), 5.0));
-            imageView.setScaleX(scaleFactor);
-            imageView.setScaleY(scaleFactor);
-        });
-
-        imageView.setOnMousePressed((MouseEvent event) -> {
-            mouseAnchorX = event.getSceneX() - imageView.getTranslateX();
-            mouseAnchorY = event.getSceneY() - imageView.getTranslateY();
-        });
-
-        imageView.setOnMouseDragged((MouseEvent event) -> {
-            double translateX = event.getSceneX() - mouseAnchorX;
-            double translateY = event.getSceneY() - mouseAnchorY;
-            imageView.setTranslateX(translateX);
-            imageView.setTranslateY(translateY);
-        });
-
-        stackPane1.widthProperty().addListener((observable, oldValue, newWidth) -> {
-            double computedWidth = newWidth.doubleValue();
-            ldstackPaneWidth = computedWidth;
-
-        });
+        imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
         stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
             double computedHeight = newHeight.doubleValue();
-            ldstackPaneHeight = computedHeight;
-
-            //Placed to get height and width of stack pane in computed size before loading the image
-            initStackPaneListener();
-            initAttachmentsGrid();
+            imageviewerutil.ldstackPaneHeight = computedHeight;
+            loadTableAttachment.reload();
+            loadRecordAttachment(true);
         });
 
     }
@@ -1204,90 +1348,15 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
         JFXUtil.setColumnCenter(tblRowNoAttachment);
         JFXUtil.setColumnLeft(tblFileNameAttachment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
+
         tblAttachments.setItems(attachment_data);
-    }
-
-    private void loadTableAttachment() {
-        // Setting data to table detail
-        ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setMaxHeight(50);
-        progressIndicator.setStyle("-fx-progress-color: #FF8201;");
-        StackPane loadingPane = new StackPane(progressIndicator);
-        loadingPane.setAlignment(Pos.CENTER);
-        tblAttachments.setPlaceholder(loadingPane);
-        progressIndicator.setVisible(true);
-
-        Label placeholderLabel = new Label("NO RECORD TO LOAD");
-        placeholderLabel.setStyle("-fx-font-size: 10px;"); // Adjust the size as needed
-
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-//                Thread.sleep(1000);
-                Platform.runLater(() -> {
-                    try {
-                        attachment_data.clear();
-                        int lnCtr;
-                        int lnCount = 0;
-
-                        List<Model_Transaction_Attachment> rawDetailAttachment = poAppController.getAttachmentList();
-                        attachment_data.setAll(rawDetailAttachment);
-                        int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
-                        if (lnTempRow < 0 || lnTempRow
-                                >= attachment_data.size()) {
-                            if (!attachment_data.isEmpty()) {
-                                /* FOCUS ON FIRST ROW */
-                                JFXUtil.selectAndFocusRow(tblAttachments, 0);
-                                pnAttachment = 0;
-                                loadRecordAttachment(true);
-                            }
-                        } else {
-                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                            JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
-                            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
-                            loadRecordAttachment(true);
-                        }
-                        if (attachment_data.size() <= 0) {
-                            loadRecordAttachment(false);
-                        }
-                    } catch (Exception e) {
-
-                    }
-
-                });
-
-                return null;
-            }
-
-            @Override
-            protected void succeeded() {
-                if (attachment_data == null || attachment_data.isEmpty()) {
-                    tblAttachments.setPlaceholder(placeholderLabel);
-                } else {
-                    tblAttachments.toFront();
-                }
-                progressIndicator.setVisible(false);
-
-            }
-
-            @Override
-            protected void failed() {
-                if (attachment_data == null || attachment_data.isEmpty()) {
-                    tblAttachments.setPlaceholder(placeholderLabel);
-                }
-                progressIndicator.setVisible(false);
-            }
-
-        };
-        new Thread(task).start(); // Run task in background
-
     }
 
     public void slideImage(int direction) {
         if (attachment_data.size() <= 0) {
             return;
         }
-        int lnRow = pnAttachment;
+        int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
         currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
 
@@ -1296,7 +1365,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             slideOut.setByX(direction * -400); // Move left or right
 
             JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
-            int lnIndex = newIndex;
+            int lnIndex = Integer.valueOf(attachment_data.get(newIndex).getIndex01());
             int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, lnIndex, 3);
             pnAttachment = lnTempRow;
             loadRecordAttachment(false);
@@ -1314,35 +1383,46 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             slideOut.play();
         }
         if (JFXUtil.isImageViewOutOfBounds(imageView, stackPane1)) {
-            resetImageBounds();
+            JFXUtil.resetImageBounds(imageView, stackPane1);
         }
     }
 
-    private void stackPaneClip() {
-        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(
-                stackPane1.getWidth() - 8, // Subtract 10 for padding (5 on each side)
-                stackPane1.getHeight() - 8 // Subtract 10 for padding (5 on each side)
-        );
-        clip.setArcWidth(8); // Optional: Rounded corners for aesthetics
-        clip.setArcHeight(8);
-        clip.setLayoutX(4); // Set padding offset for X
-        clip.setLayoutY(4); // Set padding offset for Y
-        stackPane1.setClip(clip);
+    public void clearAttachment() {
+
+        stageAttachment.closeDialog();
+        tfAttachmentNo.clear();
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setDisable(true);
 
     }
 
-    public void clearAttachment() {
-        tfAttachmentNo.clear();
-        cmbAttachmentType.setItems(documentType);
-        cmbAttachmentType.getSelectionModel().select(0);
-        cmbAttachmentType.setDisable(true);
+    private void initComboBoxes() {
+        JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
 
+    }
+
+    public void initComboboxes() {
+
+        initComboBoxes();
+        // ComboBox setup
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setOnAction(event -> {
+            if (attachment_data.size() > 0) {
+                try {
+                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
+                    poAppController.TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
+                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
+                } catch (Exception e) {
+                }
+            }
+        });
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
     }
 
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
-                tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getTransactionNo());
+                tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
                 String lsAttachmentType = poAppController.TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
                     poAppController.TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
@@ -1351,19 +1431,20 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                 int lnAttachmentType = 0;
                 lnAttachmentType = Integer.parseInt(lsAttachmentType);
                 cmbAttachmentType.getSelectionModel().select(lnAttachmentType);
-
+//                tfAttachmentSource.setText(poController.TransactionAttachmentSource(pnAttachment));
                 if (lbloadImage) {
                     try {
-                        String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getImagePath();
+                        String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getFileName())) {
-                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getFileName());
+                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            if (poAppController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poAppController.TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
-                                filePath2 = poAppController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getFileName();
+                            if (poAppController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null
+                                    && !"".equals(poAppController.TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
+                                filePath2 = poAppController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             } else {
-                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getFileName();
+                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             }
                         }
 
@@ -1374,12 +1455,11 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
 
                             // Clear previous content
                             stackPane1.getChildren().clear();
-
                             if (!isPdf) {
                                 // ----- IMAGE VIEW -----
                                 Image loimage = new Image(convertedPath);
                                 imageView.setImage(loimage);
-                                JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
+                                JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
 
                                 PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
                                 delay.setOnFinished(event -> {
@@ -1403,106 +1483,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
 
                             } else {
                                 // ----- PDF VIEW -----
-                                PDDocument document = PDDocument.load(new File(filePath2));
-                                PDFRenderer renderer = new PDFRenderer(document);
-                                int pageCount = document.getNumberOfPages();
-
-                                // Container for PDF pages
-                                VBox pdfContainer = new VBox(10);
-                                pdfContainer.setAlignment(Pos.CENTER); // center pages
-                                pdfContainer.setPrefWidth(ldstackPaneWidth);
-
-                                for (int i = 0; i < pageCount; i++) {
-                                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
-                                    Image fxImage = SwingFXUtils.toFXImage(pageImage, null);
-                                    ImageView pageView = new ImageView(fxImage);
-
-                                    pageView.setPreserveRatio(true);
-                                    pageView.setFitWidth(ldstackPaneWidth);
-                                    JFXUtil.adjustImageSize(fxImage, pageView, ldstackPaneWidth, ldstackPaneHeight);
-
-                                    pdfContainer.getChildren().add(pageView);
-                                }
-
-                                // Wrap VBox in a Group for scaling
-                                Group pdfGroup = new Group(pdfContainer);
-
-                                // Wrap Group in a StackPane to center content
-                                StackPane centerPane = new StackPane(pdfGroup);
-                                centerPane.setAlignment(Pos.CENTER);
-
-                                // ScrollPane wraps the centerPane
-                                ScrollPane scrollPane = new ScrollPane(centerPane);
-                                scrollPane.setPannable(true);
-                                scrollPane.setFitToWidth(true);
-                                scrollPane.setFitToHeight(true);
-
-                                // Stack PDF and buttons
-                                stackPane1.getChildren().setAll(scrollPane, btnArrowLeft, btnArrowRight);
-                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
-                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
-                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
-                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
-                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
-                                delay.setOnFinished(event -> {
-                                    Platform.runLater(() -> {
-                                        JFXUtil.stackPaneClip(stackPane1);
-                                    });
-                                });
-                                delay.play();
-                                document.close();
-
-                                // ----- ZOOM & PAN -----
-                                final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
-                                scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
-                                    if (event.isControlDown()) {
-                                        event.consume(); // stop default scroll behavior
-
-                                        double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
-                                        double oldZoom = zoomFactor.get();
-                                        zoomFactor.set(oldZoom * delta); // scale by multiplier
-
-                                        // Apply scale
-                                        pdfGroup.setScaleX(zoomFactor.get());
-                                        pdfGroup.setScaleY(zoomFactor.get());
-
-                                        // Keep mouse position centered during zoom
-                                        Bounds viewportBounds = scrollPane.getViewportBounds();
-                                        Bounds contentBounds = pdfGroup.getBoundsInParent();
-                                        double mouseX = event.getX();
-                                        double mouseY = event.getY();
-
-                                        double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
-                                        double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
-
-                                        Platform.runLater(() -> {
-                                            Bounds newBounds = pdfGroup.getBoundsInParent();
-                                            double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
-                                            double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
-
-                                            scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
-                                            scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
-                                        });
-                                    }
-                                });
-
-                                // Pan with mouse drag
-                                final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
-                                pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
-
-                                pdfGroup.setOnMouseDragged(e -> {
-                                    if (lastMouse.get() != null) {
-                                        double deltaX = e.getSceneX() - lastMouse.get().getX();
-                                        double deltaY = e.getSceneY() - lastMouse.get().getY();
-
-                                        pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
-                                        pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
-
-                                        lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
-                                    }
-                                });
-                                pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
+                                JFXUtil.PDFViewConfig(filePath2, stackPane1, btnArrowLeft, btnArrowRight, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
                             }
                         } else {
                             imageView.setImage(null);
@@ -1524,7 +1505,42 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                     pnAttachment = 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
+        }
+    }
+
+    public void RemoveWindowEvent() {
+        root.sceneProperty().removeListener(WindowKeyEvent);
+        scene.setOnKeyPressed(null);
+        stageAttachment.closeDialog();
+    }
+
+    public void showAttachmentDialog() {
+        stageAttachment.closeDialog();
+        if (poAppController.getTransactionAttachmentCount() <= 0) {
+            ShowMessageFX.Warning(null, psFormName, "No transaction attachment to load.");
+            return;
+        }
+        Map<String, Pair<String, String>> data = new HashMap<>();
+        data.clear();
+        int lnCount = 0;
+        for (int lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
+            if (RecordStatus.INACTIVE.equals(poAppController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                continue;
+            }
+            lnCount += 1;
+            data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poAppController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                    poAppController.TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
+        }
+        AttachmentDialogController controller = new AttachmentDialogController();
+        controller.setOpenedImage(pnAttachment);
+        controller.addData(data);
+
+        try {
+            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 }

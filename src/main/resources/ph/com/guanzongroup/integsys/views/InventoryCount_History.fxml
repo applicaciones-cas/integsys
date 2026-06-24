@@ -24,7 +24,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="apMainAnchor" prefHeight="789.0" stylesheets="@../css/Tables.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="apMainAnchor" prefHeight="789.0" stylesheets="@../css/Tables.css" xmlns="http://javafx.com/javafx/8.0.381" xmlns:fx="http://javafx.com/fxml/1">
     <children>
     <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -62,7 +62,7 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="tfSearchSourceno" promptText="Press F3: Search" GridPane.columnIndex="2" />
+                                    <TextField fx:id="tfSearchInvCountType" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                     <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" GridPane.columnIndex="6" />
                                  </children>
                               </GridPane>
@@ -92,7 +92,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnSave1" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print">
+                              <Button fx:id="btnPrint" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -139,7 +139,7 @@
                <center>
                   <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                      <children>
-                        <TabPane maxHeight="800.0" maxWidth="1.7976931348623157E308" minHeight="800.0" minWidth="0.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TabPane fx:id="tabPaneMain" maxHeight="800.0" maxWidth="1.7976931348623157E308" minHeight="800.0" minWidth="0.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <tabs>
                             <Tab text="Details">
                                  <content>
@@ -176,6 +176,7 @@
                                                                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                        <RowConstraints maxHeight="-Infinity" minHeight="28.0" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                         <RowConstraints maxHeight="45.0" minHeight="45.0" prefHeight="45.0" vgrow="SOMETIMES" />
                                                                 </rowConstraints>
                                                                 <children>
@@ -194,12 +195,12 @@
                                                                         </font>
                                                                     </Label>
                                                                         <Label text="Date" GridPane.rowIndex="2" />
-                                                                    <Label text="Inclusion" GridPane.rowIndex="4">
+                                                                    <Label text="Inclusion/Exclusion" GridPane.rowIndex="4">
                                                                            <font>
                                                                               <Font size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                    <Label text="Remarks" GridPane.rowIndex="7">
+                                                                    <Label text="Remarks" GridPane.rowIndex="8">
                                                                            <font>
                                                                               <Font size="12.0" />
                                                                            </font>
@@ -216,10 +217,9 @@
                                                                         </Label>
                                                                     <TextField fx:id="tfTransNo" disable="true" editable="false" maxHeight="25.0" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                                         <DatePicker fx:id="dpTransactionDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                    <TextField fx:id="tfInclusion" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                                    <TextField fx:id="tfRequestedBy" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                                    <TextField fx:id="tfRequestedBy" disable="true" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                                                         <TextField fx:id="tfCountNo" alignment="CENTER_RIGHT" disable="true" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-                                                <TextArea fx:id="taRemarks" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="7">
+                                                <TextArea fx:id="taRemarks" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="8">
                                                    <GridPane.margin>
                                                       <Insets top="1.0" />
                                                    </GridPane.margin>
@@ -229,9 +229,12 @@
                                                                               <Font size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextField fx:id="tfInventoryCountType" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfInventoryCountType" disable="true" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                                                         <DatePicker fx:id="dpRequestedDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                         <Label text="Requested Date" GridPane.rowIndex="6" />
+                                                                        <ComboBox fx:id="cmbInclusion" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                                                        <Label text="Cut-Off Date" GridPane.rowIndex="7" />
+                                                                        <DatePicker fx:id="dpCutOffDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                                                                 </children>
                                                             </GridPane>
                                                         </children>
@@ -308,9 +311,9 @@
                                                                               <Font size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                    <TextField fx:id="tfBarcode" maxHeight="25.0" GridPane.columnIndex="2" />
-                                                                    <TextField fx:id="tfDescription" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="1" />
-                                                                        <TextField fx:id="tfSupersede" GridPane.columnIndex="6" />
+                                                                    <TextField fx:id="tfBarcode" disable="true" maxHeight="25.0" GridPane.columnIndex="2" />
+                                                                    <TextField fx:id="tfDescription" alignment="TOP_LEFT" disable="true" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="1" />
+                                                                        <TextField fx:id="tfSupersede" disable="true" GridPane.columnIndex="6" />
                                                                     <TextField fx:id="tfBrand" disable="true" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                     <TextField fx:id="tfColor" disable="true" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                                                     <TextField fx:id="tfMeasure" disable="true" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="4" />
@@ -356,7 +359,7 @@
                                                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                                </padding>
                                                     </AnchorPane>
-                                                            <AnchorPane fx:id="apDetail1" layoutX="10.0" layoutY="252.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;">
+                                                            <AnchorPane fx:id="apDetailOther" layoutX="10.0" layoutY="252.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;">
                                                                <children>
                                                                   <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                      <columnConstraints>
@@ -407,18 +410,19 @@
                                                                               <Font size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextField fx:id="tfEntryNo" maxHeight="25.0" GridPane.columnIndex="2" />
-                                                                        <TextField fx:id="tfActualQuantity" alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" promptText="0.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                                        <TextField fx:id="tfMS" alignment="CENTER_RIGHT" disable="true" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                                                                        <TextField fx:id="tfEX" alignment="CENTER_RIGHT" disable="true" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="6" />
-                                                                        <TextField fx:id="tfSE" alignment="CENTER_RIGHT" disable="true" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="8" />
-                                                                        <TextField fx:id="tfDE" alignment="CENTER_RIGHT" disable="true" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                        <TextField fx:id="tfEntryNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" />
+                                                                        <TextField fx:id="tfActualQuantity" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="1.7976931348623157E308" promptText="0.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                        <TextField fx:id="tfDE" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                        <TextField fx:id="tfMS" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                                        <TextField fx:id="tfTD" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                                                                        <TextField fx:id="tfEX" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="6" />
+                                                                        <TextField fx:id="tfDG" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="7" />
+                                                                        <TextField fx:id="tfSE" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="8" />
                                                                         <Label text="Transfer w/o Doc" GridPane.rowIndex="8">
                                                                            <font>
                                                                               <Font size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextField fx:id="tfDG" alignment="CENTER_RIGHT" disable="true" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="7" />
                                                                         <Label text="Remarks" GridPane.rowIndex="2">
                                                                            <font>
                                                                               <Font name="System Bold" size="12.0" />
@@ -439,13 +443,12 @@
                                                                               <Font size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextField fx:id="tfTD" alignment="CENTER_RIGHT" disable="true" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-                                                                        <Label alignment="BOTTOM_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Dif. Cause" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                                                                        <Label alignment="BOTTOM_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Discrepany Cause" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
                                                                            <font>
                                                                               <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextArea fx:id="taRemarksDetail" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+                                                                        <TextArea fx:id="taRemarksDetail" disable="true" editable="false" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.rowSpan="2" />
                                                                      </children>
                                                                   </GridPane>
                                                                </children>
@@ -482,16 +485,16 @@
                                                                         <Insets left="5.0" right="5.0" top="5.0" />
                                                                     </GridPane.margin>
                                                                 </AnchorPane>
-                                                                <TableView fx:id="tblViewMaster" onMouseClicked="#ontblMasterClicked" GridPane.rowIndex="1">
+                                                                <TableView fx:id="tblViewDetails" minWidth="780.0" onMouseClicked="#ontblDetailClicked" GridPane.rowIndex="1">
                                                                     <columns>
                                                                         <TableColumn fx:id="tblColNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="-1.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
-                                                                        <TableColumn fx:id="tblColTransNo" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Barcode" />
-                                                                        <TableColumn fx:id="tblColTransDate" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Description" />
+                                                                        <TableColumn fx:id="tblColBarcode" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Barcode" />
+                                                                        <TableColumn fx:id="tblColDescription" editable="false" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="120.0" sortable="false" style="-fx-font-size: 12;" text="Description" />
                                                                         <TableColumn fx:id="tblColBrand" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Brand" />
                                                                         <TableColumn fx:id="tblColMeasure" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Measure" />
-                                                                        <TableColumn fx:id="tblColCount1" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 1" />
-                                                                        <TableColumn fx:id="tblColCount2" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 2" />
-                                                                        <TableColumn fx:id="tblColCount3" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 3" />
+                                                                        <TableColumn fx:id="tblColCount1" editable="false" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 1" />
+                                                                        <TableColumn fx:id="tblColCount2" editable="false" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 2" />
+                                                                        <TableColumn fx:id="tblColCount3" editable="false" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 3" />
                                                                     </columns>
                                                                     <GridPane.margin>
                                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
