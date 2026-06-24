@@ -207,7 +207,7 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
             loadRecordSearch();
 
             poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
-            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED+PurchaseOrderReceivingStatus.RETURNED_I);
             TriggerWindowEvent();
         });
 
@@ -563,7 +563,8 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
                                 // Confirmation Prompt
                                 JSONObject loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
+                                    if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())
+                                            || PurchaseOrderReceivingStatus.RETURNED_I.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
                                             loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
@@ -1346,8 +1347,10 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
                                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
 
-                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
+                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID, PurchaseOrderReceivingStatus.CONFIRMED_I)) {
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
+                            }  else if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.RETURNED_I)) {
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "FAA0A0", highlightedRowsMain);
                             }
                         }
                     }
@@ -1876,7 +1879,11 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
                     int lnCtr;
                     try {
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().ReloadDetail();
+                            String lsExistJournal = poPurchaseReceivingController.PurchaseOrderReceiving().existJournal();
+                            if(lsExistJournal == null
+                                    || "".equals(lsExistJournal)) {
+                                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().ReloadDetail();
+                            }
                         }
 
                         String lsReportMonthYear = "";
@@ -2185,8 +2192,8 @@ public class SIPosting_ConfirmationController implements Initializable, ScreenIn
 
         switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
             case PurchaseOrderReceivingStatus.CONFIRMED:
+            case PurchaseOrderReceivingStatus.RETURNED_I:
                 JFXUtil.setButtonsVisibility(lbShow3, btnConfirm);
-
                 break;
             case PurchaseOrderReceivingStatus.POSTED:
             case PurchaseOrderReceivingStatus.PAID:

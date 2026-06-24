@@ -204,6 +204,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             poPurchaseReceivingController.PurchaseOrderReceiving().isFinance(true);
             poPurchaseReceivingController.PurchaseOrderReceiving().setWithUI(true);
             poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.VERIFIED);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.POSTED);
             poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
             loadRecordSearch();
 
