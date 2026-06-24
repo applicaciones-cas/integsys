@@ -208,7 +208,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
             poPurchaseReceivingController.PurchaseOrderReceiving().setWithUI(true);
             loadRecordSearch();
             poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.VERIFIED);
-            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.VERIFIED);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED_I);
             TriggerWindowEvent();
         });
 
@@ -407,7 +407,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
                         break;
                     case "btnUpdate":
                         String lsUserId = oApp.getUserID();
-                        String lsPosition = poPurchaseReceivingController.PurchaseOrderReceiving().checkPosition(PurchaseOrderReceivingStatus.CONFIRMED_I, lsUserId);
+                        String lsPosition = poPurchaseReceivingController.PurchaseOrderReceiving().checkPosition(PurchaseOrderReceivingStatus.VERIFIED, lsUserId);
                         if (lsPosition == null || "".equals(lsPosition)) {
                             poJSON.put("result", "error");
                             poJSON.put("message", "User is not an authorized officer.");
@@ -415,7 +415,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
                             return;
                         }
                         //Recheck transaction status
-                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
+                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.VERIFIED);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -484,7 +484,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
                     case "btnSave":
                         poJSON = new JSONObject();
                         //Recheck transaction status
-                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
+                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.VERIFIED);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -2116,7 +2116,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
         JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
 
         switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
-            case PurchaseOrderReceivingStatus.CONFIRMED:
+            case PurchaseOrderReceivingStatus.CONFIRMED_I:
                 JFXUtil.setButtonsVisibility(lbShow3, btnVerify);
 
                 break;
