@@ -119,7 +119,8 @@ public class PurchaseOrderReportsController implements Initializable, ScreenInte
     @FXML
     private TableColumn<ModelTableDetail, String> index01, index02, index03, index04,
             index05, index06, index07, index08,
-            index09, index10, index11, index12;
+            index09, index10, index11, index12,
+            index13, index14, index15, index16;
 
     @FXML
     private Pagination pagination;
@@ -466,6 +467,10 @@ public class PurchaseOrderReportsController implements Initializable, ScreenInte
         index10.setCellValueFactory(new PropertyValueFactory<>("index10"));
         index11.setCellValueFactory(new PropertyValueFactory<>("index11"));
         index12.setCellValueFactory(new PropertyValueFactory<>("index12"));
+        index13.setCellValueFactory(new PropertyValueFactory<>("index13"));
+        index14.setCellValueFactory(new PropertyValueFactory<>("index14"));
+        index15.setCellValueFactory(new PropertyValueFactory<>("index15"));
+        index16.setCellValueFactory(new PropertyValueFactory<>("index16"));
 
         applyTableMode(isSummarized);
 
@@ -494,7 +499,8 @@ public class PurchaseOrderReportsController implements Initializable, ScreenInte
             index07.setText("Date Trans");
             index08.setText("Category");
             index09.setText("Term");
-            index10.setText("Total");
+            index10.setText("Status");
+            index11.setText("Total");
 
             // 🔥 ALIGNMENT
             index02.setStyle("-fx-alignment: CENTER-LEFT;");
@@ -505,27 +511,37 @@ public class PurchaseOrderReportsController implements Initializable, ScreenInte
             index07.setStyle("-fx-alignment: CENTER;");
             index08.setStyle("-fx-alignment: CENTER-LEFT;");
             index09.setStyle("-fx-alignment: CENTER;");
-            index10.setStyle("-fx-alignment: CENTER-RIGHT;"); // 💰 amount
-            index09.setPrefWidth(80);
+            index10.setStyle("-fx-alignment: CENTER;");
+            index11.setStyle("-fx-alignment: CENTER-RIGHT;"); // 💰 amount
+//            index09.setPrefWidth(80);
 
             // HIDE UNUSED
-            index11.setVisible(false);
             index12.setVisible(false);
+            index13.setVisible(false);
+            index14.setVisible(false);
+            index15.setVisible(false);
+            index16.setVisible(false);
 
         } else {
+
 
             // DETAIL MODE
             index02.setText("Supplier");
             index03.setText("Destination");
+            index03.setText("Destination");
             index04.setText("Transaction No.");
             index05.setText("Date Trans.");
-            index06.setText("Brand");
-            index07.setText("Model Code");
-            index08.setText("Model Name");
-            index09.setText("Color");
-            index10.setText("Qty");
-            index11.setText("Unit Price");
-            index12.setText("Total");
+            index06.setText("Barrcode");
+            index07.setText("Description");
+            index08.setText("Brand");
+            index09.setText("Model Code");
+            index10.setText("Model Name");
+            index11.setText("Color");
+            index12.setText("Qty");
+            index13.setText("Rcvd.");
+            index14.setText("Canc.");
+            index15.setText("Unit Price");
+            index16.setText("Total");
 
             // 🔥 ALIGNMENT
             index02.setStyle("-fx-alignment: CENTER-LEFT;");
@@ -536,14 +552,19 @@ public class PurchaseOrderReportsController implements Initializable, ScreenInte
             index07.setStyle("-fx-alignment: CENTER-LEFT;");
             index08.setStyle("-fx-alignment: CENTER-LEFT;");
             index09.setStyle("-fx-alignment: CENTER-LEFT;");
-            index10.setStyle("-fx-alignment: CENTER;"); // 🔢 qty
-            index11.setStyle("-fx-alignment: CENTER-RIGHT;"); // 💰 price
-            index12.setStyle("-fx-alignment: CENTER-RIGHT;"); // 💰 total
-            index10.setPrefWidth(80);
-
+            index10.setStyle("-fx-alignment: CENTER-LEFT;");
+            index11.setStyle("-fx-alignment: CENTER-LEFT;");
+            index12.setStyle("-fx-alignment: CENTER;");
+            index13.setStyle("-fx-alignment: CENTER;");
+            index14.setStyle("-fx-alignment: CENTER;"); // 🔢 qty
+            index15.setStyle("-fx-alignment: CENTER-RIGHT;"); // 💰 price
+            index16.setStyle("-fx-alignment: CENTER-RIGHT;"); // 💰 total
             // SHOW
-            index11.setVisible(true);
             index12.setVisible(true);
+            index13.setVisible(true);
+            index14.setVisible(true);
+            index15.setVisible(true);
+            index16.setVisible(true);
         }
     }
 
@@ -605,8 +626,9 @@ public class PurchaseOrderReportsController implements Initializable, ScreenInte
                                         obj.get("dTransact") == null ? "" : obj.get("dTransact").toString(),
                                         obj.get("Category") == null ? "" : obj.get("Category").toString(),
                                         obj.get("Term") == null ? "" : obj.get("Term").toString(),
-                                        obj.get("Total") == null ? "" : CustomCommonUtil.setIntegerValueToDecimalFormat(Double.parseDouble(obj.get("Total").toString()), true),
-                                        ""
+                                        obj.get("cTranStat") == null ? "" : obj.get("cTranStat").toString(),
+                                        obj.get("Total") == null ? "" : CustomCommonUtil.setIntegerValueToDecimalFormat(Double.parseDouble(obj.get("Total").toString()), true)
+
                                 ));
                             } else {
                                 detail_data.add(new ModelTableDetail(
@@ -615,19 +637,21 @@ public class PurchaseOrderReportsController implements Initializable, ScreenInte
                                         obj.get("Destination") == null ? "" : obj.get("Destination").toString(),
                                         obj.get("sTransNox") == null ? "" : obj.get("sTransNox").toString(),
                                         obj.get("dTransact") == null ? "" : obj.get("dTransact").toString(),
+                                        obj.get("sBarCodex") == null ? "" : obj.get("sBarCodex").toString(),
+                                        obj.get("Description") == null ? "" : obj.get("Description").toString(),
                                         obj.get("Brand") == null ? "" : obj.get("Brand").toString(),
                                         obj.get("ModelCode") == null ? "" : obj.get("ModelCode").toString(),
                                         obj.get("ModelName") == null ? "" : obj.get("ModelName").toString(),
                                         obj.get("Color") == null ? "" : obj.get("Color").toString(),
-                                        obj.get("Quantity") == null ? ""
-                                        : obj.get("Quantity").toString(),
+                                        obj.get("Quantity") == null ? "" : obj.get("Quantity").toString(),
+                                        obj.get("nReceived") == null ? "" : obj.get("nReceived").toString(),
+                                        obj.get("nCancelld") == null ? "" : obj.get("nCancelld").toString(),
                                         obj.get("UnitPrice") == null ? ""
                                         : CustomCommonUtil.setIntegerValueToDecimalFormat(
                                                 Double.parseDouble(obj.get("UnitPrice").toString()), true),
                                         obj.get("Total") == null ? ""
                                         : CustomCommonUtil.setIntegerValueToDecimalFormat(
-                                                Double.parseDouble(obj.get("Total").toString()), true),
-                                        "", "", ""
+                                                Double.parseDouble(obj.get("Total").toString()), true)
                                 ));
                             }
                         }
