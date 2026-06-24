@@ -1555,12 +1555,12 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
         boolean lbShow = JFXUtil.isObjectEqualTo(
                 poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus(),
                 JournalStatus.OPEN);
-        if (!lbShow) {
+        boolean lbShow2 = (pnEditMode == EditMode.UPDATE);
+        if (!lbShow && !lbShow2) {
             JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
         } else {
             JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
         }
-
         JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
         if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
             tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());

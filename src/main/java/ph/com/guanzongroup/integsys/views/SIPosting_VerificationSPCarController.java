@@ -1484,12 +1484,12 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
         boolean lbShow = JFXUtil.isObjectEqualTo(
                 poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus(),
                 JournalStatus.OPEN);
-        if (!lbShow) {
+        boolean lbShow2 = (pnEditMode == EditMode.UPDATE);
+        if (!lbShow && !lbShow2) {
             JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
         } else {
             JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
         }
-
         JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
         if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
             tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
@@ -1536,17 +1536,7 @@ public class SIPosting_VerificationSPCarController implements Initializable, Scr
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setBranchCode(psBranchId);
             Platform.runLater(() -> {
                 String lsActive = pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus();
-                Map<String, String> statusMap = new HashMap<>();
-                statusMap.put(PurchaseOrderReceivingStatus.POSTED, "POSTED");
-                statusMap.put(PurchaseOrderReceivingStatus.PAID, "PAID");
-                statusMap.put(PurchaseOrderReceivingStatus.CONFIRMED, "CONFIRMED");
-                statusMap.put(PurchaseOrderReceivingStatus.OPEN, "OPEN");
-                statusMap.put(PurchaseOrderReceivingStatus.RETURNED, "RETURNED");
-                statusMap.put(PurchaseOrderReceivingStatus.VOID, "VOIDED");
-                statusMap.put(PurchaseOrderReceivingStatus.CANCELLED, "CANCELLED");
-
-                String lsStat = statusMap.getOrDefault(lsActive, "UNKNOWN");
-                lblStatus.setText(lsStat);
+                lblStatus.setText(poPurchaseReceivingController.PurchaseOrderReceiving().getStatus(lsActive).toUpperCase());
             });
 
             if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscountRate().doubleValue() > 0.00) {
