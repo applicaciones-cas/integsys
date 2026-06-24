@@ -566,7 +566,7 @@ public class SIPosting_VerificationMCController implements Initializable, Screen
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) {
-                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
+                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().VerifySIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
@@ -592,7 +592,7 @@ public class SIPosting_VerificationMCController implements Initializable, Screen
                                 return;
                             }
 
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().VerifySIPosting("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -1537,40 +1537,38 @@ public class SIPosting_VerificationMCController implements Initializable, Screen
     }
 
     public void loadRecordJEMaster() {
-        try {
-            //DISABLE Journal entry fields if has value
-            String lsJournal = poPurchaseReceivingController.PurchaseOrderReceiving().existJournal();
-            if (lsJournal != null && !"".equals(lsJournal)) {
-                JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
-            } else {
-                JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
-            }
-            JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
+        boolean lbShow = JFXUtil.isObjectEqualTo(
+                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus(),
+                JournalStatus.OPEN);
+        if (!lbShow) {
+            JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
+        } else {
+            JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
+        }
 
-            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
-                tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
-                String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionDate());
-                dpJETransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsJETransactionDate, "yyyy-MM-dd"));
+        JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
+        if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
+            tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
+            String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionDate());
+            dpJETransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsJETransactionDate, "yyyy-MM-dd"));
 
-                taJERemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getRemarks());
-                double lnTotalDebit = 0;
-                double lnTotalCredit = 0;
-                for (int lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
-                    if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
-                        continue;
-                    }
-                    lnTotalDebit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount();
-                    lnTotalCredit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount();
+            taJERemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getRemarks());
+            double lnTotalDebit = 0;
+            double lnTotalCredit = 0;
+            for (int lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
+                if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
+                    continue;
                 }
-
-                tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
-                tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
-                JFXUtil.updateCaretPositions(apJEMaster);
+                lnTotalDebit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount();
+                lnTotalCredit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount();
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+
+            tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
+            tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
+            JFXUtil.updateCaretPositions(apJEMaster);
         }
     }
+
 
     public void loadRecordMaster() {
         try {
@@ -2168,8 +2166,8 @@ public class SIPosting_VerificationMCController implements Initializable, Screen
         JFXUtil.setButtonsVisibility(false, btnVerify);
         //Unkown || Ready
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
-        JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
-
+        JFXUtil.setDisabled(!lbShow1, apJEMaster, apJEDetail);
+        JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
         switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
             case PurchaseOrderReceivingStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(lbShow3, btnVerify);
@@ -2182,9 +2180,7 @@ public class SIPosting_VerificationMCController implements Initializable, Screen
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
-            case PurchaseOrderReceivingStatus.VERIFIED:
-                JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments, apJEMaster, apJEDetail);
-                break;
+
         }
         boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
                 && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());

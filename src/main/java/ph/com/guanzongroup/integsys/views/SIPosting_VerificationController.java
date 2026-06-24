@@ -565,7 +565,7 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) {
-                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
+                                            loJSON = poPurchaseReceivingController.PurchaseOrderReceiving().VerifySIPosting("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
@@ -591,7 +591,7 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
                                 return;
                             }
 
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().VerifySIPosting("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -1326,43 +1326,43 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
             protected Void call() throws Exception {
                 Thread.sleep(100);
 //                Thread.sleep(1000);
-                    main_data.clear();
-                    JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
+                main_data.clear();
+                JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
 
-                    if (poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingCount() > 0) {
-                        //pending
-                        //retreiving using column index
-                        for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingCount() - 1; lnCtr++) {
-                            try {
-                                main_data.add(new ModelDeliveryAcceptance_Main(String.valueOf(lnCtr + 1),
-                                        String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).Supplier().getCompanyName()),
-                                        String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getDueDate()),
-                                        String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getReferenceNo()),
-                                        String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionTotal(), true))
-                                ));
-                            } catch (SQLException | GuanzonException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                            }
+                if (poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingCount() > 0) {
+                    //pending
+                    //retreiving using column index
+                    for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingCount() - 1; lnCtr++) {
+                        try {
+                            main_data.add(new ModelDeliveryAcceptance_Main(String.valueOf(lnCtr + 1),
+                                    String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).Supplier().getCompanyName()),
+                                    String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getDueDate()),
+                                    String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getReferenceNo()),
+                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionTotal(), true))
+                            ));
+                        } catch (SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                        }
 
-                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
-                            }
+                        if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
+                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
                         }
                     }
+                }
 
-                    if (pnMain < 0 || pnMain
-                            >= main_data.size()) {
-                        if (!main_data.isEmpty()) {
-                            /* FOCUS ON FIRST ROW */
-                            JFXUtil.selectAndFocusRow(tblViewMainList, 0);
-                            pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-                        }
-                    } else {
-                        /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                        JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
+                if (pnMain < 0 || pnMain
+                        >= main_data.size()) {
+                    if (!main_data.isEmpty()) {
+                        /* FOCUS ON FIRST ROW */
+                        JFXUtil.selectAndFocusRow(tblViewMainList, 0);
+                        pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
-                    JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
+                } else {
+                    /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                    JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
+                }
+                JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
 
                 return null;
             }
@@ -1552,38 +1552,35 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
     }
 
     public void loadRecordJEMaster() {
-        try {
-            //DISABLE Journal entry fields if has value
-            String lsJournal = poPurchaseReceivingController.PurchaseOrderReceiving().existJournal();
-            if (lsJournal != null && !"".equals(lsJournal)) {
-                JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
-            } else {
-                JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
-            }
-            
-            JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
-            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
-                tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
-                String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionDate());
-                dpJETransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsJETransactionDate, "yyyy-MM-dd"));
-                
-                taJERemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getRemarks());
-                double lnTotalDebit = 0;
-                double lnTotalCredit = 0;
-                for (int lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
-                    if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
-                        continue;
-                    }
-                    lnTotalDebit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount();
-                    lnTotalCredit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount();
+        boolean lbShow = JFXUtil.isObjectEqualTo(
+                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus(),
+                JournalStatus.OPEN);
+        if (!lbShow) {
+            JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
+        } else {
+            JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
+        }
+
+        JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
+        if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
+            tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
+            String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionDate());
+            dpJETransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsJETransactionDate, "yyyy-MM-dd"));
+
+            taJERemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getRemarks());
+            double lnTotalDebit = 0;
+            double lnTotalCredit = 0;
+            for (int lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
+                if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
+                    continue;
                 }
-                
-                tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
-                tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
-                JFXUtil.updateCaretPositions(apJEMaster);
+                lnTotalDebit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount();
+                lnTotalCredit += poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount();
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+
+            tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
+            tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
+            JFXUtil.updateCaretPositions(apJEMaster);
         }
     }
 
@@ -2179,7 +2176,8 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
 
         //Unkown || Ready
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
-        JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apAttachments, apJEMaster, apJEDetail);
+        JFXUtil.setDisabled(!lbShow1, apJEMaster, apJEDetail);
+        JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
 
         switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
             case PurchaseOrderReceivingStatus.CONFIRMED:
@@ -2193,9 +2191,7 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
-            case PurchaseOrderReceivingStatus.VERIFIED:
-                JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments, apJEMaster, apJEDetail);
-                break;
+
         }
         boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
                 && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
