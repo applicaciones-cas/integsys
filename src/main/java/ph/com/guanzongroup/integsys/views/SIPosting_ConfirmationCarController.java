@@ -1538,11 +1538,12 @@ public class SIPosting_ConfirmationCarController implements Initializable, Scree
     public void loadRecordJEMaster() {
         try {
             //DISABLE Journal entry fields if has value
-            String lsJournal = poPurchaseReceivingController.PurchaseOrderReceiving().existJournal();
-            if (lsJournal != null && !"".equals(lsJournal)) {
-                JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
-            } else {
+            boolean lbShow = JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().existJournal(), null, "");
+            boolean lbShow2 = (pnEditMode == EditMode.UPDATE);
+            if (lbShow && lbShow2) {
                 JFXUtil.setDisabled(false, apJEMaster, apJEDetail);
+            } else {
+                JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
             }
             JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
 
