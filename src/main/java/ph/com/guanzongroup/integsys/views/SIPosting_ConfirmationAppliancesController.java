@@ -475,7 +475,6 @@ public class SIPosting_ConfirmationAppliancesController implements Initializable
                             return;
                         }
                         //Recheck transaction status
-                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -544,7 +543,6 @@ public class SIPosting_ConfirmationAppliancesController implements Initializable
                     case "btnSave":
                         poJSON = new JSONObject();
                         //Recheck transaction status
-                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));

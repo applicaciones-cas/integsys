@@ -207,7 +207,7 @@ public class SIPosting_ConfirmationCarController implements Initializable, Scree
             loadRecordSearch();
 
             poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
-          poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED+PurchaseOrderReceivingStatus.RETURNED_I);
+            poPurchaseReceivingController.PurchaseOrderReceiving().setTransactionStatus(PurchaseOrderReceivingStatus.CONFIRMED+PurchaseOrderReceivingStatus.RETURNED_I);
             TriggerWindowEvent();
         });
 
@@ -475,7 +475,6 @@ public class SIPosting_ConfirmationCarController implements Initializable, Scree
                             return;
                         }
                         //Recheck transaction status
-                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -544,7 +543,7 @@ public class SIPosting_ConfirmationCarController implements Initializable, Scree
                     case "btnSave":
                         poJSON = new JSONObject();
                         //Recheck transaction status
-                        poPurchaseReceivingController.PurchaseOrderReceiving().setForm(PurchaseOrderReceivingStatus.CONFIRMED_I);
+
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
