@@ -2118,6 +2118,7 @@ public class SIPosting_VerificationMonarchHospitalityController implements Initi
             case PurchaseOrderReceivingStatus.VOID:
             case PurchaseOrderReceivingStatus.CANCELLED:
             case PurchaseOrderReceivingStatus.RETURNED:
+            case PurchaseOrderReceivingStatus.RETURNED_I:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
             case PurchaseOrderReceivingStatus.VERIFIED:

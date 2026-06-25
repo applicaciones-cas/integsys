@@ -2129,6 +2129,7 @@ public class SIPosting_VerificationLPController implements Initializable, Screen
             case PurchaseOrderReceivingStatus.VOID:
             case PurchaseOrderReceivingStatus.CANCELLED:
             case PurchaseOrderReceivingStatus.RETURNED:
+            case PurchaseOrderReceivingStatus.RETURNED_I:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
             case PurchaseOrderReceivingStatus.VERIFIED:
