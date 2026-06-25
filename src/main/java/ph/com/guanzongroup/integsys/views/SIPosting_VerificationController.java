@@ -1566,7 +1566,7 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
         } else {
             JFXUtil.setDisabled(true, apJEMaster, apJEDetail);
         }
-        
+
         JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
         if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
             tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
@@ -2192,7 +2192,6 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
         switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
             case PurchaseOrderReceivingStatus.CONFIRMED_I:
                 JFXUtil.setButtonsVisibility(lbShow3, btnVerify);
-
                 break;
             case PurchaseOrderReceivingStatus.POSTED:
             case PurchaseOrderReceivingStatus.PAID:
@@ -2201,7 +2200,9 @@ public class SIPosting_VerificationController implements Initializable, ScreenIn
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
-
+            case PurchaseOrderReceivingStatus.VERIFIED:
+                JFXUtil.setButtonsVisibility(false, btnUpdate, btnVerify);
+                break;
         }
         boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
                 && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());

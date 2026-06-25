@@ -2178,6 +2178,9 @@ public class SIPosting_VerificationCarController implements Initializable, Scree
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
+            case PurchaseOrderReceivingStatus.VERIFIED:
+                JFXUtil.setButtonsVisibility(false, btnUpdate, btnVerify);
+                break;
 
         }
         boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
