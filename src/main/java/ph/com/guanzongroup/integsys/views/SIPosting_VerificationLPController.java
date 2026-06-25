@@ -1193,7 +1193,7 @@ public class SIPosting_VerificationLPController implements Initializable, Screen
                             }
 
                             if (pbSuccess) {
-                                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setForMonthOf((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                                poPurchaseReceivingController.PurchaseOrderReceiving().Master().setReferenceDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             }
                         }
                         break;
