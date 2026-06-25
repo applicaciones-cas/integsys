@@ -587,10 +587,6 @@ public class SIPosting_ConfirmationMPController implements Initializable, Screen
                     case "btnConfirm":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
-                            if (!lbSelectTabJE) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please review and verify all Journal Entry details before confirming the transaction.");
-                                return;
-                            }
 
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ConfirmSIPosting("");
                             if ("error".equals((String) poJSON.get("result"))) {
