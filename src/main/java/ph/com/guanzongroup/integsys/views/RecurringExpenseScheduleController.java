@@ -64,7 +64,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     @FXML
     private Button btnBrowse, btnNew, btnSave, btnUpdate, btnCancel, btnClose;
     @FXML
-    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfSearchPayee, tfSearchCompany;
+    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfCompany, tfSearchCompany, tfSearchPayee;
     @FXML
     private ComboBox cmbAccountable, cmbBillingFrequency;
     @FXML
@@ -76,9 +76,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     @FXML
     private TableView tblViewDetail;
     @FXML
-    private TableColumn tblDetailRow, tblDetailBranch, tblDetailAccountNo, tblDetailAmount, tblDetailExcluded, tblDetailStatus;
+    private TableColumn tblDetailRow, tblDetailCompany, tblDetailBranch, tblDetailAccountNo, tblDetailAmount, tblDetailExcluded, tblDetailStatus;
     @FXML
     private Label lblSource1, lblSource;
+
     boolean pbKeyPressed = false;
     ObservableList<String> accountable_list = FXCollections.observableArrayList("Main Office", "Branch", "Department", "Employee");
     ObservableList<String> billingfrequency_list = FXCollections.observableArrayList("Monthly", "Quarterly", "Yearly");
@@ -265,6 +266,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelRecurringExpenseSchedule_Detail(String.valueOf(lnRowCount),
+                                                poController.Detail(lnCtr).Company().getCompanyName(),
                                                 poController.Detail(lnCtr).Branch().getBranchName(),
                                                 poController.Detail(lnCtr).getAccountNo(),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true),
@@ -371,6 +373,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             return;
         }
         try {
+            tfCompany.setText(poController.Detail(pnDetail).Company().getCompanyName());
             tfBranchName.setText(poController.Detail(pnDetail).Branch().getBranchName());
             tfAccountNo.setText(poController.Detail(pnDetail).getAccountNo());
             tfAccountName.setText(poController.Detail(pnDetail).getAccountName());
@@ -514,10 +517,22 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             });
 
                             JFXUtil.runWithDelay(.8, () -> {
-                                JFXUtil.textFieldMoveNext(tfBranchName); // must be in the success
+                                JFXUtil.textFieldMoveNext(tfCompany); // must be in the success
                             });
                             lbProceed = true;
                             loadTableDetail.reload();
+                            break;
+                        case "tfCompany":
+                            lbProceed = false;
+                            poJSON = poController.SearchCompany(lsValue, false, pnDetail);
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                txtField.setText("");
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfBranchName);
+                            }
+                            loadTableDetail.reload();
+                            lbProceed = true;
                             break;
                         case "tfBranchName":
                             lbProceed = false;
@@ -679,6 +694,12 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             loadTableDetail.reload();
                         }
                         break;
+                    case "tfCompany":
+                        if (lsValue.isEmpty()) {
+                            poController.Detail(pnDetail).setCompanyId(lsValue);
+                            poController.Detail(pnDetail).setBranchCode(lsValue);
+                        }
+                        break;
                     case "tfBranchName":
                         if (lsValue.isEmpty()) {
                             poController.Detail(pnDetail).setBranchCode(lsValue);
@@ -785,7 +806,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     public void initTextFields() {
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchPayee);
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks1);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfRecurringID, tfPayee, tfParticular);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfRecurringID, tfPayee, tfParticular, tfCompany);
         JFXUtil.setFocusListener(txtDetail_Focus, tfAccountNo, tfAccountName, tfDueDay, tfDeparment, tfEmployee, tfBranchName, tfAmount, tfBillDay, tfSearchPayee);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
@@ -909,7 +930,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     private void initDetailsGrid() {
         JFXUtil.setColumnCenter(tblDetailAccountNo, tblDetailRow, tblDetailExcluded, tblDetailStatus);
-        JFXUtil.setColumnLeft(tblDetailBranch);
+        JFXUtil.setColumnLeft(tblDetailBranch, tblDetailCompany);
         JFXUtil.setColumnRight(tblDetailAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
         tblViewDetail.setItems(details_data);
