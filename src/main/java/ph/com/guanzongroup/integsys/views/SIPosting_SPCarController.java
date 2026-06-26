@@ -2125,11 +2125,6 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
         }
-        boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
-                && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
-        if (lbShow5) {
-            JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
-        }
     }
 
     private void initAttachmentPreviewPane() {
