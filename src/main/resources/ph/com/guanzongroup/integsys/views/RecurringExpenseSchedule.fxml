@@ -282,7 +282,7 @@
                                             <columns>
                                               <TableColumn fx:id="tblDetailRow" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" text="No." />
                                                 <TableColumn fx:id="tblDetailCompany" maxWidth="166.0" minWidth="166.0" prefWidth="166.0" text="Company" />
-                                              <TableColumn fx:id="tblDetailBranch" maxWidth="232.0" minWidth="-1.0" prefWidth="232.0" text="Branch" />
+                                              <TableColumn fx:id="tblDetailBranch" maxWidth="232.0" minWidth="-Infinity" prefWidth="232.0" text="Branch" />
                                                 <TableColumn fx:id="tblDetailAccountNo" maxWidth="182.0" minWidth="182.0" prefWidth="182.0" text="Account No" />
                                                 <TableColumn fx:id="tblDetailAmount" maxWidth="142.0" minWidth="142.0" prefWidth="142.0" text="Amount" />
                                                 <TableColumn fx:id="tblDetailExcluded" maxWidth="77.0" minWidth="77.0" prefWidth="77.0" text="Excluded" />
