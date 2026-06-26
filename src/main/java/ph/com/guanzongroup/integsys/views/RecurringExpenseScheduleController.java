@@ -64,7 +64,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     @FXML
     private Button btnBrowse, btnNew, btnSave, btnUpdate, btnCancel, btnClose;
     @FXML
-    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfCompany, tfSearchCompany, tfSearchPayee;
+    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfCompany, tfSearchBranch, tfSearchPayee;
     @FXML
     private ComboBox cmbAccountable, cmbBillingFrequency;
     @FXML
@@ -76,7 +76,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     @FXML
     private TableView tblViewDetail;
     @FXML
-    private TableColumn tblDetailRow, tblDetailCompany, tblDetailBranch, tblDetailAccountNo, tblDetailAmount, tblDetailExcluded, tblDetailStatus;
+    private TableColumn tblDetailRow, tblDetailBranch, tblDetailAccountNo, tblDetailAmount, tblDetailExcluded, tblDetailStatus;
     @FXML
     private Label lblSource1, lblSource;
 
@@ -266,7 +266,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelRecurringExpenseSchedule_Detail(String.valueOf(lnRowCount),
-                                                poController.Detail(lnCtr).Company().getCompanyName(),
                                                 poController.Detail(lnCtr).Branch().getBranchName(),
                                                 poController.Detail(lnCtr).getAccountNo(),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true),
@@ -300,32 +299,16 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     private void autoSearch(TextField txtField) {
         detailSearchListener = (observable, oldValue, newValue) -> {
-//            int totalPage = (int) (Math.ceil(main_data.size() * 1.0 / ROWS_PER_PAGE));
-//            pgPagination.setPageCount(totalPage);
             filteredDataDetail.setPredicate(orders -> {
                 lbresetpredicate = true;
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
-//                if (mainSearchListener != null) {
-//                    JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
-//                    mainSearchListener = null; // Clear reference to avoid memory leaks
-//                }
                 String lowerCaseFilter = newValue.toLowerCase();
-                return orders.getIndex07().toLowerCase().contains(lowerCaseFilter);
+                return orders.getIndex02().toLowerCase().contains(lowerCaseFilter);
             });
             // If no results and autoSearchMain is enabled, remove listener and trigger autoSearchMain
             if (filteredDataDetail.isEmpty()) {
-//                if (main_data.size() > 0) {
-//                    JFXUtil.removeTextFieldListener(detailSearchListener, txtField);
-//                    filteredData = new FilteredList<>(main_data, b -> true);
-//                    autoSearchMain(txtField); // Trigger autoSearchMain if no results
-//                    tblViewPuchaseOrder.setItems(filteredData);
-//
-//                    String currentText = txtField.getText();
-//                    txtField.setText(currentText + " "); // Add a space
-//                    txtField.setText(currentText);       // Set back to original
-//                }
             } else {
                 if (filteredDataDetail.size() == details_data.size()) {
                     tblViewDetail.getSelectionModel().select(pnDetail);
@@ -351,7 +334,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     public void loadRecordMaster() {
         try {
             boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY) & !details_data.isEmpty();
-            JFXUtil.setDisabled(!lbShow, tfSearchCompany);
+            JFXUtil.setDisabled(!lbShow, tfSearchBranch);
             if (poController.Master().getParticularId() != null && !"".equals(poController.Master().getParticularId())) {
                 tfRecurringID.setText(poController.Master().getRecurringId());
             } else {
@@ -367,9 +350,13 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void loadRecordDetail() {
-
         if (poController.Master().getParticularId() == null || "".equals(poController.Master().getParticularId())) {
             return;
+        }
+        if (poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE) {
+            JFXUtil.setDisabled(true, tfBranchName);
+        } else {
+            JFXUtil.setDisabled(false, tfBranchName);
         }
         try {
             tfCompany.setText(poController.Detail(pnDetail).Company().getCompanyName());
@@ -810,7 +797,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             switch (nodeID) {
                 case "tfRecurringID":
                     ShowMessageFX.Warning(null, pxeModuleName,
-                            "Complete the required fields (Payee and Particular) to enable the Recurring ID.");
+                            "Complete the required fields (Payee and Particular) to enable viewing the Recurring ID.");
                     break;
             }
         });
@@ -911,13 +898,13 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     private void initDetailsGrid() {
         JFXUtil.setColumnCenter(tblDetailAccountNo, tblDetailRow, tblDetailExcluded, tblDetailStatus);
-        JFXUtil.setColumnLeft(tblDetailBranch, tblDetailCompany);
+        JFXUtil.setColumnLeft(tblDetailBranch);
         JFXUtil.setColumnRight(tblDetailAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
         tblViewDetail.setItems(details_data);
 
         filteredDataDetail = new FilteredList<>(details_data, b -> true);
-        autoSearch(tfSearchCompany);
+        autoSearch(tfSearchBranch);
 
         SortedList<ModelRecurringExpenseSchedule_Detail> sortedData = new SortedList<>(filteredDataDetail);
         sortedData.comparatorProperty().bind(tblViewDetail.comparatorProperty());
@@ -937,7 +924,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void clearTextFields() {
-        tfSearchCompany.setText("");
+        tfSearchBranch.setText("");
         JFXUtil.clearTextFields(apBrowse, apMaster, apDetail);
     }
 

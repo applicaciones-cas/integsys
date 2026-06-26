@@ -281,12 +281,11 @@
                                           <TableView fx:id="tblViewDetail" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                                             <columns>
                                               <TableColumn fx:id="tblDetailRow" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" text="No." />
-                                                <TableColumn fx:id="tblDetailCompany" maxWidth="166.0" minWidth="166.0" prefWidth="166.0" text="Company" />
-                                              <TableColumn fx:id="tblDetailBranch" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" text="Branch" />
-                                                <TableColumn fx:id="tblDetailAccountNo" maxWidth="182.0" minWidth="182.0" prefWidth="182.0" text="Account No" />
-                                                <TableColumn fx:id="tblDetailAmount" maxWidth="142.0" minWidth="142.0" prefWidth="142.0" text="Amount" />
-                                                <TableColumn fx:id="tblDetailExcluded" maxWidth="77.0" minWidth="77.0" prefWidth="77.0" text="Excluded" />
-                                                <TableColumn fx:id="tblDetailStatus" maxWidth="77.0" minWidth="77.0" prefWidth="77.0" text="Status" />
+                                              <TableColumn fx:id="tblDetailBranch" maxWidth="265.0" minWidth="265.0" prefWidth="265.0" text="Branch" />
+                                                <TableColumn fx:id="tblDetailAccountNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Account No" />
+                                                <TableColumn fx:id="tblDetailAmount" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Amount" />
+                                                <TableColumn fx:id="tblDetailExcluded" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Excluded" />
+                                                <TableColumn fx:id="tblDetailStatus" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Status" />
                                             </columns>
                                           </TableView>
                                           <GridPane>
@@ -300,8 +299,8 @@
                                               <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                              <children>
-                                                <Label text="Company" />
-                                                <TextField fx:id="tfSearchCompany" promptText="Type: Search" GridPane.columnIndex="2" />
+                                                <Label text="Branch" />
+                                                <TextField fx:id="tfSearchBranch" promptText="Type: Search" GridPane.columnIndex="2" />
                                              </children>
                                              <GridPane.margin>
                                                 <Insets bottom="5.0" left="10.0" right="10.0" />
