@@ -133,7 +133,7 @@
                                                 <Font name="System Bold" size="12.0" />
                                              </font>
                                                             </Text>
-                                                        <TextField fx:id="tfRecurringID" editable="false" GridPane.columnIndex="2" />
+                                                        <TextField fx:id="tfRecurringID" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                         <TextField fx:id="tfPayee" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                         <TextField fx:id="tfParticular" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                     </children>
