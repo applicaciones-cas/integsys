@@ -206,14 +206,18 @@
                                                       <TableColumn fx:id="index02" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Column02" />
                                                       <TableColumn fx:id="index03" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Column03" />
                                                       <TableColumn fx:id="index04" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column04" />
-                                                      <TableColumn fx:id="index05" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column05" />
-                                                      <TableColumn fx:id="index06" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column06" />
+                                                      <TableColumn fx:id="index05" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Column05" />
+                                                      <TableColumn fx:id="index06" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Column06" />
                                                       <TableColumn fx:id="index07" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column07" />
                                                       <TableColumn fx:id="index08" maxWidth="80.0" minWidth="80.0" prefWidth="-1.0" resizable="false" sortable="false" text="Column08" />
                                                       <TableColumn fx:id="index09" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column09" />
-                                                      <TableColumn fx:id="index10" maxWidth="80.0" minWidth="80.0" prefWidth="-1.0" resizable="false" sortable="false" text="Column10" />
-                                                      <TableColumn fx:id="index11" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column11" />
-                                                      <TableColumn fx:id="index12" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column12" />
+                                                      <TableColumn fx:id="index10" maxWidth="100.0" minWidth="100.0" prefWidth="-1.0" resizable="false" sortable="false" text="Column10" />
+                                                      <TableColumn fx:id="index11" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Column11" />
+                                                      <TableColumn fx:id="index12" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" text="Column12" />
+                                                      <TableColumn fx:id="index13" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" text="Column13" />
+                                                      <TableColumn fx:id="index14" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" text="Column14" />
+                                                      <TableColumn fx:id="index15" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column15" />
+                                                      <TableColumn fx:id="index16" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Column16" />
                                                    </columns>
                                                    <columnResizePolicy>
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
