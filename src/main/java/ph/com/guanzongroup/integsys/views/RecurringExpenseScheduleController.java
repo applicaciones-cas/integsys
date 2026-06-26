@@ -274,7 +274,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                                 poController.Detail(lnCtr).isActive() ? "Active" : "Inactive",
                                                 poController.Detail(lnCtr).Company().getCompanyName()
                                         ));
-                                System.out.println(poController.Detail(lnCtr).Company().getCompanyName());
                             }
                             if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {
@@ -517,22 +516,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             });
 
                             JFXUtil.runWithDelay(.8, () -> {
-                                JFXUtil.textFieldMoveNext(tfCompany); // must be in the success
+                                JFXUtil.textFieldMoveNext(tfBranchName); // must be in the success
                             });
                             lbProceed = true;
                             loadTableDetail.reload();
-                            break;
-                        case "tfCompany":
-                            lbProceed = false;
-                            poJSON = poController.SearchCompany(lsValue, false, pnDetail);
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                                txtField.setText("");
-                            } else {
-                                JFXUtil.textFieldMoveNext(tfBranchName);
-                            }
-                            loadTableDetail.reload();
-                            lbProceed = true;
                             break;
                         case "tfBranchName":
                             lbProceed = false;
@@ -694,12 +681,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             loadTableDetail.reload();
                         }
                         break;
-                    case "tfCompany":
-                        if (lsValue.isEmpty()) {
-                            poController.Detail(pnDetail).setCompanyId(lsValue);
-                            poController.Detail(pnDetail).setBranchCode(lsValue);
-                        }
-                        break;
                     case "tfBranchName":
                         if (lsValue.isEmpty()) {
                             poController.Detail(pnDetail).setBranchCode(lsValue);
@@ -725,8 +706,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 //                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid bill day.");
-                            tfBillDay.requestFocus();
                             loadRecordDetail();
+                            tfBillDay.requestFocus();
                             return;
                         }
                         poJSON = poController.Detail(pnDetail).setBillDay(Integer.parseInt(lsValue));
@@ -747,8 +728,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 //                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid due day.");
-                            tfDueDay.requestFocus();
                             loadRecordDetail();
+                            tfDueDay.requestFocus();
                             return;
                         }
                         poJSON = poController.Detail(pnDetail).setDueDay(Integer.parseInt(lsValue));
@@ -806,7 +787,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     public void initTextFields() {
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchPayee);
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks1);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfRecurringID, tfPayee, tfParticular, tfCompany);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfRecurringID, tfPayee, tfParticular);
         JFXUtil.setFocusListener(txtDetail_Focus, tfAccountNo, tfAccountName, tfDueDay, tfDeparment, tfEmployee, tfBranchName, tfAmount, tfBillDay, tfSearchPayee);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
