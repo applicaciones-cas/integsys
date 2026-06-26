@@ -796,8 +796,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "tfRecurringID":
-                    ShowMessageFX.Warning(null, pxeModuleName,
-                            "Complete the required fields (Payee and Particular) to enable viewing of the Recurring ID.");
+                    if (JFXUtil.isObjectEqualTo(poController.Master().getParticularId(), null, "")) {
+                        ShowMessageFX.Warning(null, pxeModuleName,
+                                "Complete the required fields (Payee and Particular) to enable viewing of the Recurring ID.");
+                    }
                     break;
             }
         });
