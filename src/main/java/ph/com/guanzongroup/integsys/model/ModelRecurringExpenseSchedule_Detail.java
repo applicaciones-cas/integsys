@@ -63,6 +63,7 @@ public class ModelRecurringExpenseSchedule_Detail {
         this.index04 = new SimpleStringProperty(index04);
         this.index05 = new SimpleStringProperty(index05);
         this.index06 = new SimpleStringProperty(index06);
+        this.index07 = new SimpleStringProperty(index07);
         this.index08 = new SimpleStringProperty(index08);
     }
 
