@@ -628,7 +628,8 @@ public class SIPosting_ConfirmationMCController implements Initializable, Screen
                 } else {
                     loadRecordMaster();
                     loadTableDetail();
-                    poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                    JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
                     loadTableAttachment();
 
                     Tab currentTab = tabPaneForm.getSelectionModel().getSelectedItem();
@@ -1708,6 +1709,7 @@ public class SIPosting_ConfirmationMCController implements Initializable, Screen
                 psBranchId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getBranchCode();
             }
             closeDialog();
+            JFXUtil.clearTextFields(apAttachments);
             poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
 //            if (poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount() > 1) {
 //                if (!openedAttachment.equals(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(pnMain).getTransactionNo())) {

@@ -588,7 +588,8 @@ public class SIPosting_EntryAppliancesController implements Initializable, Scree
                 } else {
                     loadRecordMaster();
                     loadTableDetail();
-                    poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                    JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
                     loadTableAttachment();
 
                     Tab currentTab = tabPaneForm.getSelectionModel().getSelectedItem();
@@ -1644,6 +1645,7 @@ public class SIPosting_EntryAppliancesController implements Initializable, Scree
                 psBranchId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getBranchCode();
             }
             closeDialog();
+            JFXUtil.clearTextFields(apAttachments);
             poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
 //            if (poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount() > 1) {
 //                if (!openedAttachment.equals(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(pnMain).getTransactionNo())) {
