@@ -797,7 +797,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             switch (nodeID) {
                 case "tfRecurringID":
                     ShowMessageFX.Warning(null, pxeModuleName,
-                            "Complete the required fields (Payee and Particular) to enable viewing the Recurring ID.");
+                            "Complete the required fields (Payee and Particular) to enable viewing of the Recurring ID.");
                     break;
             }
         });
