@@ -3074,21 +3074,29 @@ public class JFXUtil {
                 return; // nothing to check
             }
             for (Node node : nodes) {
-                // Must be disabled
-                if (!node.isDisabled()) {
+
+                boolean inactive = node.isDisabled();
+
+                // Also treat non-editable text controls as disabled
+                if (node instanceof TextInputControl) {
+                    TextInputControl textInput = (TextInputControl) node;
+                    inactive |= !textInput.isEditable();
+                }
+
+                if (!inactive) {
                     continue;
                 }
-                // Must have a valid ID
+
                 String nodeId = node.getId();
                 if (nodeId == null || nodeId.trim().isEmpty()) {
                     continue;
                 }
 
                 Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-                // Click must be inside the disabled node
+
                 if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
                     callback.accept(nodeId);
-                    return; // stop immediately after first valid hit
+                    return;
                 }
             }
             // No disabled node detected → callback is NOT called
@@ -3147,7 +3155,7 @@ public class JFXUtil {
     }
 
     /*Displays customized tooltip for Node hover with delay*/
-     /*Requires double type number, message & any count of nodes*/
+ /*Requires double type number, message & any count of nodes*/
     public static void applyHoverTooltipDelay(double delay, String message, Node... nodes) {
         if (message == null || nodes == null) {
             return;

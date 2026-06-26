@@ -64,7 +64,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     @FXML
     private Button btnBrowse, btnNew, btnSave, btnUpdate, btnCancel, btnClose;
     @FXML
-    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfSearchPayee, tfSearchCompany;
+    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfCompany, tfSearchBranch, tfSearchPayee;
     @FXML
     private ComboBox cmbAccountable, cmbBillingFrequency;
     @FXML
@@ -79,6 +79,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     private TableColumn tblDetailRow, tblDetailBranch, tblDetailAccountNo, tblDetailAmount, tblDetailExcluded, tblDetailStatus;
     @FXML
     private Label lblSource1, lblSource;
+
     boolean pbKeyPressed = false;
     ObservableList<String> accountable_list = FXCollections.observableArrayList("Main Office", "Branch", "Department", "Employee");
     ObservableList<String> billingfrequency_list = FXCollections.observableArrayList("Monthly", "Quarterly", "Yearly");
@@ -272,7 +273,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                                 poController.Detail(lnCtr).isActive() ? "Active" : "Inactive",
                                                 poController.Detail(lnCtr).Company().getCompanyName()
                                         ));
-                                System.out.println(poController.Detail(lnCtr).Company().getCompanyName());
                             }
                             if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {
@@ -299,32 +299,16 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     private void autoSearch(TextField txtField) {
         detailSearchListener = (observable, oldValue, newValue) -> {
-//            int totalPage = (int) (Math.ceil(main_data.size() * 1.0 / ROWS_PER_PAGE));
-//            pgPagination.setPageCount(totalPage);
             filteredDataDetail.setPredicate(orders -> {
                 lbresetpredicate = true;
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
-//                if (mainSearchListener != null) {
-//                    JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
-//                    mainSearchListener = null; // Clear reference to avoid memory leaks
-//                }
                 String lowerCaseFilter = newValue.toLowerCase();
-                return orders.getIndex07().toLowerCase().contains(lowerCaseFilter);
+                return orders.getIndex02().toLowerCase().contains(lowerCaseFilter);
             });
             // If no results and autoSearchMain is enabled, remove listener and trigger autoSearchMain
             if (filteredDataDetail.isEmpty()) {
-//                if (main_data.size() > 0) {
-//                    JFXUtil.removeTextFieldListener(detailSearchListener, txtField);
-//                    filteredData = new FilteredList<>(main_data, b -> true);
-//                    autoSearchMain(txtField); // Trigger autoSearchMain if no results
-//                    tblViewPuchaseOrder.setItems(filteredData);
-//
-//                    String currentText = txtField.getText();
-//                    txtField.setText(currentText + " "); // Add a space
-//                    txtField.setText(currentText);       // Set back to original
-//                }
             } else {
                 if (filteredDataDetail.size() == details_data.size()) {
                     tblViewDetail.getSelectionModel().select(pnDetail);
@@ -350,7 +334,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     public void loadRecordMaster() {
         try {
             boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY) & !details_data.isEmpty();
-            JFXUtil.setDisabled(!lbShow, tfSearchCompany);
+            JFXUtil.setDisabled(!lbShow, tfSearchBranch);
             if (poController.Master().getParticularId() != null && !"".equals(poController.Master().getParticularId())) {
                 tfRecurringID.setText(poController.Master().getRecurringId());
             } else {
@@ -366,11 +350,16 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void loadRecordDetail() {
-
         if (poController.Master().getParticularId() == null || "".equals(poController.Master().getParticularId())) {
             return;
         }
+        if (poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE) {
+            JFXUtil.setDisabled(true, tfBranchName);
+        } else {
+            JFXUtil.setDisabled(false, tfBranchName);
+        }
         try {
+            tfCompany.setText(poController.Detail(pnDetail).Company().getCompanyName());
             tfBranchName.setText(poController.Detail(pnDetail).Branch().getBranchName());
             tfAccountNo.setText(poController.Detail(pnDetail).getAccountNo());
             tfAccountName.setText(poController.Detail(pnDetail).getAccountName());
@@ -704,8 +693,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 //                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid bill day.");
-                            tfBillDay.requestFocus();
                             loadRecordDetail();
+                            tfBillDay.requestFocus();
                             return;
                         }
                         poJSON = poController.Detail(pnDetail).setBillDay(Integer.parseInt(lsValue));
@@ -726,8 +715,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 //                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid due day.");
-                            tfDueDay.requestFocus();
                             loadRecordDetail();
+                            tfDueDay.requestFocus();
                             return;
                         }
                         poJSON = poController.Detail(pnDetail).setDueDay(Integer.parseInt(lsValue));
@@ -807,8 +796,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "tfRecurringID":
-                    ShowMessageFX.Warning(null, pxeModuleName,
-                            "Complete the required fields (Payee and Particular) to enable the Recurring ID.");
+                    if (JFXUtil.isObjectEqualTo(poController.Master().getParticularId(), null, "")) {
+                        ShowMessageFX.Warning(null, pxeModuleName,
+                                "Complete the required fields (Payee and Particular) to enable viewing of the Recurring ID.");
+                    }
                     break;
             }
         });
@@ -915,7 +906,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         tblViewDetail.setItems(details_data);
 
         filteredDataDetail = new FilteredList<>(details_data, b -> true);
-        autoSearch(tfSearchCompany);
+        autoSearch(tfSearchBranch);
 
         SortedList<ModelRecurringExpenseSchedule_Detail> sortedData = new SortedList<>(filteredDataDetail);
         sortedData.comparatorProperty().bind(tblViewDetail.comparatorProperty());
@@ -935,7 +926,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void clearTextFields() {
-        tfSearchCompany.setText("");
+        tfSearchBranch.setText("");
         JFXUtil.clearTextFields(apBrowse, apMaster, apDetail);
     }
 
