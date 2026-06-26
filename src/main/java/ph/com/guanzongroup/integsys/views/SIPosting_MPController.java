@@ -2170,6 +2170,8 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
             case PurchaseOrderReceivingStatus.CANCELLED:
             case PurchaseOrderReceivingStatus.RETURNED:
             case PurchaseOrderReceivingStatus.RETURNED_I:
+            case PurchaseOrderReceivingStatus.CONFIRMED:
+            case PurchaseOrderReceivingStatus.CONFIRMED_I:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
         }
