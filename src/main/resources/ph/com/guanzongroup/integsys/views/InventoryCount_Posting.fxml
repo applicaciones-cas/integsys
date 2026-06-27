@@ -81,17 +81,6 @@
                             <children>
                                 <HBox fx:id="hbButtons" alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                              <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
-                                 <effect>
-                                    <Blend />
-                                 </effect>
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="SEARCH" size="20" />
-                                 </graphic>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                              </Button>
                               <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
                                  <effect>
                                     <Blend />
@@ -103,45 +92,12 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Count">
+                              <Button fx:id="btnPost" contentDisplay="TOP" ellipsisString="" layoutX="90.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Post">
                                  <effect>
                                     <Blend />
                                  </effect>
                                  <graphic>
-                                    <FontAwesomeIconView glyphName="EDIT" size="20" />
-                                 </graphic>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                              </Button>
-                              <Button fx:id="btnUpdate1" contentDisplay="TOP" ellipsisString="" layoutX="165.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
-                                 <effect>
-                                    <Blend />
-                                 </effect>
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="EDIT" size="20" />
-                                 </graphic>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                              </Button>
-                              <Button fx:id="btnVerify" contentDisplay="TOP" ellipsisString="" layoutX="240.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Verify">
-                                 <effect>
-                                    <Blend />
-                                 </effect>
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="CHECK" size="20" />
-                                 </graphic>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                              </Button>
-                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
-                                 <effect>
-                                    <Blend />
-                                 </effect>
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="CLOSE" size="20" />
+                                    <FontAwesomeIconView glyphName="PRINT" size="20" />
                                  </graphic>
                                  <font>
                                     <Font size="12.0" />
@@ -153,28 +109,6 @@
                                  </effect>
                                  <graphic>
                                     <FontAwesomeIconView glyphName="PRINT" size="20" />
-                                 </graphic>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                              </Button>
-                              <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
-                                 <effect>
-                                    <Blend />
-                                 </effect>
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="SAVE" size="20" />
-                                 </graphic>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                              </Button>
-                              <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
-                                 <effect>
-                                    <Blend />
-                                 </effect>
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="TIMES" size="20" />
                                  </graphic>
                                  <font>
                                     <Font size="12.0" />
@@ -294,7 +228,7 @@
                                                                         </Label>
                                                                     <TextField fx:id="tfTransNo" disable="true" editable="false" maxHeight="25.0" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                                         <DatePicker fx:id="dpTransactionDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                    <TextField fx:id="tfRequestedBy" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                                    <TextField fx:id="tfRequestedBy" disable="true" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                                                         <TextField fx:id="tfCountNo" alignment="CENTER_RIGHT" disable="true" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="3" />
                                                 <TextArea fx:id="taRemarks" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="8">
                                                    <GridPane.margin>
@@ -306,12 +240,12 @@
                                                                               <Font size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextField fx:id="tfInventoryCountType" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfInventoryCountType" disable="true" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                                                         <DatePicker fx:id="dpRequestedDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                         <Label text="Requested Date" GridPane.rowIndex="6" />
-                                                                        <ComboBox fx:id="cmbInclusion" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                                                        <ComboBox fx:id="cmbInclusion" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                                                                         <Label text="Cut-Off Date" GridPane.rowIndex="7" />
-                                                                        <DatePicker fx:id="dpCutOffDate" disable="true" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                                        <DatePicker fx:id="dpCutOffDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                                                                 </children>
                                                             </GridPane>
                                                         </children>
@@ -488,13 +422,13 @@
                                                                            </font>
                                                                         </Label>
                                                                         <TextField fx:id="tfEntryNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" />
-                                                                        <TextField fx:id="tfActualQuantity" alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" promptText="0.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                                        <TextField fx:id="tfDE" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                                                                        <TextField fx:id="tfMS" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                                                                        <TextField fx:id="tfTD" alignment="CENTER_RIGHT" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-                                                                        <TextField fx:id="tfEX" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="6" />
-                                                                        <TextField fx:id="tfDG" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="7" />
-                                                                        <TextField fx:id="tfSE" alignment="CENTER_RIGHT" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="8" />
+                                                                        <TextField fx:id="tfActualQuantity" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="1.7976931348623157E308" promptText="0.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                        <TextField fx:id="tfDE" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                        <TextField fx:id="tfMS" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                                        <TextField fx:id="tfTD" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                                                                        <TextField fx:id="tfEX" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="6" />
+                                                                        <TextField fx:id="tfDG" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="7" />
+                                                                        <TextField fx:id="tfSE" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="8" />
                                                                         <Label text="Transfer w/o Doc" GridPane.rowIndex="8">
                                                                            <font>
                                                                               <Font size="12.0" />
@@ -525,7 +459,7 @@
                                                                               <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextArea fx:id="taRemarksDetail" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+                                                                        <TextArea fx:id="taRemarksDetail" disable="true" editable="false" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.rowSpan="2" />
                                                                      </children>
                                                                   </GridPane>
                                                                </children>
