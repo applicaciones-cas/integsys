@@ -421,7 +421,8 @@ public class SIPosting_HistoryMCController implements Initializable, ScreenInter
                         //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                         poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
-                        poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                        JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
                         break;
                     case "btnSerials":
                         if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
@@ -622,7 +623,8 @@ public class SIPosting_HistoryMCController implements Initializable, ScreenInter
                                 //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                                 psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                                 poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
-                                poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                                JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
                                 loadRecordMaster();
                                 loadTableDetail();
                                 populateJE();

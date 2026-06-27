@@ -158,6 +158,17 @@
                                     <Font size="12.0" />
                                  </font>
                                         </Button>
+                              <Button fx:id="btnReturn" contentDisplay="TOP" ellipsisString="" layoutX="390.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Return">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="REPEAT" size="20" />
+                                 </graphic>
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Button>
                               <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="BOOK" size="20" />
@@ -330,9 +341,9 @@
                                                                                                         <Label text="Advance Payment" GridPane.columnIndex="9" GridPane.rowIndex="13" />
                                                                                                         <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
                                                                                                         <DatePicker fx:id="dpTransactionDate" disable="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                        <TextField fx:id="tfSupplier" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                                                                                                        <TextField fx:id="tfBranch" disable="true" editable="false" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                                                                        <TextField fx:id="tfTrucking" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                                                                        <TextField fx:id="tfSupplier" disable="true" editable="false" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                                                                        <TextField fx:id="tfBranch" disable="true" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                                                                                        <TextField fx:id="tfTrucking" disable="true" editable="false" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                                                                                         <TextField fx:id="tfTerm" maxHeight="25.0" maxWidth="-Infinity" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                         <DatePicker fx:id="dpReferenceDate" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                                                                         <TextField fx:id="tfReferenceNo" maxHeight="25.0" GridPane.columnIndex="7" GridPane.rowIndex="3" />
@@ -353,10 +364,10 @@
                                                                                                         <TextField fx:id="tfFreightAmt" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="11" GridPane.rowIndex="5" />
                                                                                                         <CheckBox fx:id="cbVatInclusive" mnemonicParsing="false" onAction="#cmdCheckBox_Click" prefHeight="17.0" prefWidth="8.0" GridPane.columnIndex="11" GridPane.rowIndex="6" />
                                                                                                         <TextField fx:id="tfVatRate" alignment="CENTER_RIGHT" layoutX="833.0" layoutY="220.0" promptText="0.00" GridPane.columnIndex="11" GridPane.rowIndex="7" />
-                                                                                                        <TextField fx:id="tfVatSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="8" />
-                                                                                                        <TextField fx:id="tfVatAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="9" />
-                                                                                                        <TextField fx:id="tfZeroVatSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="10" />
-                                                                                                        <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="11" />
+                                                                                                        <TextField fx:id="tfVatSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="8" />
+                                                                                                        <TextField fx:id="tfVatAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="9" />
+                                                                                                        <TextField fx:id="tfZeroVatSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="10" />
+                                                                                                        <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="11" />
                                                                                                         <TextField fx:id="tfNetTotal" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="12" />
                                                                                                         <TextField fx:id="tfAdvancePayment" alignment="CENTER_RIGHT" disable="true" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="13" />
                                                                                                         <TextArea fx:id="taRemarks" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="224.0" prefWidth="577.0" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="7" GridPane.rowSpan="8">

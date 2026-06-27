@@ -356,7 +356,8 @@ public class SIPosting_HistoryLPController implements Initializable, ScreenInter
                         //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                         poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
-                        poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                        JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
 
                         break;
                     case "btnClose":
@@ -510,7 +511,8 @@ public class SIPosting_HistoryLPController implements Initializable, ScreenInter
                                 //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                                 psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                                 poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
-                                poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                                JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
                                 loadRecordMaster();
                                 loadTableDetail();
                                 populateJE();
