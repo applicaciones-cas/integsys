@@ -72,6 +72,21 @@ public class ModelDeliveryAcceptance_Main {
         this.index05 = new SimpleStringProperty(index05);
     }
 
+    public ModelDeliveryAcceptance_Main(String index01,
+            String index02,
+            String index03,
+            String index04,
+            String index05,
+            String index06) {
+
+        this.index01 = new SimpleStringProperty(index01);
+        this.index02 = new SimpleStringProperty(index02);
+        this.index03 = new SimpleStringProperty(index03);
+        this.index04 = new SimpleStringProperty(index04);
+        this.index05 = new SimpleStringProperty(index05);
+        this.index06 = new SimpleStringProperty(index06);
+    }
+
     public String getIndex01() {
         return index01.get();
     }
@@ -110,6 +125,14 @@ public class ModelDeliveryAcceptance_Main {
 
     public void setIndex05(String index05) {
         this.index05.set(index05);
+    }
+
+    public String getIndex06() {
+        return index06.get();
+    }
+
+    public void setIndex06(String index06) {
+        this.index06.set(index06);
     }
 
 }

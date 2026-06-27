@@ -420,7 +420,8 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                         //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                         poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
-                        poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                        JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
                         break;
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
@@ -580,7 +581,8 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                                 //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                                 psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                                 poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
-                                poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
+                                JFXUtil.clearTextFields(apAttachments);
+            poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
                                 loadRecordMaster();
                                 loadTableDetail();
                                 populateJE();
