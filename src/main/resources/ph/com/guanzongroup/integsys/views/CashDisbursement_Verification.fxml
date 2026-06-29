@@ -155,7 +155,7 @@
                                                 <Font size="12.0" />
                                             </font>
                                         </Button>
-                                        <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Verify">
+                                        <Button fx:id="btnVerify" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Verify">
                                             <effect>
                                                 <Blend />
                                             </effect>
