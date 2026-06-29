@@ -1188,9 +1188,9 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     Platform.runLater(() -> {
                         BIR_data.clear();
                         try {
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.ReloadWTDeductions();
-                            }
+//                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//                                poController.ReloadWTDeductions();
+//                            }
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
@@ -1222,7 +1222,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
-                        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                        } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -2714,8 +2714,8 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
                 return;
             }
-            boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
+//            boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
+//            JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
 
             tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
@@ -3077,10 +3077,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnUpdate, btnReturn);
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(),
-                    CashDisbursementStatus.OPEN, CashDisbursementStatus.CONFIRMED, CashDisbursementStatus.RETURNED)) {
-                JFXUtil.setButtonsVisibility(true, btnDisapprove);
-            }
+//            if (JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(),
+//                    CashDisbursementStatus.OPEN, CashDisbursementStatus.CONFIRMED, CashDisbursementStatus.RETURNED)) {
+//                JFXUtil.setButtonsVisibility(true, btnDisapprove);
+//            }
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;
         JFXUtil.setDisabled(!lbShow4, cmbAttachmentType);
