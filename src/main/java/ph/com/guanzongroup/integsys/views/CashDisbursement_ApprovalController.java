@@ -491,7 +491,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         }
                     }
                     //Recheck transaction status
-                    poJSON = poController.checkUpdateTransaction(true);
+                    poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
@@ -515,7 +515,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 case "btnSave":
                     //Recheck transaction status
                     if (pnEditMode == EditMode.UPDATE) {
-                        poJSON = poController.checkUpdateTransaction(true);
+                        poJSON = poController.checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
