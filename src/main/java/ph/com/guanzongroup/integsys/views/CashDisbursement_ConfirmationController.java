@@ -2561,6 +2561,8 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     lsStat = "Void";
                     break;
                 case CashDisbursementStatus.CONFIRMED:
+                case CashDisbursementStatus.RETURNED:
+                default:
                     lsStat = "Cancel";
                     break;
             }
