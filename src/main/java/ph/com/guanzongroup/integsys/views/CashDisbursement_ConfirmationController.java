@@ -257,7 +257,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(CashDisbursementStatus.OPEN);
+                    poController.setTransactionStatus(CashDisbursementStatus.OPEN+CashDisbursementStatus.CONFIRMED+CashDisbursementStatus.RETURNED);
                     loadRecordSearch();
                     TriggerWindowEvent();
                     filterIndustry();
@@ -483,6 +483,16 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnUpdate":
+                    if(!CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
+                        String lsUserId = oApp.getUserID();
+                        String lsPosition = poController.checkPosition(CashDisbursementStatus.CONFIRMED, lsUserId);
+                        if (lsPosition == null || "".equals(lsPosition)) {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", "User is not an authorized officer.");
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                    }
                     //Recheck transaction status
                     poJSON = poController.checkUpdateTransaction(true);
                     if (!"success".equals((String) poJSON.get("result"))) {
@@ -548,24 +558,27 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!checkJEorJEPSaving()) {
-                                break;
-                            }
-                            if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
-                                break;
-                            } else {
-                                poJSON = poController.ConfirmTransaction("");
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        if(CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
+                            || CashDisbursementStatus.RETURNED.equals(poController.Master().getTransactionStatus())) {
+                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
+                                if (!checkJEorJEPSaving()) {
+                                    break;
+                                }
+                                if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                     break;
                                 } else {
-                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                    poJSON = poController.ConfirmTransaction("");
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        break;
+                                    } else {
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                    }
                                 }
-                            }
 
+                            }
                         }
 
                     }
@@ -3151,6 +3164,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
                 case CashDisbursementStatus.OPEN:
+                case CashDisbursementStatus.RETURNED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
                     break;
                 case CashDisbursementStatus.CONFIRMED:
@@ -3159,16 +3173,15 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     break;
                 case CashDisbursementStatus.VOID:
                 case CashDisbursementStatus.CANCELLED:
+                case CashDisbursementStatus.VERIFIED:
+                case CashDisbursementStatus.APPROVED:
                 default:
                     JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
                     break;
             }
             if (JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(),
-                    CashDisbursementStatus.OPEN, CashDisbursementStatus.CONFIRMED)) {
+                    CashDisbursementStatus.OPEN, CashDisbursementStatus.CONFIRMED, CashDisbursementStatus.RETURNED)) {
                 JFXUtil.setButtonsVisibility(true, btnVoid);
-            }
-            if (!poController.Master().getTransactionStatus().equals(CashDisbursementStatus.OPEN)) {
-                JFXUtil.setButtonsVisibility(false, btnUpdate);
             }
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;

@@ -599,17 +599,23 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
-                                break;
-                            } else {
-                                poJSON = poController.ConfirmTransaction("");
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        if(CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
+                                || CashDisbursementStatus.RETURNED.equals(poController.Master().getTransactionStatus())) {
+                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
+                                if (!checkJEorJEPSaving()) {
+                                    break;
+                                }
+                                if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                     break;
                                 } else {
-                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    poJSON = poController.ConfirmTransaction("");
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        break;
+                                    } else {
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    }
                                 }
                             }
                         }
@@ -794,6 +800,54 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         } catch (IOException ex) {
             Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+
+    private List<String> checkJEorJEP() {
+        List<String> titles = new ArrayList<>();
+        try {
+            // allows JE and JEP to have value
+            // require to review, either of two, if one have value then require it to check tab
+            // if two have value require to check it both
+            // if neither have value message that any of JE or JEP or both must have value
+            // question is how to define valid entry for both
+            if (!poController.existJournal().equals("")) {
+                titles.add("Journal Entry");
+            }
+            if (poController.getJournalProposalList().size() >= 1) {
+                if (!JFXUtil.isObjectEqualTo(poController.JournalProposal(0).Detail(0).getAccountCode(), null, "")) {
+                    titles.add("Journal Proposal");
+                }
+            }
+            return titles;
+        } catch (SQLException ex) {
+            Logger.getLogger(DisbursementVoucher_VerificationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return titles;
+    }
+
+    private boolean checkJEorJEPSaving() {
+        List<String> titles = checkJEorJEP();
+        if ((titles.contains("Journal Entry")) && (titles.contains("Journal Proposal"))) {
+            if (!pbIsCheckedJournalTab && !pbIsCheckedJEPTab) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal before saving.");
+                return false;
+            }
+        } else if ((titles.contains("Journal Proposal"))) {
+            if (!pbIsCheckedJEPTab) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal before saving.");
+                return false;
+            }
+        } else if (titles.contains("Journal Entry")) {
+            if (!pbIsCheckedJournalTab) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                return false;
+            }
+        } else {
+            ShowMessageFX.Warning(null, pxeModuleName, "No journal entry or journal proposal found. Add either one or both and save before verifying.");
+            return false;
+        }
+        return true;
     }
 
     private void populateBIR() {
