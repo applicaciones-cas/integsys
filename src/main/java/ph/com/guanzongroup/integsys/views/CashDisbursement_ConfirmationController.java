@@ -257,7 +257,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(CashDisbursementStatus.OPEN+CashDisbursementStatus.CONFIRMED+CashDisbursementStatus.RETURNED);
+                    poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED + CashDisbursementStatus.RETURNED);
                     loadRecordSearch();
                     TriggerWindowEvent();
                     filterIndustry();
@@ -483,7 +483,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnUpdate":
-                    if(!CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
+                    if (!CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
                         String lsUserId = oApp.getUserID();
                         String lsPosition = poController.checkPosition(CashDisbursementStatus.CONFIRMED, lsUserId);
                         if (lsPosition == null || "".equals(lsPosition)) {
@@ -558,12 +558,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if(CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
-                            || CashDisbursementStatus.RETURNED.equals(poController.Master().getTransactionStatus())) {
+                        if (CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
+                                || CashDisbursementStatus.RETURNED.equals(poController.Master().getTransactionStatus())) {
                             if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                                if (!checkJEorJEPSaving()) {
-                                    break;
-                                }
                                 if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                     break;
@@ -615,9 +612,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            if (!checkJEorJEPSaving()) {
-                                return;
-                            }
                             if (poController.Master().getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
                                 if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
@@ -811,53 +805,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         } catch (IOException ex) {
             Logger.getLogger(CashDisbursement_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private List<String> checkJEorJEP() {
-        List<String> titles = new ArrayList<>();
-        try {
-            // allows JE and JEP to have value
-            // require to review, either of two, if one have value then require it to check tab
-            // if two have value require to check it both
-            // if neither have value message that any of JE or JEP or both must have value
-            // question is how to define valid entry for both
-            if (!poController.existJournal().equals("")) {
-                titles.add("Journal Entry");
-            }
-            if (poController.getJournalProposalList().size() >= 1) {
-                if (!JFXUtil.isObjectEqualTo(poController.JournalProposal(0).Detail(0).getAccountCode(), null, "")) {
-                    titles.add("Journal Proposal");
-                }
-            }
-            return titles;
-        } catch (SQLException ex) {
-            Logger.getLogger(DisbursementVoucher_VerificationController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return titles;
-    }
-
-    private boolean checkJEorJEPSaving() {
-        List<String> titles = checkJEorJEP();
-        if ((titles.contains("Journal Entry")) && (titles.contains("Journal Proposal"))) {
-            if (!pbIsCheckedJournalTab && !pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal before saving.");
-                return false;
-            }
-        } else if ((titles.contains("Journal Proposal"))) {
-            if (!pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal before saving.");
-                return false;
-            }
-        } else if (titles.contains("Journal Entry")) {
-            if (!pbIsCheckedJournalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                return false;
-            }
-        } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "No journal entry or journal proposal found. Add either one or both and save before verifying.");
-            return false;
-        }
-        return true;
     }
 
     private void populateBIR() {
