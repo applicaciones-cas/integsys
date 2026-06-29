@@ -226,6 +226,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                     TriggerWindowEvent();
                     filterIndustry();
                     lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                    poController.setForm(CashDisbursementStatus.VERIFIED);
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }

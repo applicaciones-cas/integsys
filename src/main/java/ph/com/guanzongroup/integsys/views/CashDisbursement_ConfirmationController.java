@@ -258,6 +258,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 //                poController.setCategoryID(psCategoryId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
                     poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED + CashDisbursementStatus.RETURNED);
+                    poController.setForm(CashDisbursementStatus.CONFIRMED);
                     loadRecordSearch();
                     TriggerWindowEvent();
                     filterIndustry();

@@ -259,6 +259,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     TriggerWindowEvent();
                     filterIndustry();
                     lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                    poController.setForm(CashDisbursementStatus.APPROVED);
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
