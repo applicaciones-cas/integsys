@@ -1033,6 +1033,81 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
+        loadTableDetailJEP = new JFXUtil.ReloadableTableTask(
+                tblVwJournalProposalDetails,
+                journalproposal_data,
+                () -> {
+                    Platform.runLater(() -> {
+                        pbEnteredJEP = false;
+                        journalproposal_data.clear();
+                        try {
+                            if (poController.getJournalProposalList() == null) {
+                                return;
+                            } else {
+                                if (poController.getJournalProposalList().isEmpty()) {
+                                    return;
+                                }
+                            }
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                poController.JournalProposal(pnMainJEP).ReloadDetail();
+                            }
+                            String lsReportMonthYear = "";
+                            String lsAcctCode = "";
+                            String lsAccDesc = "";
+                            int lnRowCount = 0;
+                            for (int lnCtr = 0; lnCtr < poController.JournalProposal(pnMainJEP).getDetailCount(); lnCtr++) {
+                                lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.JournalProposal(pnMainJEP).Detail(lnCtr).getForMonthOf());
+                                lsAcctCode = poController.JournalProposal(pnMainJEP).Detail(lnCtr).getAccountCode();
+                                lsAccDesc = poController.JournalProposal(pnMainJEP).Detail(lnCtr).Account_Chart().getDescription();
+                                if (lsAcctCode == null) {
+                                    lsAcctCode = "";
+                                }
+                                if (lsAccDesc == null) {
+                                    lsAccDesc = "";
+                                }
+                                if (!poController.JournalProposal(pnMainJEP).Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
+                                lnRowCount += 1;
+                                journalproposal_data.add(
+                                        new ModelJournalEntryProposal_Detail(
+                                                String.valueOf(lnRowCount),
+                                                String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
+                                                String.valueOf(lsAcctCode),
+                                                String.valueOf(lsAccDesc),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(lnCtr).getDebitAmount(), true)),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(lnCtr).getCreditAmount(), true)),
+                                                String.valueOf(lnCtr)
+                                        ));
+
+                                lsReportMonthYear = "";
+                                lsAcctCode = "";
+                                lsAccDesc = "";
+                            }
+                            int lnTempRow = JFXUtil.getDetailRow(journalproposal_data, pnDetailJEP, 07); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= journalproposal_data.size()) {
+                                if (!journalproposal_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblVwJournalProposalDetails, 0);
+                                    int lnRow = Integer.parseInt(journalproposal_data.get(0).getIndex07());
+                                    pnDetailJEP = lnRow;
+                                    loadRecordDetailJEP();
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblVwJournalProposalDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(journalproposal_data.get(tblVwJournalProposalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                                pnDetailJEP = lnRow;
+                                loadRecordDetailJEP();
+                            }
+                            loadRecordMasterJEP();
+                        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                        }
+                    });
+                });
         loadTableDetailBIR = new JFXUtil.ReloadableTableTask(
                 tblVwBIRDetails,
                 BIR_data,
