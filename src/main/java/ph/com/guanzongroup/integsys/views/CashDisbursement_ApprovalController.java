@@ -254,7 +254,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED + CashDisbursementStatus.RETURNED);
+                    poController.setTransactionStatus(CashDisbursementStatus.APPROVED + CashDisbursementStatus.VERIFIED);
                     loadRecordSearch();
                     TriggerWindowEvent();
                     filterIndustry();
