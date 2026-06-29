@@ -909,14 +909,14 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                 JFXUtil.clearTextFields(apDVMaster1, apDVMaster2, apDVDetail);
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                pbIsCheckedJournalTab = false;
+                pbIsCheckedJournalProposalTab = false;
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals(poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     poController.resetTransaction();
                     return;
                 }
-                pbIsCheckedJournalTab = false;
-                pbIsCheckedJournalProposalTab = false;
                 pnEditMode = poController.getEditMode();
                 loadTableDetail.reload();
                 moveNext(false, false);
