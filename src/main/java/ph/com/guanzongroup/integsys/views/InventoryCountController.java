@@ -93,7 +93,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  * @author User
  */
 public class InventoryCountController implements Initializable, ScreenInterface {
-    
+
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
     private String psFormName = "Inventory Count Entry";
@@ -104,72 +104,72 @@ public class InventoryCountController implements Initializable, ScreenInterface 
     private ObservableList<Model_Inventory_Count_Detail> laTransactionDetail;
     private int pnSelectMaster, pnEditMode, pnTransactionDetail;
     private boolean pbIsProgrammaticSelection = false;
-    
+
     @FXML
     private AnchorPane apMainAnchor, apMaster, apDetail, apDetailOther, apTransaction,
             apAttachmentButtons, apBrowse, apButton, apAttachments;
-    
+
     @FXML
     private DatePicker dpTransactionDate, dpRequestedDate, dpCutOffDate;
-    
+
     @FXML
     private TextArea taRemarks, taRemarksDetail;
-    
+
     @FXML
     private TextField tfSearchTransNo, tfTransNo, tfBarcode, tfDescription, tfSupersede, tfBrand, tfModel, tfColor,
             tfVariant, tfMeasure, tfInvType, tfRequestedBy, tfCountNo, tfSearchInvCountType, tfInclusion,
-            tfInventoryCountType, tfWarehouse, tfBin, tfClassification, tfSection,
+            tfInventoryCountType, tfWarehouse, tfBin, tfClassification, tfSection, tfQOH,
             tfEntryNo, tfActualQuantity, tfMS, tfEX, tfSE, tfDE, tfDG, tfTD, tfAttachmentNo;
-    
+
     @FXML
     private Button btnNew, btnUpdate, btnSearch, btnBrowse, btnSave, btnPrint, btnCancel,
             btnHistory, btnClose, btnVoid,
             btnArrowLeft, btnArrowRight, btnAddAttachment, btnRemoveAttachment;
     @FXML
     private TableView<Model_Inventory_Count_Detail> tblViewDetails;
-    
+
     @FXML
-    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription, tblColBrand, tblColMeasure, tblColCount1, tblColCount2, tblColCount3;
-    
+    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription, tblColBrand, tblColMeasure, tblColQOH, tblColCount1, tblColCount2, tblColCount3;
+
     @FXML
     private Label lblSource, lblStatus;
-    
+
     @FXML
     private StackPane stackPane1;
-    
+
     @FXML
     private ImageView imageView;
-    
+
     @FXML
     private ComboBox cmbAttachmentType;
-    
+
     @FXML
     private TableView tblAttachments;
-    
+
     @FXML
     private TableColumn tblRowNoAttachment, tblFileNameAttachment;
-    
+
     @FXML
     private TabPane tabPaneMain;
-    
+
     @FXML
     private ComboBox<String> cmbInclusion;
-    
+
     @Override
     public void setGRider(GRiderCAS foValue) {
         poApp = foValue;
     }
-    
+
     @Override
     public void setIndustryID(String fsValue) {
         psIndustryID = fsValue;
     }
-    
+
     @Override
     public void setCompanyID(String fsValue) {
         psCompanyID = fsValue;
     }
-    
+
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryID = fsValue;
@@ -180,7 +180,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new InvWarehouseControllers(poApp, poLogWrapper).InventoryCount();
@@ -194,7 +194,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 
             //background thread
             Platform.runLater(() -> {
-                
+
                 poAppController.setTransactionStatus("10");
                 //initialize logged in category
                 poAppController.setIndustryID(psIndustryID);
@@ -214,23 +214,23 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     appUnload.unloadForm(apMainAnchor, poApp, psFormName);
                 }
                 btnNew.fire();
-                
+
             });
             initializeTableDetail();
             initControlEvents();
             initAttachmentsGrid();
             initAttachmentPreviewPane();
-//            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
-            lblSource.setText("");
+            lblSource.setText(poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
-            
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
-            
+
         }
     }
-    
+
     @FXML
     void ontblDetailClicked(MouseEvent e) {
         try {
@@ -238,17 +238,17 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             if (pnTransactionDetail <= 0) {
                 return;
             }
-            
+
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            
+
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-            
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
-    
+
     @FXML
     private void cmdButton_Click(ActionEvent event) {
         try {
@@ -261,7 +261,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
                         return;
                     }
-                    
+
                     switch (lastFocusedControl.getId()) {
                         case "tfInventoryCountType":
                             if (!isJSONSuccess(poAppController.searchInventoryCountType(tfInventoryCountType.getText(), false),
@@ -270,9 +270,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             }
                             tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
                             loadTransactionDetailList();
-                            
+
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
-                            
+
                             break;
                         case "tfRequestedBy":
                             if (!isJSONSuccess(poAppController.searchRequestBy(tfRequestedBy.getText(), false),
@@ -283,28 +283,28 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             break;
                     }
                     break;
-                
+
                 case "btnBrowse":
                     if (lastFocusedControl == null) {
                         ShowMessageFX.Information(null, psFormName,
                                 "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
                         return;
                     }
-                    
+
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchInvCountType":
-                            
+
                             if (!isJSONSuccess(poAppController.searchTransactionOpen(tfSearchInvCountType.getText(), true, false),
                                     "Initialize Search Inventory Count ! ")) {
                                 return;
                             }
                             getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
-                            
+
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                             break;
                         case "tfSearchTransNo":
-                            
+
                             if (!isJSONSuccess(poAppController.searchTransactionOpen(tfSearchTransNo.getText(), true, true),
                                     "Initialize Search Transaction! ")) {
                                 return;
@@ -313,36 +313,36 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 //                                tfSearchTransNo.setText(poAppController.getMaster().getTransactionNo());
                             getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
-                            
+
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                             break;
                     }
                     break;
-                
+
                 case "btnNew":
                     if (!isJSONSuccess(poAppController.NewTransaction(), "Initialize New Transaction")) {
                         return;
                     }
                     clearAllInputs();
-                    
+
                     loadTableAttachment.reload();
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
-                
+
                 case "btnUpdate":
                     if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
                         return;
                     }
-                    
+
                     if (!isJSONSuccess(poAppController.UpdateTransaction(), "Initialize Update Transaction")) {
                         return;
                     }
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
-                
+
                 case "btnSave":
                     if (tfTransNo.getText().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
@@ -354,7 +354,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
-                    
+
                     if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                         return;
                     }
@@ -363,13 +363,13 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             return;
                         }
                     }
-                    
+
                     reloadTableDetail();
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
-                    
+
                     break;
-                
+
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
                         poAppController = new InvWarehouseControllers(poApp, poLogWrapper).InventoryCount();
@@ -379,27 +379,27 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             unloadForm appUnload = new unloadForm();
                             appUnload.unloadForm(apMainAnchor, poApp, psFormName);
                         }
-                        
+
                         Platform.runLater(() -> {
                             poAppController.setTransactionStatus("10");
 //                            poAppController.getMaster().setIndustryId(psIndustryID);
                             poAppController.setIndustryID(psIndustryID);
                             poAppController.setCompanyID(psCompanyID);
                             poAppController.setCategoryID(psCategoryID);
-                            
+
                             clearAllInputs();
                         });
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
                     break;
-                
+
                 case "btnHistory":
                     if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
                         return;
                     }
-                    
+
                     try {
                         poAppController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
@@ -410,7 +410,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     }
                     break;
-                
+
                 case "btnClose":
                     unloadForm appUnload = new unloadForm();
                     if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?")) {
@@ -418,7 +418,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         appUnload.unloadForm(apMainAnchor, poApp, psFormName);
                     }
                     break;
-                
+
                 case "btnPrint":
                     if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
@@ -437,19 +437,19 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         ShowMessageFX.Information("Please load transaction before proceeding..", null, "Issuance Approval");
                         return;
                     }
-                    
+
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Cancel transaction?") == true) {
-                        
+
                         if (!isJSONSuccess(poAppController.CancelTransaction(), "Initialize Cancel Transaction")) {
                             return;
                         }
-                        
+
                         reloadTableDetail();
                         getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
-                    
+
                     break;
                 case "btnAddAttachment":
                     fileChooser = new FileChooser();
@@ -458,7 +458,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
                     );
                     java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
-                    
+
                     if (selectedFile != null) {
                         // Read image from the selected file
                         Path imgPath = selectedFile.toPath();
@@ -497,7 +497,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        
+
                         pnAttachment = poAppController.addAttachment(imgPath2);
                         //Copy file to Attachment path
                         poAppController.copyFile(selectedFile.toString());
@@ -540,13 +540,13 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     slideImage(-1);
                     break;
             }
-            
+
             initButtonDisplay(poAppController.getEditMode());
-            
+
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
-            
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -565,26 +565,26 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         poAppController.getMaster().setRemarks(lsValue);
                         loadTransactionMaster();
                         break;
-                    
+
                     case "taRemarksDetail":
                         poAppController.getDetail(pnTransactionDetail).setRemarks(lsValue);
                         reloadTableDetail();
                         loadSelectedTransactionDetail(pnTransactionDetail);
                         break;
-                    
+
                 }
             } else {
                 loTextField.selectAll();
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            
+
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-            
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
-    
+
     private final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsTextFieldID = loTextField.getId();
@@ -593,7 +593,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             if (lsValue == null) {
                 return;
             }
-            
+
             if (!nv) {
                 /*Lost Focus*/
                 switch (lsTextFieldID) {
@@ -615,7 +615,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                             reloadTableDetail();
                             loadSelectedTransactionDetail(pnTransactionDetail);
                             loTextField.requestFocus();
-                            
+
                         }
                         if (lnActualQty <= 0.00) {
                             return;
@@ -641,14 +641,14 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 loTextField.selectAll();
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            
+
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-            
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
-    
+
     private void txtField_KeyPressed(KeyEvent event) {
         TextField loTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
@@ -669,7 +669,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 CommonUtils.SetNextFocus(loTxtField);
                                 break;
                             case "tfSearchInvCountType":
-                                
+
                                 if (!isJSONSuccess(poAppController.searchTransactionOpen(lsValue, true, false),
                                         "Initialize Search Inventory Count ! ")) {
                                     return;
@@ -678,7 +678,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 //                                tfSearchSourceno.setText(poAppController.getMaster().Branch().getBranchName());
                                 getLoadedTransaction();
                                 initButtonDisplay(poAppController.getEditMode());
-                                
+
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                                 break;
                             case "tfSearchTransNo":
@@ -695,7 +695,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 //                                tfSearchTransNo.setText(poAppController.getMaster().getTransactionNo());
                                 getLoadedTransaction();
                                 initButtonDisplay(poAppController.getEditMode());
-                                
+
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                                 break;
                             case "tfInventoryCountType":
@@ -705,9 +705,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 }
                                 tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
                                 loadTransactionDetailList();
-                                
+
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
-                                
+
                                 break;
                             case "tfRequestedBy":
                                 if (!isJSONSuccess(poAppController.searchRequestBy(tfRequestedBy.getText(), false),
@@ -716,26 +716,26 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 }
                                 tfRequestedBy.setText(poAppController.getMaster().ClientRequestBy().getCompanyName());
                                 break;
-                            
+
                         }
                         break;
                 }
             }
         } catch (Exception ex) {
-            
+
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-            
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
-    
+
     private void loadTransactionDetailList() {
         StackPane overlay = getOverlayProgress(apMaster);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
         overlay.setVisible(true);
         pi.setVisible(true);
-        
+
         Task<ObservableList<Model_Inventory_Count_Detail>> loadTransaction = new Task<ObservableList<Model_Inventory_Count_Detail>>() {
             @Override
             protected ObservableList<Model_Inventory_Count_Detail> call() throws Exception {
@@ -743,21 +743,21 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         "Initialize : Load of generate List")) {
                     return null;
                 }
-                
+
                 List<Model_Inventory_Count_Detail> rawList = poAppController.getDetailList();
                 System.out.print("The size of list is " + rawList.size());
                 return FXCollections.observableArrayList(new ArrayList<>(rawList));
             }
-            
+
             @Override
             protected void succeeded() {
                 ObservableList<Model_Inventory_Count_Detail> laDetailList = getValue();
                 tblViewDetails.setItems(laDetailList);
-                
+
                 overlay.setVisible(false);
                 pi.setVisible(false);
             }
-            
+
             @Override
             protected void failed() {
                 overlay.setVisible(false);
@@ -768,7 +768,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 .getName()).log(Level.SEVERE, null, ex);
                 poLogWrapper.severe(psFormName + " : " + ex.getMessage());
             }
-            
+
             @Override
             protected void cancelled() {
                 overlay.setVisible(false);
@@ -779,14 +779,13 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         thread.setDaemon(true);
         thread.start();
     }
-    
+
     private void loadTransactionMaster() {
         try {
-//            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
-//                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
+            lblSource.setText(poAppController.getMaster().Industry().getDescription());
             lblStatus.setText(InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryCountStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
-            
+
             tfTransNo.setText(poAppController.getMaster().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getMaster().getTransactionDate()));
             tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
@@ -803,7 +802,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             dpRequestedDate.setValue(ParseDate(poAppController.getMaster().getRequestedDate()));
             dpCutOffDate.setValue(ParseDate(poAppController.getMaster().getCutOff()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
-            
+
             if (poAppController.getMaster().getTransactionStatus().equals(InventoryCountStatus.CONFIRMED)) {
                 btnVoid.setText("Cancel");
             }
@@ -813,16 +812,16 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
-            
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
-            
+
         }
     }
-    
+
     private void loadSelectedTransactionDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
-        
+
         int tblIndex = fnRow - 1;
-        
+
         tfBarcode.setText(tblColBarcode.getCellData(tblIndex));
         tfDescription.setText(tblColDescription.getCellData(tblIndex));
         tfBrand.setText(tblColBrand.getCellData(tblIndex));
@@ -852,6 +851,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         }
         tfEntryNo.setText(String.valueOf(poAppController.getDetail(fnRow).getEntryNo()));
         tfActualQuantity.setText(String.valueOf(lnActualCount));
+        tfQOH.setText(String.valueOf(poAppController.getDetail(fnRow).getQuantityOnHand()));
         taRemarksDetail.setText(poAppController.getDetail(fnRow).getRemarks());
 
         //---------------------------Dif Cause to Concatication------------------------------------
@@ -861,12 +861,12 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         tfEX.setText("0.0");
         tfDG.setText("0.0");
         tfSE.setText("0.0");
-        
+
     }
-    
+
     private void initControlEvents() {
         List<Control> laControls = getAllSupportedControls();
-        
+
         for (Control loControl : laControls) {
             //add more if required
             if (loControl instanceof TextField) {
@@ -891,43 +891,43 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 loControlField.getEditor().setOnKeyPressed(this::dPicker_KeyPressed);
             }
         }
-        
+
         imageView.setImage(null);
         clearAllInputs();
-        
+
         cmbInclusion.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> {
                     if (newVal != null && !pbIsProgrammaticSelection) {
                         try {
                             Inclusion selected = Inclusion.fromDisplay(newVal);
-                            
+
                             StackPane overlay = getOverlayProgress(apMaster);
                             ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
                             overlay.setVisible(true);
                             pi.setVisible(true);
-                            
+
                             Task<ObservableList<Model_Inventory_Count_Detail>> overrideTask
                             = new Task<ObservableList<Model_Inventory_Count_Detail>>() {
-                        
+
                         @Override
                         protected ObservableList<Model_Inventory_Count_Detail> call() throws Exception {
                             JSONObject loJSON = poAppController.setInclusion(selected.name());
                             if (!isJSONSuccess(loJSON, "Initialize override detail")) {
                                 return null; // signal failure
                             }
-                            
+
                             List<Model_Inventory_Count_Detail> rawDetail = poAppController.getDetailList();
                             System.out.println("Override detail size: " + rawDetail.size());
                             return FXCollections.observableArrayList(new ArrayList<>(rawDetail));
                         }
-                        
+
                         @Override
                         protected void succeeded() {
                             ObservableList<Model_Inventory_Count_Detail> result = getValue();
-                            
+
                             overlay.setVisible(false);
                             pi.setVisible(false);
-                            
+
                             if (result == null) {
                                 // setInclusion failed — restore previous selection
                                 pbIsProgrammaticSelection = true;
@@ -958,7 +958,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 }
                             }
                         }
-                        
+
                         @Override
                         protected void failed() {
                             overlay.setVisible(false);
@@ -972,23 +972,23 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 cmbInclusion.getSelectionModel().select(-1);
                             }
                             pbIsProgrammaticSelection = false;
-                            
+
                             Throwable ex = getException();
                             Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
                             poLogWrapper.severe(psFormName + " : " + ex.getMessage());
                         }
-                        
+
                         @Override
                         protected void cancelled() {
                             overlay.setVisible(false);
                             pi.setVisible(false);
                         }
                     };
-                            
+
                             Thread thread = new Thread(overrideTask);
                             thread.setDaemon(true);
                             thread.start();
-                            
+
                         } catch (Exception ex) {
                             Logger.getLogger(InventoryCountController.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -996,23 +996,23 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 }
         );
     }
-    
+
     public enum Inclusion {
         AI("All Items"),
         BB("Bins"),
         RX("Random"),
         C("By Classification");
-        
+
         private final String displayName;
-        
+
         Inclusion(String displayName) {
             this.displayName = displayName;
         }
-        
+
         public String getDisplayName() {
             return displayName;
         }
-        
+
         public static Inclusion fromDisplay(String displayName) {
             for (Inclusion i : values()) {
                 if (i.displayName.equalsIgnoreCase(displayName)) {
@@ -1021,7 +1021,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             }
             return AI; // default
         }
-        
+
         public static Inclusion fromCode(String code) {
             if (code == null || code.isEmpty()) {
                 return AI;
@@ -1032,9 +1032,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 return AI;
             }
         }
-        
+
     }
-    
+
     private void controllerFocusTracker(Control control) {
         control.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
@@ -1042,11 +1042,11 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             }
         });
     }
-    
+
     private void clearAllInputs() {
-        
+
         List<Control> laControls = getAllSupportedControls();
-        
+
         for (Control loControl : laControls) {
             if (loControl instanceof TextField) {
                 ((TextField) loControl).clear();
@@ -1074,11 +1074,11 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         }
         clearAttachment();
     }
-    
+
     private void initButtonDisplay(int fnEditMode) {
-        
+
         boolean lbEditing = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-        
+
         String lsTransNo = tfTransNo.getText();
         boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
         boolean lbIsApproved = lbHasTransaction
@@ -1095,7 +1095,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         // Transaction-dependent buttons (only when not editing)
         initButtonControls(!lbEditing && lbHasTransaction, "btnUpdate", "btnVoid", "btnHistory", "btnPrint");
         initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved, "btnUpdate");
-        
+
         tfInventoryCountType.setDisable(fnEditMode == EditMode.UPDATE);
         // Disable panes during editing
         apMaster.setDisable(!lbEditing);
@@ -1103,12 +1103,12 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         apDetailOther.setDisable(!lbEditing);
         //reload attachment
         loadTableAttachment.reload();
-        
+
     }
-    
+
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
         Set<String> showOnly = new HashSet<>(Arrays.asList(buttonFxIdsToShow));
-        
+
         for (Field loField : getClass().getDeclaredFields()) {
             loField.setAccessible(true);
             String fieldName = loField.getName(); // fx:id
@@ -1127,7 +1127,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             } catch (IllegalAccessException e) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
                 ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
-                
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
                 ;
             }
@@ -1143,68 +1143,119 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             }
         });
     }
-    
+
     private void initializeTableDetail() {
-        
+
         if (laTransactionDetail == null) {
             laTransactionDetail = FXCollections.observableArrayList();
-            
+
             tblViewDetails.setItems(laTransactionDetail);
             tblViewDetails.setRowFactory(tv -> new TableRow<Model_Inventory_Count_Detail>() {
                 @Override
                 protected void updateItem(Model_Inventory_Count_Detail item, boolean empty) {
                     super.updateItem(item, empty);
-                    
+
+                    // Always reset style classes first
+                    getStyleClass().removeAll("row-variance", "row-selected-variance");
+
                     if (empty || item == null) {
                         setStyle("");
                         return;
                     }
 
-                    // Only apply on 2nd or 3rd cycle
-                    if (poAppController.getMaster().getCounterNo() <= 1) {
+                    if (poAppController.getMaster().getCounterNo() <= 0) {
                         setStyle("");
                         return;
                     }
-                    
+
                     try {
-                        // Get prior cycle actual count
-                        double lnPriorCount = 0.0;
-                        switch (poAppController.getMaster().getCounterNo()) {
-                            case 2:
-                                lnPriorCount = item.getActualCounter01() != null
-                                        ? item.getActualCounter01() : 0.0;
-                                break;
-                            case 3:
-                                lnPriorCount = item.getActualCounter02() != null
-                                        ? item.getActualCounter02() : 0.0;
-                                break;
-                        }
-                        
                         double lnQtyOnHand = item.getQuantityOnHand() != null
                                 ? item.getQuantityOnHand() : 0.0;
-                        double lnVariance = lnPriorCount - lnQtyOnHand;
-                        
-                        if (Math.abs(lnVariance) < 0.0000001) {
-                            // Zero variance - visually suppressed (grey out)
-                            setStyle("-fx-background-color: #d3d3d3; -fx-text-fill: #888888;");
-                        } else {
-                            // Has discrepancy - highlight
-                            setStyle("-fx-background-color: #fff3cd;");
+
+                        double lnActualCount = 0.0;
+                        switch (poAppController.getMaster().getCounterNo()) {
+                            case 1:
+                                lnActualCount = item.getActualCounter01() != null
+                                        ? item.getActualCounter01() : 0.0;
+                                break;
+                            case 2:
+                                lnActualCount = item.getActualCounter02() != null
+                                        ? item.getActualCounter02() : 0.0;
+                                break;
+                            case 3:
+                                lnActualCount = item.getActualCounter03() != null
+                                        ? item.getActualCounter03() : 0.0;
+                                break;
                         }
+
+                        double lnVariance = lnActualCount - lnQtyOnHand;
+
+                        if (Math.abs(lnVariance) < 0.0000001) {
+                            // Equal — no highlight
+                            setStyle("");
+                        } else {
+                            // Has variance — highlight yellow, selection handled by CSS
+                            getStyleClass().add("row-variance");
+                            setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                        }
+
                     } catch (Exception e) {
                         setStyle("");
                     }
+
+                    // Re-apply selection highlight on top of variance style
+                    selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                        if (getItem() == null) {
+                            return;
+                        }
+                        if (isSelected) {
+                            getStyleClass().removeAll("row-variance");
+                            getStyleClass().add("row-selected-variance");
+                            setStyle("-fx-background-color: #e0a800; -fx-text-fill: #ffffff;");
+                        } else {
+                            getStyleClass().removeAll("row-selected-variance");
+                            try {
+                                double lnQOH = getItem().getQuantityOnHand() != null
+                                        ? getItem().getQuantityOnHand() : 0.0;
+                                double lnCount = 0.0;
+                                switch (poAppController.getMaster().getCounterNo()) {
+                                    case 1:
+                                        lnCount = getItem().getActualCounter01() != null
+                                                ? getItem().getActualCounter01() : 0.0;
+                                        break;
+                                    case 2:
+                                        lnCount = getItem().getActualCounter02() != null
+                                                ? getItem().getActualCounter02() : 0.0;
+                                        break;
+                                    case 3:
+                                        lnCount = getItem().getActualCounter03() != null
+                                                ? getItem().getActualCounter03() : 0.0;
+                                        break;
+                                }
+                                double lnVar = lnCount - lnQOH;
+                                if (Math.abs(lnVar) < 0.0000001) {
+                                    setStyle("");
+                                } else {
+                                    getStyleClass().add("row-variance");
+                                    setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                                }
+                            } catch (Exception e) {
+                                setStyle("");
+                            }
+                        }
+                    });
                 }
             });
+            tblColQOH.setStyle("-fx-alignment: CENTER;");
             tblColCount1.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount2.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount3.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
-            
+
             tblColNo.setCellValueFactory((loModel) -> {
                 int index = tblViewDetails.getItems().indexOf(loModel.getValue()) + 1;
                 return new SimpleStringProperty(String.valueOf(index));
             });
-            
+
             tblColBarcode.setCellValueFactory((loModel) -> {
                 try {
                     return new SimpleStringProperty(loModel.getValue().Inventory().getBarCode());
@@ -1213,7 +1264,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     return new SimpleStringProperty("");
                 }
             });
-            
+
             tblColDescription.setCellValueFactory((loModel) -> {
                 try {
                     return new SimpleStringProperty(loModel.getValue().Inventory().getDescription());
@@ -1222,7 +1273,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     return new SimpleStringProperty("");
                 }
             });
-            
+
             tblColBrand.setCellValueFactory((loModel) -> {
                 try {
                     return new SimpleStringProperty(loModel.getValue().Inventory().Brand().getDescription());
@@ -1231,7 +1282,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     return new SimpleStringProperty("");
                 }
             });
-            
+
             tblColMeasure.setCellValueFactory((loModel) -> {
                 try {
                     return new SimpleStringProperty(loModel.getValue().Inventory().Measure().getDescription());
@@ -1240,20 +1291,25 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     return new SimpleStringProperty("");
                 }
             });
-            
+
+            tblColQOH.setCellValueFactory((loModel) -> {
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getQuantityOnHand()));
+
+            });
+
             tblColCount1.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter01()));
-                
+
             });
-            
+
             tblColCount2.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter02()));
-                
+
             });
-            
+
             tblColCount3.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter03()));
-                
+
             });
             loadTableAttachment = new JFXUtil.ReloadableTableTask(
                     tblAttachments,
@@ -1304,7 +1360,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             );
         }
     }
-    
+
     private void reloadTableDetail() {
         List<Model_Inventory_Count_Detail> rawDetail = poAppController.getDetailList();
         laTransactionDetail.setAll(rawDetail);
@@ -1313,20 +1369,20 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         int indexToSelect = (pnTransactionDetail >= 1 && pnTransactionDetail < laTransactionDetail.size())
                 ? pnTransactionDetail - 1
                 : laTransactionDetail.size() - 1;
-        
+
         tblViewDetails.getSelectionModel().select(indexToSelect);
-        
+
         pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
         tblViewDetails.refresh();
     }
-    
+
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {
 //        clearAllInputs();
         loadTransactionMaster();
         reloadTableDetail();
         loadSelectedTransactionDetail(pnTransactionDetail);
     }
-    
+
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
@@ -1341,7 +1397,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             }
             return false;
         }
-        
+
         String message = (String) loJSON.get("message");
         poLogWrapper.severe(psFormName + " :" + message);
         if (message != null) {
@@ -1351,11 +1407,11 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, message));
             }
         }
-        
+
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
     }
-    
+
     private LocalDate ParseDate(Date date) {
         if (date == null) {
             return null;
@@ -1363,7 +1419,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         Date loDate = new java.util.Date(date.getTime());
         return loDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
-    
+
     private StackPane getOverlayProgress(AnchorPane foAnchorPane) {
         ProgressIndicator localIndicator = null;
         StackPane localOverlay = null;
@@ -1381,30 +1437,30 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 }
             }
         }
-        
+
         if (localIndicator == null) {
             localIndicator = new ProgressIndicator();
             localIndicator.setMaxSize(50, 50);
             localIndicator.setVisible(false);
             localIndicator.setStyle("-fx-progress-color: orange;");
         }
-        
+
         if (localOverlay == null) {
             localOverlay = new StackPane();
             localOverlay.setPickOnBounds(false); // Let clicks through
             localOverlay.getChildren().add(localIndicator);
-            
+
             AnchorPane.setTopAnchor(localOverlay, 0.0);
             AnchorPane.setBottomAnchor(localOverlay, 0.0);
             AnchorPane.setLeftAnchor(localOverlay, 0.0);
             AnchorPane.setRightAnchor(localOverlay, 0.0);
-            
+
             foAnchorPane.getChildren().add(localOverlay);
         }
-        
+
         return localOverlay;
     }
-    
+
     private List<Control> getAllSupportedControls() {
         List<Control> controls = new ArrayList<>();
         for (Field field : getClass().getDeclaredFields()) {
@@ -1422,22 +1478,22 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             } catch (IllegalAccessException e) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
                 ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
-                
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
             }
         }
         return controls;
     }
-    
+
     final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
         DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsDatePickerID = loDatePicker.getId();
         LocalDate loValue = loDatePicker.getValue();
-        
+
         if (loValue == null) {
             return;
         }
-        
+
         LocalDateTime ldDateTimeValue = loValue.atTime(LocalTime.now());
         Date ldDateValue = Date.from(loValue.atStartOfDay(ZoneId.systemDefault()).toInstant());
         if (!nv) {
@@ -1449,13 +1505,13 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 case "dpCutOffDate":
                     poAppController.getMaster().setCutOff((ldDateTimeValue));
                     return;
-                
+
             }
         }
     };
-    
+
     private void dPicker_KeyPressed(KeyEvent event) {
-        
+
         TextField loTxtField = (TextField) event.getSource();
         String loDatePickerID = ((DatePicker) loTxtField.getParent()).getId(); // cautious cast
         String loValue = loTxtField.getText();
@@ -1463,9 +1519,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         if (loValue != null && !loValue.isEmpty()) {
             Date toDateValue = SQLUtil.toDate(loValue, "dd/MM/yyyy");
             lsValue = SQLUtil.dateFormat(toDateValue, SQLUtil.FORMAT_SHORT_DATE);
-            
+
         }
-        
+
         if (event.getCode() != null) {
             switch (event.getCode()) {
                 case TAB:
@@ -1473,19 +1529,19 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 case F3:
                     event.consume();
                     switch (loDatePickerID) {
-                        
+
                     }
             }
         }
         event.consume();
-        
+
     }
 
     //-----------------------------Attachment Code--------------------------------------------------------------------------------------
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
     public static ObservableList<String> documentType = FXCollections.observableArrayList("Other");
     String lsValidDisbMessage = "Please provide generate inventory count detail to proceed.";
-    
+
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     JFXUtil.ReloadableTableTask loadTableAttachment;
@@ -1494,9 +1550,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
     private FileChooser fileChooser;
     private int pnAttachment = 0;
     private int currentIndex = 0;
-    
+
     private boolean pbIsCheckedAttachmentTab = false;
-    
+
     AnchorPane root = null;
     Scene scene = null;
     JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
@@ -1505,7 +1561,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             setKeyEvent(newScene);
         }
     };
-    
+
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
             switch (tabTitle) {
@@ -1517,7 +1573,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     }
                 }
                 break;
-                
+
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
@@ -1529,7 +1585,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                                 ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                             }
-                            
+
                             loadTableAttachment.reload();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
@@ -1539,9 +1595,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     break;
             }
         });
-        
+
     }
-    
+
     private void setKeyEvent(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
@@ -1568,15 +1624,15 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             }
         });
     }
-    
+
     private boolean DoesContainValidDisbDetail() {
-        
+
         if (poAppController.getDetailCount() <= 0) {
             return false;
         }
         return true;
     }
-    
+
     public void resetImageBounds() {
         imageView.setScaleX(1.0);
         imageView.setScaleY(1.0);
@@ -1584,7 +1640,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         imageView.setTranslateY(0);
         stackPane1.setAlignment(imageView, javafx.geometry.Pos.CENTER);
     }
-    
+
     private void initAttachmentPreviewPane() {
         imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
         stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
@@ -1593,17 +1649,17 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             loadTableAttachment.reload();
             loadRecordAttachment(true);
         });
-        
+
     }
-    
+
     public void initAttachmentsGrid() {
         JFXUtil.setColumnCenter(tblRowNoAttachment);
         JFXUtil.setColumnLeft(tblFileNameAttachment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
-        
+
         tblAttachments.setItems(attachment_data);
     }
-    
+
     public void slideImage(int direction) {
         if (attachment_data.size() <= 0) {
             return;
@@ -1611,7 +1667,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
         currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
-        
+
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
             TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
             slideOut.setByX(direction * -400); // Move left or right
@@ -1628,33 +1684,33 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                 TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imageView);
                 slideIn.setToX(0);
                 slideIn.play();
-                
+
                 loadRecordAttachment(true);
             });
-            
+
             slideOut.play();
         }
         if (JFXUtil.isImageViewOutOfBounds(imageView, stackPane1)) {
             JFXUtil.resetImageBounds(imageView, stackPane1);
         }
     }
-    
+
     public void clearAttachment() {
-        
+
         stageAttachment.closeDialog();
         tfAttachmentNo.clear();
         cmbAttachmentType.setItems(documentType);
         cmbAttachmentType.setDisable(true);
-        
+
     }
-    
+
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
-        
+
     }
-    
+
     public void initComboboxes() {
-        
+
         initComboBoxes();
         // ComboBox setup
         cmbAttachmentType.setItems(documentType);
@@ -1670,7 +1726,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         });
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
     }
-    
+
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
@@ -1699,7 +1755,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             }
                         }
-                        
+
                         if (filePath != null && !filePath.isEmpty()) {
                             Path imgPath = Paths.get(filePath2);
                             String convertedPath = imgPath.toUri().toString();
@@ -1712,7 +1768,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 Image loimage = new Image(convertedPath);
                                 imageView.setImage(loimage);
                                 JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
-                                
+
                                 PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
                                 delay.setOnFinished(event -> {
                                     Platform.runLater(() -> {
@@ -1732,7 +1788,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-                                
+
                             } else {
                                 // ----- PDF VIEW -----
                                 JFXUtil.PDFViewConfig(filePath2, stackPane1, btnArrowLeft, btnArrowRight, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
@@ -1740,7 +1796,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         } else {
                             imageView.setImage(null);
                         }
-                        
+
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -1760,13 +1816,13 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         } catch (Exception ex) {
         }
     }
-    
+
     public void RemoveWindowEvent() {
         root.sceneProperty().removeListener(WindowKeyEvent);
         scene.setOnKeyPressed(null);
         stageAttachment.closeDialog();
     }
-    
+
     public void showAttachmentDialog() {
         stageAttachment.closeDialog();
         if (poAppController.getTransactionAttachmentCount() <= 0) {
@@ -1787,7 +1843,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         AttachmentDialogController controller = new AttachmentDialogController();
         controller.setOpenedImage(pnAttachment);
         controller.addData(data);
-        
+
         try {
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {

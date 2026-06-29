@@ -59,6 +59,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableRow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -120,7 +121,7 @@ public class InventoryCount_PostingController implements Initializable, ScreenIn
     @FXML
     private TextField tfSearchTransNo, tfTransNo, tfBarcode, tfDescription, tfSupersede, tfBrand, tfModel, tfColor,
             tfVariant, tfMeasure, tfInvType, tfRequestedBy, tfCountNo, tfSearchInvCountType, tfInclusion,
-            tfInventoryCountType, tfWarehouse, tfBin, tfClassification, tfSection,
+            tfInventoryCountType, tfWarehouse, tfBin, tfClassification, tfSection, tfQOH,
             tfEntryNo, tfActualQuantity, tfMS, tfEX, tfSE, tfDE, tfDG, tfTD, tfAttachmentNo;
 
     @FXML
@@ -130,7 +131,7 @@ public class InventoryCount_PostingController implements Initializable, ScreenIn
     private TableView<Model_Inventory_Count_Detail> tblViewDetails;
 
     @FXML
-    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription, tblColBrand, tblColMeasure, tblColCount1, tblColCount2, tblColCount3;
+    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription, tblColBrand, tblColMeasure, tblColQOH, tblColCount1, tblColCount2, tblColCount3;
 
     @FXML
     private Label lblSource, lblStatus;
@@ -218,8 +219,7 @@ public class InventoryCount_PostingController implements Initializable, ScreenIn
             initControlEvents();
             initAttachmentsGrid();
             initAttachmentPreviewPane();
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName());
-            lblSource.setText("");
+            lblSource.setText(poAppController.getMaster().Industry().getDescription());
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -611,6 +611,7 @@ public class InventoryCount_PostingController implements Initializable, ScreenIn
         }
 
         tfEntryNo.setText(String.valueOf(poAppController.getDetail(fnRow).getEntryNo()));
+        tfQOH.setText(String.valueOf(poAppController.getDetail(fnRow).getQuantityOnHand()));
         tfActualQuantity.setText(String.valueOf(lnActualCount));
         taRemarksDetail.setText(poAppController.getDetail(fnRow).getRemarks());
 
@@ -962,7 +963,103 @@ public class InventoryCount_PostingController implements Initializable, ScreenIn
             laTransactionDetail = FXCollections.observableArrayList();
 
             tblViewDetails.setItems(laTransactionDetail);
+            tblViewDetails.setRowFactory(tv -> new TableRow<Model_Inventory_Count_Detail>() {
+                @Override
+                protected void updateItem(Model_Inventory_Count_Detail item, boolean empty) {
+                    super.updateItem(item, empty);
 
+                    // Always reset style classes first
+                    getStyleClass().removeAll("row-variance", "row-selected-variance");
+
+                    if (empty || item == null) {
+                        setStyle("");
+                        return;
+                    }
+
+                    if (poAppController.getMaster().getCounterNo() <= 0) {
+                        setStyle("");
+                        return;
+                    }
+
+                    try {
+                        double lnQtyOnHand = item.getQuantityOnHand() != null
+                                ? item.getQuantityOnHand() : 0.0;
+
+                        double lnActualCount = 0.0;
+                        switch (poAppController.getMaster().getCounterNo()) {
+                            case 1:
+                                lnActualCount = item.getActualCounter01() != null
+                                        ? item.getActualCounter01() : 0.0;
+                                break;
+                            case 2:
+                                lnActualCount = item.getActualCounter02() != null
+                                        ? item.getActualCounter02() : 0.0;
+                                break;
+                            case 3:
+                                lnActualCount = item.getActualCounter03() != null
+                                        ? item.getActualCounter03() : 0.0;
+                                break;
+                        }
+
+                        double lnVariance = lnActualCount - lnQtyOnHand;
+
+                        if (Math.abs(lnVariance) < 0.0000001) {
+                            // Equal — no highlight
+                            setStyle("");
+                        } else {
+                            // Has variance — highlight yellow, selection handled by CSS
+                            getStyleClass().add("row-variance");
+                            setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                        }
+
+                    } catch (Exception e) {
+                        setStyle("");
+                    }
+
+                    // Re-apply selection highlight on top of variance style
+                    selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                        if (getItem() == null) {
+                            return;
+                        }
+                        if (isSelected) {
+                            getStyleClass().removeAll("row-variance");
+                            getStyleClass().add("row-selected-variance");
+                            setStyle("-fx-background-color: #e0a800; -fx-text-fill: #ffffff;");
+                        } else {
+                            getStyleClass().removeAll("row-selected-variance");
+                            try {
+                                double lnQOH = getItem().getQuantityOnHand() != null
+                                        ? getItem().getQuantityOnHand() : 0.0;
+                                double lnCount = 0.0;
+                                switch (poAppController.getMaster().getCounterNo()) {
+                                    case 1:
+                                        lnCount = getItem().getActualCounter01() != null
+                                                ? getItem().getActualCounter01() : 0.0;
+                                        break;
+                                    case 2:
+                                        lnCount = getItem().getActualCounter02() != null
+                                                ? getItem().getActualCounter02() : 0.0;
+                                        break;
+                                    case 3:
+                                        lnCount = getItem().getActualCounter03() != null
+                                                ? getItem().getActualCounter03() : 0.0;
+                                        break;
+                                }
+                                double lnVar = lnCount - lnQOH;
+                                if (Math.abs(lnVar) < 0.0000001) {
+                                    setStyle("");
+                                } else {
+                                    getStyleClass().add("row-variance");
+                                    setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                                }
+                            } catch (Exception e) {
+                                setStyle("");
+                            }
+                        }
+                    });
+                }
+            });
+            tblColQOH.setStyle("-fx-alignment: CENTER;");
             tblColCount1.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount2.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount3.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
@@ -1006,6 +1103,11 @@ public class InventoryCount_PostingController implements Initializable, ScreenIn
                     poLogWrapper.severe(psFormName, e.getMessage());
                     return new SimpleStringProperty("");
                 }
+            });
+
+            tblColQOH.setCellValueFactory((loModel) -> {
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getQuantityOnHand()));
+
             });
 
             tblColCount1.setCellValueFactory((loModel) -> {
