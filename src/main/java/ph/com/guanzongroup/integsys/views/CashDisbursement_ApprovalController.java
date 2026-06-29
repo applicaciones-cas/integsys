@@ -470,7 +470,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnApprove, btnUpdate, btnSearch, btnSave, btnCancel, btnDisapprove, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnReturn,btnApprove, btnUpdate, btnSearch, btnSave, btnCancel, btnDisapprove, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -555,8 +555,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
-                                || CashDisbursementStatus.RETURNED.equals(poController.Master().getTransactionStatus())) {
+                        if (CashDisbursementStatus.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                             if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to approve this transaction?")) { //requires to review journal entry
                                 if (!checkJEorJEPSaving()) {
                                     break;
