@@ -742,6 +742,13 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                     Platform.runLater(() -> {
                         journalproposal_data.clear();
                         try {
+                            if (poController.getJournalProposalList() == null) {
+                                return;
+                            } else {
+                                if (poController.getJournalProposalList().isEmpty()) {
+                                    return;
+                                }
+                            }
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.JournalProposal(pnMainJEP).ReloadDetail();
                             }
