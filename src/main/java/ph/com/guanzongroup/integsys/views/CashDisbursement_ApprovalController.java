@@ -482,7 +482,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 case "btnUpdate":
                     if (!CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
                         String lsUserId = oApp.getUserID();
-                        String lsPosition = poController.checkPosition(CashDisbursementStatus.CONFIRMED, lsUserId);
+                        String lsPosition = poController.checkPosition(CashDisbursementStatus.APPROVED, lsUserId);
                         if (lsPosition == null || "".equals(lsPosition)) {
                             poJSON.put("result", "error");
                             poJSON.put("message", "User is not an authorized officer.");
@@ -565,7 +565,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
                                     break;
                                 } else {
-                                    poJSON = poController.ConfirmTransaction("");
+                                    poJSON = poController.ApproveTransaction();
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         break;
@@ -888,10 +888,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                                 poController.TransactionList(lnCtr).getPayeeName(),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCtr).getTransactionTotal(), true)),
                                                 poController.TransactionList(lnCtr).getTransactionNo()));
-                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.VOID)) {
+                                        if (JFXUtil.isObjectEqualTo(poController.TransactionList(lnCtr).getTransactionStatus(), CashDisbursementStatus.CANCELLED, CashDisbursementStatus.RETURNED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsMain);
                                         }
-                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.CONFIRMED)) {
+                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                         }
                                     }
@@ -2511,16 +2511,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
     private void loadRecordMaster() {
         try {
-            String lsStat = "";
-            switch (poController.Master().getTransactionStatus()) {
-                case CashDisbursementStatus.OPEN:
-                    lsStat = "Void";
-                    break;
-                case CashDisbursementStatus.CONFIRMED:
-                    lsStat = "Cancel";
-                    break;
-            }
-            btnDisapprove.setText(lsStat);
             boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(), CashDisbursementStatus.OPEN);
             JFXUtil.setDisabled(!lbShow3, tfCreditTo);
 
