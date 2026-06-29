@@ -6,6 +6,7 @@ package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
 
+import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.JournalProposalStatus;
 import ph.com.guanzongroup.integsys.model.*;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -524,6 +525,14 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
                 case "btnUpdate":
+                    String lsUserId = oApp.getUserID();
+                    String lsPosition = poController.checkPosition(CashDisbursementStatus.OPEN, lsUserId);
+                    if (lsPosition == null || "".equals(lsPosition)) {
+                        poJSON.put("result", "error");
+                        poJSON.put("message", "User is not an authorized officer.");
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
                     //Recheck transaction status
                     poJSON = poController.checkUpdateTransaction(true);
                     if (!"success".equals((String) poJSON.get("result"))) {
