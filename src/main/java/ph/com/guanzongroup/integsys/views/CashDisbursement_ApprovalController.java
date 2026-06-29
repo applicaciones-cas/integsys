@@ -3063,7 +3063,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
                     break;
                 case CashDisbursementStatus.RETURNED:
-                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnDisapprove, btnReturn);
+                    JFXUtil.setButtonsVisibility(false, btnApprove,btnUpdate, btnDisapprove, btnReturn);
                     break;
                 case CashDisbursementStatus.CONFIRMED:
                 case CashDisbursementStatus.VERIFIED:
