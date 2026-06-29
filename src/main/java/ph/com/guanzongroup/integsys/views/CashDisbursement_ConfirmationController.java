@@ -1588,7 +1588,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 
     private void initTextFields() {
         //Initialise  TextField Focus
-        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks);
+        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks, taJournalProposalRemarks);
         JFXUtil.setFocusListener(txtMaster_Focus, apDVMaster1, apDVMaster2);
         JFXUtil.setFocusListener(txtSearch_Focus, apBrowse);
         JFXUtil.setFocusListener(txtDetail_Focus, apDVDetail);
@@ -1598,14 +1598,15 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setFocusListener(txtJournalProposalMaster_Focus, apJournalProposalMaster);
         JFXUtil.setFocusListener(txtJournalProposalDetails_Focus, apJournalProposalDetails);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apJournalProposalMaster, apJournalProposalDetails, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments);
 
-        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfAmountDetail);
+        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBaseAmount, tfAmountDetail);
         JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);
             JFXUtil.setVerticalScroll(taJournalRemarks);
+            JFXUtil.setVerticalScroll(taJournalProposalRemarks);
         });
 
         JFXUtil.handleDisabledNodeClick(apDVDetail, pnEditMode, nodeID -> {
@@ -1684,6 +1685,13 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         loadRecordMasterJE();
+                        break;
+                    case "taJournalProposalRemarks":
+                        poJSON = poController.JournalProposal(pnMainJEP).Master().setRemarks(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        loadRecordMasterJEP();
                         break;
                 }
             });
@@ -3059,6 +3067,23 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         moveNextJE(false, false);
                     }
                     break;
+                case "cbJEMasterProposalReverse":
+                    if (!isProceed()) {
+                        loadRecordMasterJEP();
+                        return;
+                    }
+                    if (poController.JournalProposal(pnMainJEP).getEditMode() == EditMode.ADDNEW) {
+                        poController.getJournalProposalList().remove(pnMainJEP);
+                    } else {
+                        poController.JournalProposal(pnMainJEP).Master().isReverse(checkedBox.isSelected());
+                    }
+                    Platform.runLater(() -> {
+                        loadTableMainJEP.reload();
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableDetailJEP.reload();
+                        });
+                    });
+                    break;
                 case "cbJEProposalReverse":
                     if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.ADDNEW) {
                         poController.JournalProposal(pnMainJEP).Detail().remove(pnDetailJEP);
@@ -3085,6 +3110,28 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 
             }
         }
+    }
+
+    private boolean isProceed() {
+        String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
+        String lsMessage = "";
+        boolean lbIsCbChecked = cbJEMasterProposalReverse.isSelected();
+        switch (dbValue) {
+            case JournalProposalStatus.OPEN:
+                lsMessage = lbIsCbChecked ? "activate" : "void";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
+            case JournalProposalStatus.VOID:
+                lsMessage = lbIsCbChecked ? "activate" : "void";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
+            case JournalProposalStatus.RETURNED:
+            case JournalProposalStatus.CONFIRMED:
+                lsMessage = lbIsCbChecked ? "activate" : "cancel";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
+            case JournalProposalStatus.CANCELLED:
+                lsMessage = lbIsCbChecked ? "activate" : "cancel";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
+        }
+        return true;
     }
 
     private void initButton(int fnEditMode) {
