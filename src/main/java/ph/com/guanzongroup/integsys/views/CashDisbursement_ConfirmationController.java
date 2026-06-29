@@ -513,7 +513,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     loadTableDetail.reload();
                     break;
                 case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apBIRDetail);
+                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apJournalProposalDetails, apJournalProposalMaster, apBIRDetail);
                     break;
                 case "btnSave":
                     //Recheck transaction status
@@ -924,7 +924,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCtr).getTransactionTotal(), true)),
                                                 poController.TransactionList(lnCtr).getTransactionNo()));
                                         if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.VOID)
-                                        || poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.RETURNED)) {
+                                                || poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.RETURNED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsMain);
                                         }
                                         if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.CONFIRMED)) {

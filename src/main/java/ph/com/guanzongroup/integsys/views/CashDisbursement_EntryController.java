@@ -549,7 +549,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     loadTableDetail.reload();
                     break;
                 case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apBIRDetail);
+                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apJournalProposalDetails, apJournalProposalMaster, apBIRDetail);
                     break;
                 case "btnSave":
                     //Recheck transaction status
@@ -595,7 +595,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if(CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
+                        if (CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
                                 || CashDisbursementStatus.RETURNED.equals(poController.Master().getTransactionStatus())) {
                             if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
                                 if (!checkJEorJEPSaving()) {
@@ -797,7 +797,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
 
     private List<String> checkJEorJEP() {
         List<String> titles = new ArrayList<>();

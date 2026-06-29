@@ -510,7 +510,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     loadTableDetail.reload();
                     break;
                 case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apBIRDetail);
+                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apJournalProposalDetails, apJournalProposalMaster, apBIRDetail);
                     break;
                 case "btnSave":
                     //Recheck transaction status

@@ -36,7 +36,6 @@ import org.guanzon.appdriver.base.*;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CashDisbursement;
@@ -452,7 +451,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnUpdate":
-                    if(!CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
+                    if (!CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
                         String lsUserId = oApp.getUserID();
                         String lsPosition = poController.checkPosition(CashDisbursementStatus.VERIFIED, lsUserId);
                         if (lsPosition == null || "".equals(lsPosition)) {
@@ -482,7 +481,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                     loadTableDetail.reload();
                     break;
                 case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apBIRDetail);
+                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apJournalProposalDetails, apJournalProposalMaster, apBIRDetail);
                     break;
                 case "btnSave":
                     //Recheck transaction status
@@ -527,7 +526,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if(CashDisbursementStatus.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
+                        if (CashDisbursementStatus.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
                             if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
                                 if (!checkJEorJEPSaving()) {
                                     break;
@@ -1033,7 +1032,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                                 loadRecordDetail();
                             }
                             loadRecordMaster();
-                        } catch ( GuanzonException | SQLException ex) { //CloneNotSupportedException |
+                        } catch (GuanzonException | SQLException ex) { //CloneNotSupportedException |
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -1268,7 +1267,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                                 pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
-                        } catch (SQLException | GuanzonException  ex) { //CloneNotSupportedException
+                        } catch (SQLException | GuanzonException ex) { //CloneNotSupportedException
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -3127,7 +3126,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                     JFXUtil.setButtonsVisibility(true, btnUpdate); //btnVoid
                     break;
                 case CashDisbursementStatus.CONFIRMED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate,btnVerify);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVerify);
                     break;
                 case CashDisbursementStatus.VERIFIED:
                 case CashDisbursementStatus.VOID:
