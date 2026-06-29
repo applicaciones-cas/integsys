@@ -470,7 +470,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnReturn,btnApprove, btnUpdate, btnSearch, btnSave, btnCancel, btnDisapprove, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnReturn, btnApprove, btnUpdate, btnSearch, btnSave, btnCancel, btnDisapprove, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -3063,7 +3063,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
                     break;
                 case CashDisbursementStatus.RETURNED:
-                    JFXUtil.setButtonsVisibility(false, btnApprove,btnUpdate, btnDisapprove, btnReturn);
+                    JFXUtil.setButtonsVisibility(false, btnApprove, btnUpdate, btnDisapprove, btnReturn);
                     break;
                 case CashDisbursementStatus.CONFIRMED:
                 case CashDisbursementStatus.VERIFIED:
