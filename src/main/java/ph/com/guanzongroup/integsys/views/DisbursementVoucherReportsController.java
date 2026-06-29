@@ -80,7 +80,7 @@ public class DisbursementVoucherReportsController implements Initializable, Scre
 
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     ObservableList<String> DVStatus = FXCollections.observableArrayList("ALL", "OPEN", "VERIFIED", "CERTIFIED", "CANCELLED", "AUTHORIZED", "VOID", "DISAPPROVED", "RETURNED", "RETURNED_I");
-    ObservableList<String> CheckStatus = FXCollections.observableArrayList("ALL", "FLOAT", "FLOAT", "POSTED", "CANCELLED", "STALED", "STOP_PAYMENT", "BOUNCED", "VOID");
+    ObservableList<String> CheckStatus = FXCollections.observableArrayList("ALL", "FLOAT", "OPEN", "POSTED", "CANCELLED", "STALED", "STOP_PAYMENT", "BOUNCED", "VOID");
 
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
