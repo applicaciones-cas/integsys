@@ -977,9 +977,9 @@ public class CashDisbursement_VerificationController implements Initializable, S
                             details_data.clear();
 
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                if (poController.Master().getSourceNo() == null || "".equals(poController.Master().getSourceNo())) {
-                                    poController.ReloadDetail();
-                                }
+//                                if (poController.Master().getSourceNo() == null || "".equals(poController.Master().getSourceNo())) {
+//                                    poController.ReloadDetail();
+//                                }
                                 poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1033,7 +1033,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                                 loadRecordDetail();
                             }
                             loadRecordMaster();
-                        } catch (CloneNotSupportedException | GuanzonException | SQLException ex) {
+                        } catch ( GuanzonException | SQLException ex) { //CloneNotSupportedException |
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -1234,9 +1234,9 @@ public class CashDisbursement_VerificationController implements Initializable, S
                     Platform.runLater(() -> {
                         BIR_data.clear();
                         try {
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.ReloadWTDeductions();
-                            }
+//                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//                                poController.ReloadWTDeductions();
+//                            }
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
@@ -1268,7 +1268,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                                 pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
-                        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                        } catch (SQLException | GuanzonException  ex) { //CloneNotSupportedException
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -2611,6 +2611,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
             taDVRemarks.setText(poController.Master().getRemarks());
 
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2);
+            JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVDetail, apBIRDetail, apAttachmentButtons, apAttachments);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -2778,8 +2779,8 @@ public class CashDisbursement_VerificationController implements Initializable, S
             if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
                 return;
             }
-            boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
+//            boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
+//            JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
 
             tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
@@ -3115,9 +3116,9 @@ public class CashDisbursement_VerificationController implements Initializable, S
         JFXUtil.setButtonsVisibility(false, btnUpdate); //btnVoid
         JFXUtil.setButtonsVisibility(lbShow2, btnVerify);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
-
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail,
-                apJournalMaster, apJournalDetails, apJournalProposalMaster, apJournalProposalDetails, apBIRDetail, apAttachments);
+        //apDVMaster1, apDVMaster2, apDVDetail, apBIRDetail, apAttachments
+        JFXUtil.setDisabled(!lbShow,
+                apJournalMaster, apJournalDetails, apJournalProposalMaster, apJournalProposalDetails);
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
