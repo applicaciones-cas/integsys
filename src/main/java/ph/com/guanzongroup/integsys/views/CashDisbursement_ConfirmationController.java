@@ -494,7 +494,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         }
                     }
                     //Recheck transaction status
-                    poJSON = poController.checkUpdateTransaction(true);
+                    poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
@@ -518,7 +518,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 case "btnSave":
                     //Recheck transaction status
                     if (pnEditMode == EditMode.UPDATE) {
-                        poJSON = poController.checkUpdateTransaction(true);
+                        poJSON = poController.checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
