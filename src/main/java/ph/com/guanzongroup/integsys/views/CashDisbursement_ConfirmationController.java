@@ -915,6 +915,8 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     poController.resetTransaction();
                     return;
                 }
+                pbIsCheckedJournalTab = false;
+                pbIsCheckedJournalProposalTab = false;
                 pnEditMode = poController.getEditMode();
                 loadTableDetail.reload();
                 moveNext(false, false);
