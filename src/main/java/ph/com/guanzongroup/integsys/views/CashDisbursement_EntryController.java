@@ -5,12 +5,6 @@
 package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
-
-import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
-import ph.com.guanzongroup.cas.cashflow.status.JournalProposalStatus;
-import ph.com.guanzongroup.integsys.model.*;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,9 +81,11 @@ import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CashDisbursement;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CashDisbursementStatus;
+import ph.com.guanzongroup.cas.cashflow.status.JournalProposalStatus;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
-
-import static ph.com.guanzongroup.integsys.views.CashLiquidation_EntryController.poController;
+import ph.com.guanzongroup.integsys.model.*;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -173,7 +169,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     private Tab tabDetails, tabJournal, tabJournalProposal, tabBIR, tabAttachments;
     @FXML
     private TextField tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatAmountDetail, tfAmountDetail, tfCashAdvParticular, tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo,
-                        tfJournalProposalTransactionNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount;
+            tfJournalProposalTransactionNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount;
     @FXML
     private ComboBox<JFXUtil.Status> cmbJournalProposalStatus;
     @FXML
@@ -711,7 +707,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
                         //Limit maximum pages of pdf to add
                         if (imgPath2.toLowerCase().endsWith(".pdf")) {
-                            try (PDDocument document = PDDocument.load(selectedFile)) {
+                            try ( PDDocument document = PDDocument.load(selectedFile)) {
                                 PDFRenderer pdfRenderer = new PDFRenderer(document);
                                 int pageCount = document.getNumberOfPages();
                                 if (pageCount > 5) {
@@ -968,7 +964,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         loadRecordMasterJEP();
         loadTableDetailJEP.reload();
     }
-
 
     public void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
@@ -1528,13 +1523,13 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             }
         });
         tblVwJournalProposalDetails.setOnMouseClicked(event -> {
-                    if (!journalproposal_data.isEmpty() && event.getClickCount() == 1) {
-                        int lnRow = Integer.parseInt(journalproposal_data.get(tblVwJournalProposalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
-                        pnDetailJEP = lnRow;
-                        loadRecordDetailJEP();
-                        moveNextJEP(false, false);
-                    }
-                }
+            if (!journalproposal_data.isEmpty() && event.getClickCount() == 1) {
+                int lnRow = Integer.parseInt(journalproposal_data.get(tblVwJournalProposalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                pnDetailJEP = lnRow;
+                loadRecordDetailJEP();
+                moveNextJEP(false, false);
+            }
+        }
         );
         tblVwBIRDetails.setOnMouseClicked(event -> {
             if (!BIR_data.isEmpty() && event.getClickCount() == 1) { // Detect single click (or use another condition for double click)
@@ -1545,8 +1540,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelCashDisbursement_Main) item).getIndex02(), highlightedRowsMain);
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
-        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails);
+        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails);
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -1613,7 +1608,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
     private void initTextFields() {
         //Initialise  TextField Focus
-        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks,taJournalProposalRemarks);
+        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks, taJournalProposalRemarks);
         JFXUtil.setFocusListener(txtMaster_Focus, apDVMaster1, apDVMaster2);
         JFXUtil.setFocusListener(txtSearch_Focus, apBrowse);
         JFXUtil.setFocusListener(txtDetail_Focus, apDVDetail);
@@ -1623,11 +1618,11 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         JFXUtil.setFocusListener(txtJournalProposalDetails_Focus, apJournalProposalDetails);
         JFXUtil.setFocusListener(txtBIRDetail_Focus, apBIRDetail);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails,apJournalProposalMaster, apJournalProposalDetails, apBIRDetail);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apJournalProposalMaster, apJournalProposalDetails, apBIRDetail);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
 
-        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfAmountDetail);
-        JFXUtil.setCommaFormatter2(tfVatExemptDetail, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount);
+        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBaseAmount, tfAmountDetail);
+        JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);
             JFXUtil.setVerticalScroll(taJournalRemarks);
@@ -2049,7 +2044,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     case "tfJournalProposalDebitAmount":
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount() > 0.0000
-                                && Double.parseDouble(lsValue) > 0) {
+                        && Double.parseDouble(lsValue) > 0) {
 
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
                             poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).setDebitAmount(0.0000);
@@ -2074,7 +2069,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     case "tfJournalProposalCreditAmount":
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getDebitAmount() > 0.0000
-                                && Double.parseDouble(lsValue) > 0) {
+                        && Double.parseDouble(lsValue) > 0) {
 
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
                             poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).setCreditAmount(0.0000);
@@ -2519,7 +2514,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         JFXUtil.altSwitch(lsID, new Object[][]{
                             {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
-                                {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(false, true)},
+                            {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(false, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
                         });
                         event.consume();
@@ -2572,10 +2567,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 return;
             }
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
-                    {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getAccountCode(), tfJournalProposalAccountCode},
-                    {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).Account_Chart().getDescription(), tfJournalProposalAccountDescription}, // if null or empty, then requesting focus to the txtfield
-                    {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getDebitAmount(), tfJournalProposalDebitAmount},
-                    {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount(), tfJournalProposalCreditAmount},}, tfJournalProposalCreditAmount); // default
+                {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getAccountCode(), tfJournalProposalAccountCode},
+                {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).Account_Chart().getDescription(), tfJournalProposalAccountDescription}, // if null or empty, then requesting focus to the txtfield
+                {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getDebitAmount(), tfJournalProposalDebitAmount},
+                {poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount(), tfJournalProposalCreditAmount},}, tfJournalProposalCreditAmount); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -2970,8 +2965,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
-        JFXUtil.setComboBoxActionListener(comboBoxActionListener,  cmbJournalProposalStatus);
-        JFXUtil.initComboBoxCellDesignColor("#FF8201",  cmbJournalProposalStatus);
+        JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbJournalProposalStatus);
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbJournalProposalStatus);
         cmbJournalProposalStatus.setItems(filteredStatuses);
     }
 
@@ -3101,8 +3096,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             });
 
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpJournalTransactionDate, dpReportMonthYear,dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo);
-        JFXUtil.setActionListener(datepicker_Action, dpDVTransactionDate, dpJournalTransactionDate, dpReportMonthYear,dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpJournalTransactionDate, dpReportMonthYear, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo);
+        JFXUtil.setActionListener(datepicker_Action, dpDVTransactionDate, dpJournalTransactionDate, dpReportMonthYear, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo);
     }
 
     @FXML
@@ -3236,7 +3231,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apJournalMaster, apJournalDetails,apJournalProposalMaster, apJournalProposalDetails,  apBIRDetail, apAttachments);
+                apMainList, apJournalMaster, apJournalDetails, apJournalProposalMaster, apJournalProposalDetails, apBIRDetail, apAttachments);
         filterIndustry();
     }
 
