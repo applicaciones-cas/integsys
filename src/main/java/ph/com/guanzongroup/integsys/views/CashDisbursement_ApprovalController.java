@@ -931,9 +931,9 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             details_data.clear();
 
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                if (poController.Master().getSourceNo() == null || "".equals(poController.Master().getSourceNo())) {
-                                    poController.ReloadDetail();
-                                }
+//                                if (poController.Master().getSourceNo() == null || "".equals(poController.Master().getSourceNo())) {
+//                                    poController.ReloadDetail();
+//                                }
                                 poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -987,7 +987,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 loadRecordDetail();
                             }
                             loadRecordMaster();
-                        } catch (CloneNotSupportedException | GuanzonException | SQLException ex) {
+                        } catch (GuanzonException | SQLException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -3068,7 +3068,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     break;
                 case CashDisbursementStatus.CONFIRMED:
                 case CashDisbursementStatus.VERIFIED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnReturn);
                     break;
                 case CashDisbursementStatus.VOID:
                 case CashDisbursementStatus.CANCELLED:
