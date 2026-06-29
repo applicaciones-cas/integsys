@@ -287,7 +287,27 @@ public class InventoryCount_PostingController implements Initializable, ScreenIn
                             break;
                     }
                     break;
+                case "btnPost":
 
+                    if (tfTransNo.getText().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
+                        return;
+                    }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to post transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize post Transaction")) {
+                            return;
+                        }
+                        // seperate as per maam grace 06252026
+//                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize post Transaction")) {
+//                            return;
+//                        }
+                    }
+
+                    reloadTableDetail();
+                    getLoadedTransaction();
+                    pnEditMode = poAppController.getEditMode();
+
+                    break;
                 case "btnHistory":
                     if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
