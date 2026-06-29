@@ -236,6 +236,8 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             initDetailGrid();
             initMainGrid();
             initDetailJEGrid();
+            initMainJEPGrid();
+            initDetailJEPGrid();
             initDetailBIRGrid();
             initAttachmentsGrid();
             initTableOnClick();
