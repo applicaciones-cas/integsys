@@ -528,18 +528,14 @@ public class CashDisbursement_VerificationController implements Initializable, S
                                 if (!checkJEorJEPSaving()) {
                                     break;
                                 }
-                                if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+                                
+                                poJSON = poController.VerifyTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
-                                    poJSON = poController.VerifyTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
 
                             }
@@ -708,17 +704,17 @@ public class CashDisbursement_VerificationController implements Initializable, S
         List<String> titles = checkJEorJEP();
         if ((titles.contains("Journal Entry")) && (titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalTab && !pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal.");
                 return false;
             }
         } else if ((titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal.");
                 return false;
             }
         } else if (titles.contains("Journal Entry")) {
             if (!pbIsCheckedJournalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry.");
                 return false;
             }
         } else {

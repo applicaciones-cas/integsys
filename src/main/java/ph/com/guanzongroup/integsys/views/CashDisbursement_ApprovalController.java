@@ -615,15 +615,15 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             if (!checkJEorJEPSaving()) {
                                 return;
                             }
-                            if (poController.Master().getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
-                                if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
-                                    return;
-                                }
-//                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
-//                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
-//                                    return;
-                            } else {
+//                            if (poController.Master().getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
+////                                if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
+////                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
+////                                    return;
+////                                }
+////                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
+////                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
+////                                    return;
+//                            } else {
                                 poJSON = poController.ApproveTransaction();
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -633,7 +633,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                     JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
-                            }
+//                            }
 
                         }
                     } else {
@@ -752,17 +752,17 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         List<String> titles = checkJEorJEP();
         if ((titles.contains("Journal Entry")) && (titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalTab && !pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal.");
                 return false;
             }
         } else if ((titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal.");
                 return false;
             }
         } else if (titles.contains("Journal Entry")) {
             if (!pbIsCheckedJournalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry.");
                 return false;
             }
         } else {
@@ -3060,16 +3060,14 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
-                case CashDisbursementStatus.OPEN:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
-                    break;
                 case CashDisbursementStatus.RETURNED:
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnUpdate, btnDisapprove, btnReturn);
                     break;
                 case CashDisbursementStatus.CONFIRMED:
                 case CashDisbursementStatus.VERIFIED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnReturn);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove,btnReturn);
                     break;
+                case CashDisbursementStatus.OPEN:
                 case CashDisbursementStatus.VOID:
                 case CashDisbursementStatus.CANCELLED:
                 case CashDisbursementStatus.APPROVED:
