@@ -367,7 +367,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
-                                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             }
                             loadTableAttachment.reload();
                         } else {
@@ -1155,7 +1155,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadRecordDetailBIR();
             }
         });
-        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalList, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments, tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 

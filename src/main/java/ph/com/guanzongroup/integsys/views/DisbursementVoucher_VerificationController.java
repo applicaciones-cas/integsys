@@ -504,7 +504,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
             return titles;
         } catch (SQLException ex) {
-            Logger.getLogger(DisbursementVoucher_VerificationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
         return titles;
     }
@@ -569,54 +569,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apJournalProposalMaster, apJournalProposalDetails, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails, apBIRDetail);
                     break;
                 case "btnSave":
-                    //Recheck transaction status
-                    poController.setForm(DisbursementStatic.VERIFIED);
-                    poJSON = poController.checkUpdateTransaction(false);
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-
-                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
-                        return;
-                    }
-
-                    if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
-                        if (!checkJEorJEPSaving()) {
-                            return;
-                        }
-                    }
-                    poJSON = poController.SaveTransaction();
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-
-                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-
-                    poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
-                    if ("success".equals(poJSON.get("result"))) {
-                        pnEditMode = poController.getEditMode();
-                    }
-                    if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
-                            //validation for checking details in JE & JEP
-                            if (!checkJEorJEPSaving()) {
-                                break;
-                            } else {
-                                poJSON = poController.VerifyTransaction("");
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    break;
-                                } else {
-                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                }
-                            }
-                        }
-                    }
-                    pnEditMode = poController.getEditMode();
-                    break;
+                    handleSaveWithLoading();
+                    return;
 
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?")) {
@@ -705,33 +659,134 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
-                pbIsCheckedJournalTab = false;
-                pbIsCheckedJournalProposalTab = false;
-                poController.resetTransaction();
-                poController.Master().setIndustryID(psIndustryId);
-                poController.Master().setCompanyID(psCompanyId);
-                poController.Master().setSupplierClientID(psSupplierPayeeId);
-                clearTextFields();
-                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
-                pnEditMode = EditMode.UNKNOWN;
+            cmdReloadProcess(lsButton);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    private void cmdReloadProcess(String lsButton) {
+        if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
+            pbIsCheckedJournalTab = false;
+            pbIsCheckedJournalProposalTab = false;
+            poController.resetTransaction();
+            poController.Master().setIndustryID(psIndustryId);
+            poController.Master().setCompanyID(psCompanyId);
+            poController.Master().setSupplierClientID(psSupplierPayeeId);
+            clearTextFields();
+            JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+            pnEditMode = EditMode.UNKNOWN;
+        }
+
+        if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+        } else {
+            loadRecordMaster();
+            loadTableDetail.reload();
+            loadTableDetailJE.reload();
+            loadTableDetailBIR.reload();
+            loadTableAttachment.reload();
+            loadTableMainJEP.reload();
+            loadTableDetailJEP.reload();
+        }
+        initButton(pnEditMode);
+        if (lsButton.equals("btnUpdate")) {
+            moveNext(false, false);
+        }
+    }
+
+    private Stage getOwnerStage() {
+        return AnchorMain != null
+                && AnchorMain.getScene() != null
+                ? (Stage) AnchorMain.getScene().getWindow()
+                : null;
+    }
+
+    private void handleSaveWithLoading() {
+        try {
+            AtomicReference<JSONObject> loProcessResult = new AtomicReference<>();
+            AtomicReference<JSONObject> loOpenResultRef = new AtomicReference<>();
+
+            // Recheck transaction status before dispatching save to the loading task.
+            poController.setForm(DisbursementStatic.VERIFIED);
+            poJSON = poController.checkUpdateTransaction(false);
+            if (!"success".equals(String.valueOf(poJSON.get("result")))) {
+                ShowMessageFX.Warning(null, pxeModuleName, String.valueOf(poJSON.get("message")));
+                return;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
-            } else {
-                loadRecordMaster();
-                loadTableDetail.reload();
-                loadTableDetailJE.reload();
-                loadTableDetailBIR.reload();
-                loadTableAttachment.reload();
-                loadTableMainJEP.reload();
-                loadTableDetailJEP.reload();
+            if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
+                return;
             }
-            initButton(pnEditMode);
-            if (lsButton.equals("btnUpdate")) {
-                moveNext(false, false);
+
+            if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
+                if (!checkJEorJEPSaving()) {
+                    return;
+                }
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
+
+            JFXUtil.runWithLoading(
+                    getOwnerStage(),
+                    apButton,
+                    () -> {
+                        try {
+                            JSONObject loSaveJSON = poController.SaveTransaction();
+                            loProcessResult.set(loSaveJSON);
+
+                            if ("success".equals(String.valueOf(loSaveJSON.get("result")))) {
+                                JSONObject loOpenJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
+                                loOpenResultRef.set(loOpenJSON);
+                            }
+                        } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            throw new RuntimeException(ex);
+                        }
+                    },
+                    () -> {
+                        JSONObject loSaveJSON = loProcessResult.get();
+                        if (loSaveJSON == null) {
+                            ShowMessageFX.Error(null, pxeModuleName, "Unable to save transaction.");
+                            return;
+                        }
+
+                        if (!"success".equals(String.valueOf(loSaveJSON.get("result")))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, String.valueOf(loSaveJSON.get("message")));
+                            return;
+                        }
+
+                        ShowMessageFX.Information(null, pxeModuleName, String.valueOf(loSaveJSON.get("message")));
+
+                        JSONObject loOpenJSON = loOpenResultRef.get();
+                        if (loOpenJSON != null && "success".equals(String.valueOf(loOpenJSON.get("result")))) {
+                            pnEditMode = poController.getEditMode();
+                        }
+
+                        if (pnEditMode == EditMode.READY
+                        && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())
+                        && ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) {
+                            if (!checkJEorJEPSaving()) {
+                                cmdReloadProcess("btnSave");
+                                return;
+                            }
+                            try {
+                                poJSON = poController.VerifyTransaction("");
+                                if ("error".equals(String.valueOf(poJSON.get("result")))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, String.valueOf(poJSON.get("message")));
+                                } else {
+                                    ShowMessageFX.Information(null, pxeModuleName, String.valueOf(poJSON.get("message")));
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                }
+                            } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            }
+                        }
+
+                        pnEditMode = poController.getEditMode();
+                        cmdReloadProcess("btnSave");
+                    }
+            );
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -1424,7 +1479,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
-        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalList, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments, tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
