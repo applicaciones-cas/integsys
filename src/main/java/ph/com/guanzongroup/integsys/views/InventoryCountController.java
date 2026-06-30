@@ -129,7 +129,8 @@ public class InventoryCountController implements Initializable, ScreenInterface 
     private TableView<Model_Inventory_Count_Detail> tblViewDetails;
 
     @FXML
-    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription, tblColBrand, tblColMeasure, tblColQOH, tblColCount1, tblColCount2, tblColCount3;
+    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription,
+            tblColBrand, tblColMeasure, tblColQOH, tblColCount1, tblColCount2, tblColCount3, tblColVariance;
 
     @FXML
     private Label lblSource, lblStatus;
@@ -360,7 +361,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                     }
                     if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print transaction?") == true) {
                         if (!isJSONSuccess(poAppController.printRecord(), "Initialize print Transaction")) {
-                            return;
+//                            return;
                         }
                     }
 
@@ -1144,8 +1145,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         });
     }
 
-    private void initializeTableDetail() {
-
+     private void initializeTableDetail() {
         if (laTransactionDetail == null) {
             laTransactionDetail = FXCollections.observableArrayList();
 
@@ -1250,6 +1250,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
             tblColCount1.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount2.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount3.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
+            tblColVariance.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
 
             tblColNo.setCellValueFactory((loModel) -> {
                 int index = tblViewDetails.getItems().indexOf(loModel.getValue()) + 1;
@@ -1309,6 +1310,30 @@ public class InventoryCountController implements Initializable, ScreenInterface 
 
             tblColCount3.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter03()));
+
+            });
+
+            tblColVariance.setCellValueFactory((loModel) -> {
+
+                double lnQOH = loModel.getValue().getQuantityOnHand() != null
+                        ? loModel.getValue().getQuantityOnHand() : 0.0;
+                double lnCount = 0.0;
+                switch (poAppController.getMaster().getCounterNo()) {
+                    case 1:
+                        lnCount = loModel.getValue().getActualCounter01() != null
+                                ? loModel.getValue().getActualCounter01() : 0.0;
+                        break;
+                    case 2:
+                        lnCount = loModel.getValue().getActualCounter02() != null
+                                ? loModel.getValue().getActualCounter02() : 0.0;
+                        break;
+                    case 3:
+                        lnCount = loModel.getValue().getActualCounter03() != null
+                                ? loModel.getValue().getActualCounter03() : 0.0;
+                        break;
+                }
+                double lnVar = lnCount - lnQOH;
+                return new SimpleStringProperty(String.valueOf(lnVar));
 
             });
             loadTableAttachment = new JFXUtil.ReloadableTableTask(

@@ -575,7 +575,7 @@
                                                                         <Insets left="5.0" right="5.0" top="5.0" />
                                                                     </GridPane.margin>
                                                                 </AnchorPane>
-                                                                <TableView fx:id="tblViewDetails" minWidth="875.0" onMouseClicked="#ontblDetailClicked" GridPane.rowIndex="1">
+                                                                <TableView fx:id="tblViewDetails" minWidth="975.0" onMouseClicked="#ontblDetailClicked" GridPane.rowIndex="1">
                                                                     <columns>
                                                                         <TableColumn fx:id="tblColNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="-1.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
                                                                         <TableColumn fx:id="tblColBarcode" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Barcode" />
@@ -586,6 +586,7 @@
                                                                         <TableColumn fx:id="tblColCount1" editable="false" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 1" />
                                                                         <TableColumn fx:id="tblColCount2" editable="false" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 2" />
                                                                         <TableColumn fx:id="tblColCount3" editable="false" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Count 3" />
+                                                                        <TableColumn fx:id="tblColVariance" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Variance" />
                                                                     </columns>
                                                                     <GridPane.margin>
                                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

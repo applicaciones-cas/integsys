@@ -131,7 +131,8 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
     private TableView<Model_Inventory_Count_Detail> tblViewDetails;
 
     @FXML
-    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription, tblColBrand, tblColMeasure, tblColQOH, tblColCount1, tblColCount2, tblColCount3;
+    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription,
+            tblColBrand, tblColMeasure, tblColQOH, tblColCount1, tblColCount2, tblColCount3, tblColVariance;
 
     @FXML
     private Label lblSource, lblStatus;
@@ -320,10 +321,23 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
                         return;
                     }
-//                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
-                    if (!isJSONSuccess(poAppController.printRecord(),
-                            "Initialize Print Transaction")) {
-                        return;
+                    if (poAppController.getMaster().getCounterNo() > 0) {
+                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction with Variance ?") == true) {
+                            if (!isJSONSuccess(poAppController.printRecordFiltered(),
+                                    "Initialize Print Transaction")) {
+                                return;
+                            }
+                        } else {
+                            if (!isJSONSuccess(poAppController.printRecord(),
+                                    "Initialize Print Transaction")) {
+                                return;
+                            }
+                        }
+                    } else {
+                        if (!isJSONSuccess(poAppController.printRecord(),
+                                "Initialize Print Transaction")) {
+                            return;
+                        }
                     }
                     break;
 
@@ -1046,6 +1060,7 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
             tblColCount1.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount2.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount3.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
+            tblColVariance.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
 
             tblColNo.setCellValueFactory((loModel) -> {
                 int index = tblViewDetails.getItems().indexOf(loModel.getValue()) + 1;
@@ -1105,6 +1120,30 @@ public class InventoryCount_HistoryController implements Initializable, ScreenIn
 
             tblColCount3.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter03()));
+
+            });
+
+            tblColVariance.setCellValueFactory((loModel) -> {
+
+                double lnQOH = loModel.getValue().getQuantityOnHand() != null
+                        ? loModel.getValue().getQuantityOnHand() : 0.0;
+                double lnCount = 0.0;
+                switch (poAppController.getMaster().getCounterNo()) {
+                    case 1:
+                        lnCount = loModel.getValue().getActualCounter01() != null
+                                ? loModel.getValue().getActualCounter01() : 0.0;
+                        break;
+                    case 2:
+                        lnCount = loModel.getValue().getActualCounter02() != null
+                                ? loModel.getValue().getActualCounter02() : 0.0;
+                        break;
+                    case 3:
+                        lnCount = loModel.getValue().getActualCounter03() != null
+                                ? loModel.getValue().getActualCounter03() : 0.0;
+                        break;
+                }
+                double lnVar = lnCount - lnQOH;
+                return new SimpleStringProperty(String.valueOf(lnVar));
 
             });
             loadTableAttachment = new JFXUtil.ReloadableTableTask(
