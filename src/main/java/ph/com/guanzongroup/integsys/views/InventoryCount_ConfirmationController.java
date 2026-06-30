@@ -59,6 +59,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableRow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -98,7 +99,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
-    private String psFormName = "Inventory Count Confirmation";
+    private String psFormName = "Inventory Count Reconcilation";
     private String psIndustryID, psCompanyID, psCategoryID;
     private Control lastFocusedControl;
     private InventoryCount poAppController;
@@ -120,18 +121,19 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
     @FXML
     private TextField tfSearchTransNo, tfTransNo, tfBarcode, tfDescription, tfSupersede, tfBrand, tfModel, tfColor,
             tfVariant, tfMeasure, tfInvType, tfRequestedBy, tfCountNo, tfSearchInvCountType, tfInclusion,
-            tfInventoryCountType, tfWarehouse, tfBin, tfClassification, tfSection,
+            tfInventoryCountType, tfWarehouse, tfBin, tfClassification, tfSection, tfQOH,
             tfEntryNo, tfActualQuantity, tfMS, tfEX, tfSE, tfDE, tfDG, tfTD, tfAttachmentNo;
 
     @FXML
-    private Button btnVerify, btnUpdate, btnSearch, btnBrowse, btnSave, btnPrint, btnCancel,
+    private Button btnVerify, btnUpdate, btnUpdate1, btnSearch, btnBrowse, btnSave, btnPrint, btnCancel,
             btnHistory, btnClose, btnVoid,
             btnArrowLeft, btnArrowRight, btnAddAttachment, btnRemoveAttachment;
     @FXML
     private TableView<Model_Inventory_Count_Detail> tblViewDetails;
 
     @FXML
-    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription, tblColBrand, tblColMeasure, tblColCount1, tblColCount2, tblColCount3;
+    private TableColumn<Model_Inventory_Count_Detail, String> tblColNo, tblColBarcode, tblColDescription,
+            tblColBrand, tblColMeasure, tblColQOH, tblColCount1, tblColCount2, tblColCount3, tblColVariance;
 
     @FXML
     private Label lblSource, lblStatus;
@@ -219,8 +221,8 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
             initControlEvents();
             initAttachmentsGrid();
             initAttachmentPreviewPane();
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName());
-            lblSource.setText("");
+            lblSource.setText(poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -324,7 +326,24 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                         return;
                     }
 
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to proceed into next count of this transaction?") != true) {
+                        return;
+                    }
                     if (!isJSONSuccess(poAppController.UpdateTransactionCount(), "Initialize Update Transaction")) {
+                        return;
+                    }
+                    getLoadedTransaction();
+                    pnEditMode = poAppController.getEditMode();
+                    break;
+                case "btnUpdate1":
+                    if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
+                        return;
+                    }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to continue updating current count of this transaction?") != true) {
+                        return;
+                    }
+                    if (!isJSONSuccess(poAppController.UpdateTransaction(), "Initialize Update Transaction")) {
                         return;
                     }
                     getLoadedTransaction();
@@ -340,9 +359,10 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                         if (!isJSONSuccess(poAppController.VerifyTransaction(), "Initialize verify Transaction")) {
                             return;
                         }
-                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize post Transaction")) {
-                            return;
-                        }
+                        // seperate as per maam grace 06252026
+//                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize post Transaction")) {
+//                            return;
+//                        }
                     }
 
                     reloadTableDetail();
@@ -355,18 +375,41 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Inventory Count", "");
                         return;
                     }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") == true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") == false) {
                         return;
                     }
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to verify transaction?") != true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to verify transaction?") == true) {
                         if (!isJSONSuccess(poAppController.VerifyTransaction(), "Initialize verify Transaction")) {
                             return;
                         }
-                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize post Transaction")) {
-                            return;
+//                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize post Transaction")) {
+//                            return;
+//                        }
+                    }
+                    if (poAppController.getMaster().getCounterNo() > 0) {
+                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction with Variance ?") == true) {
+                            if (!isJSONSuccess(poAppController.printRecordFiltered(),
+                                    "Initialize Print Transaction")) {
+                                return;
+                            }
+                        } else {
+                            if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction?") == true) {
+                                if (!isJSONSuccess(poAppController.printRecord(),
+                                        "Initialize Print Transaction")) {
+                                    return;
+                                }
+                            }
+                        }
+                    } else {
+                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction?") == true) {
+
+                            if (!isJSONSuccess(poAppController.printRecord(),
+                                    "Initialize Print Transaction")) {
+                                return;
+                            }
                         }
                     }
 
@@ -430,10 +473,23 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
                         return;
                     }
-//                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
-                    if (!isJSONSuccess(poAppController.printRecord(),
-                            "Initialize Print Transaction")) {
-                        return;
+                    if (poAppController.getMaster().getCounterNo() > 0) {
+                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction with Variance ?") == true) {
+                            if (!isJSONSuccess(poAppController.printRecordFiltered(),
+                                    "Initialize Print Transaction")) {
+                                return;
+                            }
+                        } else {
+                            if (!isJSONSuccess(poAppController.printRecord(),
+                                    "Initialize Print Transaction")) {
+                                return;
+                            }
+                        }
+                    } else {
+                        if (!isJSONSuccess(poAppController.printRecord(),
+                                "Initialize Print Transaction")) {
+                            return;
+                        }
                     }
                     break;
 //                    }
@@ -870,16 +926,17 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                 lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
                 break;
             case 2:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter02();
                 break;
             case 3:
-                lnActualCount = poAppController.getDetail(fnRow).getActualCounter01();
+                lnActualCount = poAppController.getDetail(fnRow).getActualCounter03();
                 break;
             default:
                 lnActualCount = 0.0;
         }
 
         tfEntryNo.setText(String.valueOf(poAppController.getDetail(fnRow).getEntryNo()));
+        tfQOH.setText(String.valueOf(poAppController.getDetail(fnRow).getQuantityOnHand()));
         tfActualQuantity.setText(String.valueOf(lnActualCount));
         taRemarksDetail.setText(poAppController.getDetail(fnRow).getRemarks());
 
@@ -1204,7 +1261,7 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
 
         // Transaction-dependent buttons (only when not editing)
         initButtonControls(!lbEditing && lbHasTransaction, "btnHistory", "btnPrint");
-        initButtonControls(!lbEditing && lbHasTransaction && lbIsApproved, "btnVerify");
+        initButtonControls(!lbEditing && lbHasTransaction && lbIsApproved, "btnVerify", "btnUpdate1");
         initButtonControls(!lbEditing && lbHasTransaction && lbIsCountable, "btnUpdate");
         initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved && !lbIsPosted, "btnVoid");
         tfInventoryCountType.setDisable(fnEditMode == EditMode.UPDATE);
@@ -1262,10 +1319,107 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
             laTransactionDetail = FXCollections.observableArrayList();
 
             tblViewDetails.setItems(laTransactionDetail);
+            tblViewDetails.setRowFactory(tv -> new TableRow<Model_Inventory_Count_Detail>() {
+                @Override
+                protected void updateItem(Model_Inventory_Count_Detail item, boolean empty) {
+                    super.updateItem(item, empty);
 
+                    // Always reset style classes first
+                    getStyleClass().removeAll("row-variance", "row-selected-variance");
+
+                    if (empty || item == null) {
+                        setStyle("");
+                        return;
+                    }
+
+                    if (poAppController.getMaster().getCounterNo() <= 0) {
+                        setStyle("");
+                        return;
+                    }
+
+                    try {
+                        double lnQtyOnHand = item.getQuantityOnHand() != null
+                                ? item.getQuantityOnHand() : 0.0;
+
+                        double lnActualCount = 0.0;
+                        switch (poAppController.getMaster().getCounterNo()) {
+                            case 1:
+                                lnActualCount = item.getActualCounter01() != null
+                                        ? item.getActualCounter01() : 0.0;
+                                break;
+                            case 2:
+                                lnActualCount = item.getActualCounter02() != null
+                                        ? item.getActualCounter02() : 0.0;
+                                break;
+                            case 3:
+                                lnActualCount = item.getActualCounter03() != null
+                                        ? item.getActualCounter03() : 0.0;
+                                break;
+                        }
+
+                        double lnVariance = lnActualCount - lnQtyOnHand;
+
+                        if (Math.abs(lnVariance) < 0.0000001) {
+                            // Equal — no highlight
+                            setStyle("");
+                        } else {
+                            // Has variance — highlight yellow, selection handled by CSS
+                            getStyleClass().add("row-variance");
+                            setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                        }
+
+                    } catch (Exception e) {
+                        setStyle("");
+                    }
+
+                    // Re-apply selection highlight on top of variance style
+                    selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                        if (getItem() == null) {
+                            return;
+                        }
+                        if (isSelected) {
+                            getStyleClass().removeAll("row-variance");
+                            getStyleClass().add("row-selected-variance");
+                            setStyle("-fx-background-color: #e0a800; -fx-text-fill: #ffffff;");
+                        } else {
+                            getStyleClass().removeAll("row-selected-variance");
+                            try {
+                                double lnQOH = getItem().getQuantityOnHand() != null
+                                        ? getItem().getQuantityOnHand() : 0.0;
+                                double lnCount = 0.0;
+                                switch (poAppController.getMaster().getCounterNo()) {
+                                    case 1:
+                                        lnCount = getItem().getActualCounter01() != null
+                                                ? getItem().getActualCounter01() : 0.0;
+                                        break;
+                                    case 2:
+                                        lnCount = getItem().getActualCounter02() != null
+                                                ? getItem().getActualCounter02() : 0.0;
+                                        break;
+                                    case 3:
+                                        lnCount = getItem().getActualCounter03() != null
+                                                ? getItem().getActualCounter03() : 0.0;
+                                        break;
+                                }
+                                double lnVar = lnCount - lnQOH;
+                                if (Math.abs(lnVar) < 0.0000001) {
+                                    setStyle("");
+                                } else {
+                                    getStyleClass().add("row-variance");
+                                    setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                                }
+                            } catch (Exception e) {
+                                setStyle("");
+                            }
+                        }
+                    });
+                }
+            });
+            tblColQOH.setStyle("-fx-alignment: CENTER;");
             tblColCount1.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount2.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColCount3.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
+            tblColVariance.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
 
             tblColNo.setCellValueFactory((loModel) -> {
                 int index = tblViewDetails.getItems().indexOf(loModel.getValue()) + 1;
@@ -1308,6 +1462,11 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
                 }
             });
 
+            tblColQOH.setCellValueFactory((loModel) -> {
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getQuantityOnHand()));
+
+            });
+
             tblColCount1.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter01()));
 
@@ -1320,6 +1479,30 @@ public class InventoryCount_ConfirmationController implements Initializable, Scr
 
             tblColCount3.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getActualCounter03()));
+
+            });
+
+            tblColVariance.setCellValueFactory((loModel) -> {
+
+                double lnQOH = loModel.getValue().getQuantityOnHand() != null
+                        ? loModel.getValue().getQuantityOnHand() : 0.0;
+                double lnCount = 0.0;
+                switch (poAppController.getMaster().getCounterNo()) {
+                    case 1:
+                        lnCount = loModel.getValue().getActualCounter01() != null
+                                ? loModel.getValue().getActualCounter01() : 0.0;
+                        break;
+                    case 2:
+                        lnCount = loModel.getValue().getActualCounter02() != null
+                                ? loModel.getValue().getActualCounter02() : 0.0;
+                        break;
+                    case 3:
+                        lnCount = loModel.getValue().getActualCounter03() != null
+                                ? loModel.getValue().getActualCounter03() : 0.0;
+                        break;
+                }
+                double lnVar = lnCount - lnQOH;
+                return new SimpleStringProperty(String.valueOf(lnVar));
 
             });
             loadTableAttachment = new JFXUtil.ReloadableTableTask(
