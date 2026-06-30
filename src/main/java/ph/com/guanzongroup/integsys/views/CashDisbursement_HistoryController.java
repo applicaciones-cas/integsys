@@ -43,6 +43,7 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -1053,7 +1054,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 moveNextBIR(false, false);
             }
         });
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalList,tblVwBIRDetails);
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -1085,6 +1086,14 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
+                    break;
+                case "tblVwJournalProposalList":
+                    if (journalproposalmain_data.isEmpty()) {
+                        return;
+                    }
+                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+                    pnMainJEP = newIndex;
+                    loadTableDetailFromMainJEP();
                     break;
                 case "tblVwJournalProposalDetails":
                     if (journalproposal_data.isEmpty()) {
@@ -1127,6 +1136,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
 
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount);
         JFXUtil.setCommaFormatter2(tfVatExemptDetail);
+        taJournalProposalRemarks.setOnKeyPressed(this::txtField_KeyPressed);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);
             JFXUtil.setVerticalScroll(taJournalRemarks);
@@ -1158,9 +1168,9 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
-        TextField txtField = (TextField) event.getSource();
-        String lsID = (((TextField) event.getSource()).getId());
-        String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+        TextInputControl txtInput = (TextInputControl) event.getSource();
+        String lsID = txtInput.getId();
+        String lsValue = txtInput.getText() == null ? "" : txtInput.getText();
         poJSON = new JSONObject();
         try {
             if (null != event.getCode()) {
@@ -1176,7 +1186,10 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                         if (tfBaseAmount.isFocused()) {
                             pbEnteredBIR = true;
                         }
-                        CommonUtils.SetNextFocus(txtField);
+                        if (txtInput instanceof TextField) {
+                            TextField txtField = (TextField) txtInput;
+                            CommonUtils.SetNextFocus(txtField);
+                        }
                         event.consume();
                         break;
                     case F3:

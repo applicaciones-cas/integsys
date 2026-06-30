@@ -28,7 +28,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="AnchorMain" minWidth="1455.0" prefHeight="1000.0" prefWidth="1761.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="AnchorMain" minWidth="1455.0" prefHeight="1000.0" prefWidth="1761.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -190,6 +190,17 @@
                                  <graphic>
                                     <FontAwesomeIconView glyphName="REPEAT" size="20" />
                                  </graphic>
+                              </Button>
+                              <Button fx:id="btnPrint" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="PRINT" size="20" />
+                                 </graphic>
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
                               </Button>
                               <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                  <graphic>
@@ -604,8 +615,8 @@
                                                                                 <Label text="Reverse" GridPane.columnIndex="6" />
                                                                                 <Label text="Debit Amount" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                                                                                 <Label text="Credit Amount" GridPane.columnIndex="6" GridPane.rowIndex="2" />
-                                                                                <TextField fx:id="tfAccountCode" GridPane.columnIndex="2" />
-                                                                                <TextField fx:id="tfAccountDescription" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+                                                                                <TextField fx:id="tfAccountCode" promptText="Press F3: Search" GridPane.columnIndex="2" />
+                                                                                <TextField fx:id="tfAccountDescription" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="1" />
                                                                                 <DatePicker fx:id="dpReportMonthYear" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                                 <CheckBox fx:id="cbJEReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="8" />
                                                                                 <TextField fx:id="tfDebitAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="1" />
@@ -869,8 +880,8 @@
                                                                                 <TextField fx:id="tfBIRTransactionNo" editable="false" maxWidth="-Infinity" prefWidth="150.0" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                                                 <DatePicker fx:id="dpPeriodFrom" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                 <DatePicker fx:id="dpPeriodTo" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                <TextField fx:id="tfTaxCode" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                                                                                <TextField fx:id="tfParticular" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="249.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                                                <TextField fx:id="tfTaxCode" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                                <TextField fx:id="tfParticular" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="249.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                                                                                 <CheckBox fx:id="cbBIRReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                                                 <TextField fx:id="tfBaseAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                                                 <TextField fx:id="tfTaxRate" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="6" />

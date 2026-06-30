@@ -528,18 +528,14 @@ public class CashDisbursement_VerificationController implements Initializable, S
                                 if (!checkJEorJEPSaving()) {
                                     break;
                                 }
-                                if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+
+                                poJSON = poController.VerifyTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
-                                    poJSON = poController.VerifyTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
 
                             }
@@ -708,17 +704,17 @@ public class CashDisbursement_VerificationController implements Initializable, S
         List<String> titles = checkJEorJEP();
         if ((titles.contains("Journal Entry")) && (titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalTab && !pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal.");
                 return false;
             }
         } else if ((titles.contains("Journal Proposal"))) {
             if (!pbIsCheckedJournalProposalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal.");
                 return false;
             }
         } else if (titles.contains("Journal Entry")) {
             if (!pbIsCheckedJournalTab) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry.");
                 return false;
             }
         } else {
@@ -1382,6 +1378,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
             if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
+                moveNextJEPMain(false, false);
                 initButton(pnEditMode);
             }
         });
@@ -1403,7 +1400,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelCashDisbursement_Main) item).getIndex01(), highlightedRowsMain);
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalProposalDetails, tblVwJournalDetails, tblVwBIRDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalProposalDetails, tblVwJournalProposalList, tblVwJournalDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails);
     }
 
@@ -1436,6 +1433,14 @@ public class CashDisbursement_VerificationController implements Initializable, S
                             : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
+                    break;
+                case "tblVwJournalProposalList":
+                    if (journalproposalmain_data.isEmpty()) {
+                        return;
+                    }
+                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+                    pnMainJEP = newIndex;
+                    loadTableDetailFromMainJEP();
                     break;
                 case "tblVwJournalProposalDetails":
                     if (journalproposal_data.isEmpty()) {
@@ -1482,6 +1487,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
         JFXUtil.setFocusListener(txtJournalProposalDetails_Focus, apJournalProposalDetails);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apJournalProposalMaster, apJournalProposalDetails, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
+        taJournalProposalRemarks.setOnKeyPressed(this::txtField_KeyPressed);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments);
 
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBaseAmount, tfAmountDetail);
@@ -2006,9 +2012,9 @@ public class CashDisbursement_VerificationController implements Initializable, S
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
-        TextField txtField = (TextField) event.getSource();
-        String lsID = (((TextField) event.getSource()).getId());
-        String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+        TextInputControl txtInput = (TextInputControl) event.getSource();
+        String lsID = txtInput.getId();
+        String lsValue = txtInput.getText() == null ? "" : txtInput.getText();
         poJSON = new JSONObject();
         String lsBranchCode = "";
         String lsDeparment = "";
@@ -2033,7 +2039,10 @@ public class CashDisbursement_VerificationController implements Initializable, S
                         if (tfBaseAmount.isFocused()) {
                             pbEnteredBIR = true;
                         }
-                        CommonUtils.SetNextFocus(txtField);
+                        if (txtInput instanceof TextField) {
+                            TextField txtField = (TextField) txtInput;
+                            CommonUtils.SetNextFocus(txtField);
+                        }
                         event.consume();
                         break;
                     case F3:
@@ -2343,7 +2352,9 @@ public class CashDisbursement_VerificationController implements Initializable, S
                             {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
                             {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(true, true)},
+                            {new String[]{"tfJournalProposalBranch", "tfJournalProposalDepartment", "taJournalProposalRemarks"}, (Runnable) () -> moveNextJEPMain(true, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
+
                         });
                         event.consume();
                         break;
@@ -2351,7 +2362,7 @@ public class CashDisbursement_VerificationController implements Initializable, S
                         JFXUtil.altSwitch(lsID, new Object[][]{
                             {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
-                            {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(false, true)},
+                            {new String[]{"tfJournalProposalBranch", "tfJournalProposalDepartment", "taJournalProposalRemarks"}, (Runnable) () -> moveNextJEPMain(false, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
                         });
                         event.consume();
@@ -2434,6 +2445,21 @@ public class CashDisbursement_VerificationController implements Initializable, S
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    public void moveNextJEPMain(boolean isUp, boolean continueNext) {
+        if (continueNext) {
+            apJournalProposalMaster.requestFocus();
+            pnMainJEP = isUp ? JFXUtil.moveToPreviousRow(tblVwJournalProposalList) : JFXUtil.moveToNextRow(tblVwJournalProposalList);
+        }
+        loadTableDetailFromMainJEP();
+        if (pnMainJEP < 0 || pnMainJEP > poController.getJournalProposalList().size()) {
+            return;
+        }
+        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
+            {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
+            {poController.JournalProposal(pnMainJEP).Master().getRemarks(), taJournalProposalRemarks},}, taJournalProposalRemarks); // default
     }
 
     public void moveNextBIR(boolean isUp, boolean continueNext) {
