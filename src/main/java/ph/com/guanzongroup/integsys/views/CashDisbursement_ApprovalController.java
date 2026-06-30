@@ -701,7 +701,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnApprove", "btnSave", "btnCancel", "btnDisapprove", "btnReturn")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint","btnApprove", "btnSave", "btnCancel", "btnDisapprove", "btnReturn")) {
                 pbIsCheckedJournalTab = false;
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
