@@ -2534,7 +2534,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         }
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
             {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
-            {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
+            {poController.JournalProposal(pnMainJEP).Master().getDepartmentId(), tfJournalProposalDepartment},
             {poController.JournalProposal(pnMainJEP).Master().getRemarks(), taJournalProposalRemarks},}, taJournalProposalRemarks); // default
     }
 
