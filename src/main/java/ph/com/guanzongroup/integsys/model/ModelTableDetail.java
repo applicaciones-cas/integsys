@@ -29,6 +29,7 @@ public class ModelTableDetail {
     public StringProperty index14;
     public StringProperty index15;
     public StringProperty index16;
+    public StringProperty index17;
 
     public ModelTableDetail(String index01,
             String index02,
@@ -137,6 +138,117 @@ public class ModelTableDetail {
         this.index15 = new SimpleStringProperty(index15);
         this.index16 = new SimpleStringProperty(index16);
     }
+    public ModelTableDetail(String index01,
+                            String index02,
+                            String index03,
+                            String index04,
+                            String index05,
+                            String index06,
+                            String index07,
+                            String index08,
+                            String index09,
+                            String index10,
+                            String index11,
+                            String index12,
+                            String index13,
+                            String index14,
+                            String index15,
+                            String index16,
+                            String index17) {
+
+        this.index01 = new SimpleStringProperty(index01);
+        this.index02 = new SimpleStringProperty(index02);
+        this.index03 = new SimpleStringProperty(index03);
+        this.index04 = new SimpleStringProperty(index04);
+        this.index05 = new SimpleStringProperty(index05);
+        this.index06 = new SimpleStringProperty(index06);
+        this.index07 = new SimpleStringProperty(index07);
+        this.index08 = new SimpleStringProperty(index08);
+        this.index09 = new SimpleStringProperty(index09);
+        this.index10 = new SimpleStringProperty(index10);
+        this.index11 = new SimpleStringProperty(index11);
+        this.index12 = new SimpleStringProperty(index12);
+        this.index13 = new SimpleStringProperty(index13);
+        this.index14 = new SimpleStringProperty(index14);
+        this.index15 = new SimpleStringProperty(index15);
+        this.index16 = new SimpleStringProperty(index16);
+        this.index17 = new SimpleStringProperty(index17);
+    }
+    public ModelTableDetail(String index01,
+                            String index02,
+                            String index03,
+                            String index04,
+                            String index05,
+                            String index06,
+                            String index07,
+                            String index08,
+                            String index09,
+                            String index10,
+                            String index11,
+                            String index12,
+                            String index13) {
+
+        this.index01 = new SimpleStringProperty(index01);
+        this.index02 = new SimpleStringProperty(index02);
+        this.index03 = new SimpleStringProperty(index03);
+        this.index04 = new SimpleStringProperty(index04);
+        this.index05 = new SimpleStringProperty(index05);
+        this.index06 = new SimpleStringProperty(index06);
+        this.index07 = new SimpleStringProperty(index07);
+        this.index08 = new SimpleStringProperty(index08);
+        this.index09 = new SimpleStringProperty(index09);
+        this.index10 = new SimpleStringProperty(index10);
+        this.index11 = new SimpleStringProperty(index11);
+        this.index12 = new SimpleStringProperty(index12);
+        this.index13 = new SimpleStringProperty(index13);
+    }
+    public ModelTableDetail(String index01,
+                            String index02,
+                            String index03,
+                            String index04,
+                            String index05,
+                            String index06,
+                            String index07,
+                            String index08,
+                            String index09,
+                            String index10,
+                            String index11,
+                            String index12) {
+
+        this.index01 = new SimpleStringProperty(index01);
+        this.index02 = new SimpleStringProperty(index02);
+        this.index03 = new SimpleStringProperty(index03);
+        this.index04 = new SimpleStringProperty(index04);
+        this.index05 = new SimpleStringProperty(index05);
+        this.index06 = new SimpleStringProperty(index06);
+        this.index07 = new SimpleStringProperty(index07);
+        this.index08 = new SimpleStringProperty(index08);
+        this.index09 = new SimpleStringProperty(index09);
+        this.index10 = new SimpleStringProperty(index10);
+        this.index11 = new SimpleStringProperty(index11);
+        this.index12 = new SimpleStringProperty(index12);
+    }
+
+    public ModelTableDetail(String index01,
+                            String index02,
+                            String index03,
+                            String index04,
+                            String index05,
+                            String index06,
+                            String index07,
+                            String index08,
+                            String index09) {
+
+        this.index01 = new SimpleStringProperty(index01);
+        this.index02 = new SimpleStringProperty(index02);
+        this.index03 = new SimpleStringProperty(index03);
+        this.index04 = new SimpleStringProperty(index04);
+        this.index05 = new SimpleStringProperty(index05);
+        this.index06 = new SimpleStringProperty(index06);
+        this.index07 = new SimpleStringProperty(index07);
+        this.index08 = new SimpleStringProperty(index08);
+        this.index09 = new SimpleStringProperty(index09);
+    }
 
     public String getIndex01() {
         return index01.get();
@@ -218,9 +330,7 @@ public class ModelTableDetail {
         this.index10.set(index10);
     }
 
-    public String getIndex11() {
-        return index11.get();
-    }
+    public String getIndex11() {return index11.get();}
 
     public void setIndex11(String index11) {
         this.index11.set(index11);
@@ -264,5 +374,12 @@ public class ModelTableDetail {
 
     public void setIndex16(String index16) {
         this.index16.set(index16);
+    }
+
+    public String getIndex17() {
+        return index17.get();
+    }
+    public void setIndex17(String index17) {
+        this.index17.set(index17);
     }
 }
