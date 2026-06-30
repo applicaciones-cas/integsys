@@ -46,6 +46,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -1628,6 +1629,14 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
                     break;
+                case "tblVwJournalProposalList":
+                    if (journalproposalmain_data.isEmpty()) {
+                        return;
+                    }
+                    newIndex = isMovedDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+                    pnMainJEP = newIndex;
+                    loadTableDetailFromMainJEP();
+                    break;
                 case "tblVwJournalProposalDetails":
                     if (journalproposal_data.isEmpty()) {
                         return;
@@ -1685,7 +1694,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apBrowse, apJournalMaster, apJournalDetails, apJournalProposalMaster, apJournalProposalDetails, apBIRDetail);
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount);
-
+        taJournalProposalRemarks.setOnKeyPressed(this::txtField_KeyPressed);
         JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         JFXUtil.applyHoverTooltip("Undo Reverse", btnUndo);
         Platform.runLater(() -> {
@@ -2199,9 +2208,9 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
-        TextField txtField = (TextField) event.getSource();
-        String lsID = (((TextField) event.getSource()).getId());
-        String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+        TextInputControl txtInput = (TextInputControl) event.getSource();
+        String lsID = txtInput.getId();
+        String lsValue = txtInput.getText() == null ? "" : txtInput.getText();
         String lsBranchCode = "";
         String lsDeparment = "";
         poJSON = new JSONObject();
@@ -2222,7 +2231,10 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         if (tfBaseAmount.isFocused()) {
                             pbEnteredBIR = true;
                         }
-                        CommonUtils.SetNextFocus(txtField);
+                        if (txtInput instanceof TextField) {
+                            TextField txtField = (TextField) txtInput;
+                            CommonUtils.SetNextFocus(txtField);
+                        }
                         event.consume();
                         break;
                     case F3:
@@ -2533,6 +2545,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                             {new String[]{"tfPurchasedAmountDetail", "tfTaxCodeDetail", "tfParticularsDetail"}, (Runnable) () -> moveNext(true, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
                             {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(true, true)},
+                            {new String[]{"tfJournalProposalBranch", "tfJournalProposalDepartment", "taJournalProposalRemarks"}, (Runnable) () -> moveNextJEPMain(true, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
                         });
                         event.consume();
@@ -2542,6 +2555,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                             {new String[]{"tfPurchasedAmountDetail", "tfTaxCodeDetail", "tfParticularsDetail"}, (Runnable) () -> moveNext(false, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
                             {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(false, true)},
+                            {new String[]{"tfJournalProposalBranch", "tfJournalProposalDepartment", "taJournalProposalRemarks"}, (Runnable) () -> moveNextJEPMain(false, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
                         });
                         event.consume();
@@ -2590,6 +2604,21 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    public void moveNextJEPMain(boolean isUp, boolean continueNext) {
+        if (continueNext) {
+            apJournalProposalMaster.requestFocus();
+            pnMainJEP = isUp ? JFXUtil.moveToPreviousRow(tblVwJournalProposalList) : JFXUtil.moveToNextRow(tblVwJournalProposalList);
+        }
+        loadTableDetailFromMainJEP();
+        if (pnMainJEP < 0 || pnMainJEP > poController.getJournalProposalList().size()) {
+            return;
+        }
+        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
+            {poController.JournalProposal(pnMainJEP).Master().getDepartmentId(), tfJournalProposalDepartment},
+            {poController.JournalProposal(pnMainJEP).Master().getRemarks(), taJournalProposalRemarks},}, taJournalProposalRemarks); // default
     }
 
     public void moveNextJE(boolean isUp, boolean continueNext) {

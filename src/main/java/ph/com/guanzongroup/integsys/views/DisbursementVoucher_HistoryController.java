@@ -41,6 +41,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -1248,6 +1249,14 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
                     break;
+                case "tblVwJournalProposalList":
+                    if (journalproposalmain_data.isEmpty()) {
+                        return;
+                    }
+                    newIndex = isMovedDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+                    pnMainJEP = newIndex;
+                    loadTableDetailFromMainJEP();
+                    break;
                 case "tblVwJournalProposalDetails":
                     if (journalproposal_data.isEmpty()) {
                         return;
@@ -1308,16 +1317,19 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
-        TextField txtField = (TextField) event.getSource();
-        String lsID = (((TextField) event.getSource()).getId());
-        String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+        TextInputControl txtInput = (TextInputControl) event.getSource();
+        String lsID = txtInput.getId();
+        String lsValue = txtInput.getText() == null ? "" : txtInput.getText();
         poJSON = new JSONObject();
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        CommonUtils.SetNextFocus(txtField);
+                        if (txtInput instanceof TextField) {
+                            TextField txtField = (TextField) txtInput;
+                            CommonUtils.SetNextFocus(txtField);
+                        }
                         event.consume();
                         break;
                     case F3:
