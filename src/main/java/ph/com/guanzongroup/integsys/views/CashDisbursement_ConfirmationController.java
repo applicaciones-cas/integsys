@@ -652,6 +652,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                             lsStat = "void";
                             break;
                         case CashDisbursementStatus.CONFIRMED:
+                        default:
                             lsStat = "cancel";
                             break;
                     }
@@ -664,6 +665,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                     poJSON = poController.VoidTransaction();
                                     break;
                                 case CashDisbursementStatus.CONFIRMED:
+                                default:
                                     poJSON = poController.CancelTransaction();
                                     break;
                             }
