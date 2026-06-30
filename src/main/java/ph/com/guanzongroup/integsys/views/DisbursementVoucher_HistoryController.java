@@ -1138,7 +1138,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
             if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
-                moveNextJEPMain(false, false);
                 initButton(pnEditMode);
             }
         });
