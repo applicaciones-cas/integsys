@@ -1532,9 +1532,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         );
         tblVwJournalProposalList.setOnMouseClicked(event -> {
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
-            ;
             if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
+                moveNextJEPMain(false, false);
                 initButton(pnEditMode);
             }
         });

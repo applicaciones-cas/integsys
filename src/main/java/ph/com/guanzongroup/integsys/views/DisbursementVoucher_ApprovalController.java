@@ -1517,6 +1517,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
             if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
+                moveNextJEPMain(false, false);
                 initButton(pnEditMode);
             }
         });

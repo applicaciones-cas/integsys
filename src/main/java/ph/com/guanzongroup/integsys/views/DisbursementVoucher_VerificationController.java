@@ -1459,6 +1459,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
             if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
+                moveNextJEPMain(false, false);
                 initButton(pnEditMode);
             }
         });
