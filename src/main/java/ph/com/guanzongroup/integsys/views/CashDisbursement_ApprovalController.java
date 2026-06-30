@@ -167,7 +167,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     @FXML
     private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatAmountDetail, tfAmountDetail, tfCashAdvParticular, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfJournalProposalTransactionNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnApprove, btnDisapprove, btnReturn, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnApprove,btnPrint, btnDisapprove, btnReturn, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain;
     @FXML
@@ -471,7 +471,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnReturn, btnApprove, btnUpdate, btnSearch, btnSave, btnCancel, btnDisapprove, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnReturn, btnPrint, btnApprove, btnUpdate, btnSearch, btnSave, btnCancel, btnDisapprove, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -480,6 +480,12 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             poJSON = new JSONObject();
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
+                case "btnPrint":
+                    poJSON = poController.printTransaction();
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    break;
                 case "btnUpdate":
                     if (!CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
                         String lsUserId = oApp.getUserID();
@@ -705,7 +711,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint","btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -3048,7 +3054,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         boolean lbShow2 = (fnEditMode == EditMode.READY);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel, btnSearch);
-        JFXUtil.setButtonsVisibility(false, btnUpdate, btnDisapprove, btnReturn);
+        JFXUtil.setButtonsVisibility(false, btnPrint,btnUpdate, btnDisapprove, btnReturn);
 
         JFXUtil.setButtonsVisibility(lbShow2, btnApprove);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
@@ -3070,9 +3076,12 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 case CashDisbursementStatus.OPEN:
                 case CashDisbursementStatus.VOID:
                 case CashDisbursementStatus.CANCELLED:
-                case CashDisbursementStatus.APPROVED:
                 default:
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnUpdate, btnReturn);
+                    break;
+                case CashDisbursementStatus.APPROVED:
+                    JFXUtil.setButtonsVisibility(false, btnApprove, btnUpdate, btnReturn);
+                    JFXUtil.setButtonsVisibility(true, btnPrint);
                     break;
             }
 //            if (JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(),
