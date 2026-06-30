@@ -597,10 +597,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     if (pnEditMode == EditMode.READY) {
                         if (CashDisbursementStatus.OPEN.equals(poController.Master().getTransactionStatus())
                                 || CashDisbursementStatus.RETURNED.equals(poController.Master().getTransactionStatus())) {
-                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                                if (!checkJEorJEPSaving()) {
-                                    break;
-                                }
+                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { 
                                 if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                     break;
