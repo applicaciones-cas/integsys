@@ -1054,7 +1054,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 moveNextBIR(false, false);
             }
         });
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalList,tblVwBIRDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalList, tblVwJournalProposalDetails, tblVwBIRDetails);
     }
 
     private void tableKeyEvents(KeyEvent event) {
