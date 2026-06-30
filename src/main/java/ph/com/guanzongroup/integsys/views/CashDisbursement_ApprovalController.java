@@ -48,6 +48,7 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -167,7 +168,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     @FXML
     private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatAmountDetail, tfAmountDetail, tfCashAdvParticular, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfJournalProposalTransactionNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnApprove,btnPrint, btnDisapprove, btnReturn, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnApprove, btnPrint, btnDisapprove, btnReturn, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain;
     @FXML
@@ -630,15 +631,15 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 ////                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
 ////                                    return;
 //                            } else {
-                                poJSON = poController.ApproveTransaction();
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    return;
-                                } else {
-                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                }
+                            poJSON = poController.ApproveTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                            }
 //                            }
 
                         }
@@ -711,7 +712,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint","btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint", "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -1432,6 +1433,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
             if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
+                moveNextJEPMain(false, false);
                 initButton(pnEditMode);
             }
         });
@@ -1453,7 +1455,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelCashDisbursement_Main) item).getIndex01(), highlightedRowsMain);
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalProposalDetails, tblVwJournalDetails, tblVwBIRDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalProposalDetails, tblVwJournalProposalList, tblVwJournalDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails);
     }
 
@@ -1486,6 +1488,14 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
+                    break;
+                case "tblVwJournalProposalList":
+                    if (journalproposalmain_data.isEmpty()) {
+                        return;
+                    }
+                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+                    pnMainJEP = newIndex;
+                    loadTableDetailFromMainJEP();
                     break;
                 case "tblVwJournalProposalDetails":
                     if (journalproposal_data.isEmpty()) {
@@ -1532,8 +1542,9 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         JFXUtil.setFocusListener(txtJournalProposalDetails_Focus, apJournalProposalDetails);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apJournalProposalMaster, apJournalProposalDetails, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments);
+        taJournalProposalRemarks.setOnKeyPressed(this::txtField_KeyPressed);
 
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments);
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBaseAmount, tfAmountDetail);
         JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         Platform.runLater(() -> {
@@ -2057,9 +2068,9 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
-        TextField txtField = (TextField) event.getSource();
-        String lsID = (((TextField) event.getSource()).getId());
-        String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+        TextInputControl txtInput = (TextInputControl) event.getSource();
+        String lsID = txtInput.getId();
+        String lsValue = txtInput.getText() == null ? "" : txtInput.getText();
         poJSON = new JSONObject();
         String lsBranchCode = "";
         String lsDeparment = "";
@@ -2084,7 +2095,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         if (tfBaseAmount.isFocused()) {
                             pbEnteredBIR = true;
                         }
-                        CommonUtils.SetNextFocus(txtField);
+                        if (txtInput instanceof TextField) {
+                            TextField txtField = (TextField) txtInput;
+                            CommonUtils.SetNextFocus(txtField);
+                        }
                         event.consume();
                         break;
                     case F3:
@@ -2394,6 +2408,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
                             {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(true, true)},
+                            {new String[]{"tfJournalProposalBranch", "tfJournalProposalDepartment", "taJournalProposalRemarks"}, (Runnable) () -> moveNextJEPMain(true, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
                         });
                         event.consume();
@@ -2402,7 +2417,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         JFXUtil.altSwitch(lsID, new Object[][]{
                             {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
-                            {new String[]{"tfJournalProposalAccountCode", "tfJournalProposalAccountDescription", "tfJournalProposalCreditAmount"}, (Runnable) () -> moveNextJEP(false, true)},
+                            {new String[]{"tfJournalProposalBranch", "tfJournalProposalDepartment", "taJournalProposalRemarks"}, (Runnable) () -> moveNextJEPMain(false, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
                         });
                         event.consume();
@@ -2485,6 +2500,21 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    public void moveNextJEPMain(boolean isUp, boolean continueNext) {
+        if (continueNext) {
+            apJournalProposalMaster.requestFocus();
+            pnMainJEP = isUp ? JFXUtil.moveToPreviousRow(tblVwJournalProposalList) : JFXUtil.moveToNextRow(tblVwJournalProposalList);
+        }
+        loadTableDetailFromMainJEP();
+        if (pnMainJEP < 0 || pnMainJEP > poController.getJournalProposalList().size()) {
+            return;
+        }
+        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
+            {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
+            {poController.JournalProposal(pnMainJEP).Master().getRemarks(), taJournalProposalRemarks},}, taJournalProposalRemarks); // default
     }
 
     public void moveNextBIR(boolean isUp, boolean continueNext) {
@@ -3054,7 +3084,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         boolean lbShow2 = (fnEditMode == EditMode.READY);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel, btnSearch);
-        JFXUtil.setButtonsVisibility(false, btnPrint,btnUpdate, btnDisapprove, btnReturn);
+        JFXUtil.setButtonsVisibility(false, btnPrint, btnUpdate, btnDisapprove, btnReturn);
 
         JFXUtil.setButtonsVisibility(lbShow2, btnApprove);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
@@ -3071,7 +3101,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     break;
                 case CashDisbursementStatus.CONFIRMED:
                 case CashDisbursementStatus.VERIFIED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove,btnReturn);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove, btnReturn);
                     break;
                 case CashDisbursementStatus.OPEN:
                 case CashDisbursementStatus.VOID:
