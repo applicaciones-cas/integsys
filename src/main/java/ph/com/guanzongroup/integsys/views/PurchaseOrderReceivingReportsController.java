@@ -78,7 +78,7 @@ public class PurchaseOrderReceivingReportsController implements Initializable, S
     JSONArray data;
 
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
-    ObservableList<String> Status = FXCollections.observableArrayList("ALL", "OPEN", "CONFIRMED", "PROCESSED", "CANCELLED", "VOID", "APPROVED", "POSTED", "RETURNED", "APPROVED+");
+    ObservableList<String> Status = FXCollections.observableArrayList("ALL", "OPEN", "CONFIRMED", "POSTED", "CANCELLED", "VOID", "PAID", "RETURNED");
 
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
@@ -153,7 +153,7 @@ public class PurchaseOrderReceivingReportsController implements Initializable, S
         InitCriterea();
         initComboboxes();
         initDefaultDateRange();
-        poPurchasingController.PurchaseOrderReceiving().setTransactionStatus("E01234569");
+        poPurchasingController.PurchaseOrderReceiving().setTransactionStatus("0123456");
         initTableDetail();
         initPrint();
 
@@ -190,7 +190,6 @@ public class PurchaseOrderReceivingReportsController implements Initializable, S
                         loadTableMaster();
                         break;
                 }
-//                loadRecordMaster();
             }
     );
 
@@ -237,25 +236,21 @@ public class PurchaseOrderReceivingReportsController implements Initializable, S
     private String getTranStatus(String status) {
         switch (status) {
             case "ALL":
-                return "E01234569";
+                return "0123456";
             case "OPEN":
                 return "0";
             case "CONFIRMED":
                 return "1";
-            case "PROCESSED":
+            case "POSTED":
                 return "2";
             case "CANCELLED":
                 return "3";
             case "VOID":
                 return "4";
-            case "APPROVED":
+            case "PAID":
                 return "5";
-            case "POSTED":
-                return "6";
             case "RETURNED":
-                return "9";
-            case "APPROVED+":
-                return "E";
+                return "6";
             default:
                 return null;
         }
