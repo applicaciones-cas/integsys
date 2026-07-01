@@ -325,7 +325,19 @@ public class InventoryCountController implements Initializable, ScreenInterface 
                         return;
                     }
                     clearAllInputs();
+                    if (!isJSONSuccess(poAppController.loadInventoryCountType(), "Initialize load default Inventory Count type")) {
+                        // no default must be auto close the entry form
+                        unloadForm appUnload = new unloadForm();
+                        stageAttachment.closeDialog();
+                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
 
+                        return;
+                    }
+
+                    tfInventoryCountType.setText(poAppController.getMaster().InventoryCountType().getDescription());
+                    loadTransactionDetailList();
+
+                    JFXUtil.clickTabByTitleText(tabPaneMain, "Details");
                     loadTableAttachment.reload();
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
@@ -820,7 +832,9 @@ public class InventoryCountController implements Initializable, ScreenInterface 
     }
 
     private void loadSelectedTransactionDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
-
+        if (fnRow <= 0 ){
+        return;
+        }
         int tblIndex = fnRow - 1;
 
         tfBarcode.setText(tblColBarcode.getCellData(tblIndex));
@@ -829,7 +843,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         tfMeasure.setText(tblColMeasure.getCellData(tblIndex));
 
         //---------------------------Stock Detail------------------------------------
-        tfSupersede.setText(poAppController.getDetail(fnRow).Inventory().Superseded().getBarCode() == null
+        tfSupersede.setText( poAppController.getDetail(fnRow).getStockId().isEmpty()
                 ? "" : poAppController.getDetail(fnRow).Inventory().Superseded().getBarCode());
         tfModel.setText(poAppController.getDetail(fnRow).Inventory().Model().getDescription());
         tfVariant.setText(poAppController.getDetail(fnRow).Inventory().Variant().getDescription());
@@ -1145,7 +1159,7 @@ public class InventoryCountController implements Initializable, ScreenInterface 
         });
     }
 
-     private void initializeTableDetail() {
+    private void initializeTableDetail() {
         if (laTransactionDetail == null) {
             laTransactionDetail = FXCollections.observableArrayList();
 
