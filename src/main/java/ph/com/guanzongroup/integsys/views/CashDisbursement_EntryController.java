@@ -2578,7 +2578,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         }
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
             {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
-            {poController.JournalProposal(pnMainJEP).Master().getBranchCode(), tfJournalProposalBranch},
+            {poController.JournalProposal(pnMainJEP).Master().getDepartmentId(), tfJournalProposalDepartment},
             {poController.JournalProposal(pnMainJEP).Master().getRemarks(), taJournalProposalRemarks},}, taJournalProposalRemarks); // default
     }
 
