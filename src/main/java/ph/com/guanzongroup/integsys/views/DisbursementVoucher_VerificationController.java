@@ -731,6 +731,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     apButton,
                     () -> {
                         try {
+                            poController.setForm(DisbursementStatic.VERIFIED);
                             JSONObject loSaveJSON = poController.SaveTransaction();
                             loProcessResult.set(loSaveJSON);
 

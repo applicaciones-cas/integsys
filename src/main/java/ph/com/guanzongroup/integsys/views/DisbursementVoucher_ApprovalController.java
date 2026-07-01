@@ -788,6 +788,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     apButton,
                     () -> {
                         try {
+                            poController.setForm(DisbursementStatic.APPROVED);
                             JSONObject loSaveJSON = poController.SaveTransaction();
                             loProcessResult.set(loSaveJSON);
 
